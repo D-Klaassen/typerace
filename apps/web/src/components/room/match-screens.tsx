@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RaceProgress } from "./race-progress";
+import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
 
 type Race = NonNullable<RoomView["race"]>;
@@ -126,6 +127,15 @@ export function Spectating({
           you={you}
         />
       )}
+      {room.darts && (
+        <CrazyDartsMatch
+          darts={room.darts}
+          startingHp={room.settings.startingHp}
+          you={you}
+          nicknames={nicknames}
+          clockOffsetMs={clockOffsetMs}
+        />
+      )}
       {room.timeTrial && (
         <OnlineTimeTrial
           timeTrial={room.timeTrial}
@@ -137,16 +147,6 @@ export function Spectating({
       )}
     </div>
   );
-}
-
-interface ResultRow {
-  playerId: string;
-  /** Classic Race: Time, or progress when unfinished. Time Trial: best Time. */
-  time: string;
-  turns?: number;
-  wpm: number;
-  accuracy: number;
-  typos: number;
 }
 
 export function OnlineResults({
@@ -163,29 +163,8 @@ export function OnlineResults({
   const t = useTranslations("Room");
   const common = useTranslations("Common");
   const seconds = (ms: number) => common("seconds", { value: ms / 1000 });
-  const results = room.results;
-  const isTimeTrial = results?.mode === "timeTrial";
-
-  const rows: ResultRow[] =
-    results?.mode === "timeTrial"
-      ? results.ranking.map((result) => ({
-          playerId: result.name,
-          time: result.bestTimeMs === null ? "–" : seconds(result.bestTimeMs),
-          turns: result.turns,
-          wpm: result.wpm,
-          accuracy: result.accuracy,
-          typos: result.typos,
-        }))
-      : (results?.ranking ?? []).map((result) => ({
-          playerId: result.playerId,
-          time:
-            result.timeMs === null
-              ? common("percent", { value: result.progress })
-              : seconds(result.timeMs),
-          wpm: result.wpm,
-          accuracy: result.accuracy,
-          typos: result.typos,
-        }));
+  const percent = (value: number) => common("percent", { value });
+  const { headers, rows } = resultTable(room.results, { t, seconds, percent });
   const winner = rows[0];
 
   return (
@@ -200,15 +179,11 @@ export function OnlineResults({
           <TableRow>
             <TableHead>#</TableHead>
             <TableHead>{t("player")}</TableHead>
-            <TableHead className="text-right">
-              {isTimeTrial ? t("bestTime") : t("time")}
-            </TableHead>
-            {isTimeTrial && (
-              <TableHead className="text-right">{t("turns")}</TableHead>
-            )}
-            <TableHead className="text-right">{t("wpm")}</TableHead>
-            <TableHead className="text-right">{t("accuracy")}</TableHead>
-            <TableHead className="text-right">{t("typos")}</TableHead>
+            {headers.map((header) => (
+              <TableHead key={header} className="text-right">
+                {header}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -218,23 +193,11 @@ export function OnlineResults({
               <TableCell className="font-medium">
                 {nicknames[row.playerId] ?? "?"}
               </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.time}
-              </TableCell>
-              {isTimeTrial && (
-                <TableCell className="text-right tabular-nums">
-                  {row.turns}
+              {row.cells.map((cell, cellIndex) => (
+                <TableCell key={cellIndex} className="text-right tabular-nums">
+                  {cell}
                 </TableCell>
-              )}
-              <TableCell className="text-right tabular-nums">
-                {Math.round(row.wpm)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {common("percent", { value: row.accuracy })}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.typos}
-              </TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>
@@ -248,4 +211,67 @@ export function OnlineResults({
       )}
     </div>
   );
+}
+
+interface ResultTable {
+  headers: string[];
+  rows: { playerId: string; cells: (string | number)[] }[];
+}
+
+function resultTable(
+  results: RoomView["results"],
+  {
+    t,
+    seconds,
+    percent,
+  }: {
+    t: (key: string) => string;
+    seconds: (ms: number) => string;
+    percent: (value: number) => string;
+  },
+): ResultTable {
+  const stats = (result: { wpm: number; accuracy: number; typos: number }) => [
+    Math.round(result.wpm),
+    percent(result.accuracy),
+    result.typos,
+  ];
+  const statHeaders = [t("wpm"), t("accuracy"), t("typos")];
+
+  switch (results?.mode) {
+    case "timeTrial":
+      return {
+        headers: [t("bestTime"), t("turns"), ...statHeaders],
+        rows: results.ranking.map((result) => ({
+          playerId: result.name,
+          cells: [
+            result.bestTimeMs === null ? "–" : seconds(result.bestTimeMs),
+            result.turns,
+            ...stats(result),
+          ],
+        })),
+      };
+    case "crazyDarts":
+      return {
+        headers: [t("hpLeft"), t("damageDealt"), ...statHeaders],
+        rows: results.ranking.map((result) => ({
+          playerId: result.playerId,
+          cells: [result.hp, result.damageDealt, ...stats(result)],
+        })),
+      };
+    case "classicRace":
+      return {
+        headers: [t("time"), ...statHeaders],
+        rows: results.ranking.map((result) => ({
+          playerId: result.playerId,
+          cells: [
+            result.timeMs === null
+              ? percent(result.progress)
+              : seconds(result.timeMs),
+            ...stats(result),
+          ],
+        })),
+      };
+    default:
+      return { headers: [], rows: [] };
+  }
 }

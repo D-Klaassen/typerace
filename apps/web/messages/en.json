@@ -142,7 +142,6 @@
     "start": "Start Match",
     "needTwoPlayers": "You need at least two Players to start.",
     "waitingForStart": "Waiting for the Host to start the Match.",
-    "modeSoon": "Crazy Darts can’t be played Online yet. Pick another Mode to start a Match.",
     "getReady": "Get ready…",
     "progressLabel": "Race progress",
     "finishedWaiting": "Finished! Waiting for the others…",
@@ -160,6 +159,14 @@
     "theirTurn": "{name}’s Turn",
     "turnDone": "Done! Next up…",
     "bestTime": "Best time",
-    "turns": "Turns"
+    "turns": "Turns",
+    "youAreOut": "You’re out! Watch who wins…",
+    "hpLabel": "HP",
+    "hp": "{hp} HP",
+    "out": "Out",
+    "dartsLabel": "Latest Darts",
+    "dartLine": "{from} 🎯 {to} −{damage}",
+    "hpLeft": "HP left",
+    "damageDealt": "Damage dealt"
   }
 }

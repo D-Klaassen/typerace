@@ -54,16 +54,6 @@ describe("Room Matches", () => {
     expect(counting.countdownEndsAtMs).toBe(4_000);
   });
 
-  it("only starts Modes that can be played Online so far", () => {
-    const room = updateSettings(roomWith("Anna", "Bob"), "p1", {
-      mode: "crazyDarts",
-    });
-
-    expect(startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 })).toBe(
-      room,
-    );
-  });
-
   it("starts racing when the countdown ends", () => {
     let room = startCountdown(roomWith("Anna", "Bob"), "p1", {
       text: "ab",
@@ -205,5 +195,45 @@ describe("Room Matches", () => {
 
     expect(room.phase).toBe("results");
     expect(room.timeTrial?.trial.winner).toBe("p2");
+  });
+
+  it("plays Crazy Darts until one Player has HP left", () => {
+    let room = updateSettings(roomWith("Anna", "Bob"), "p1", {
+      mode: "crazyDarts",
+      startingHp: 2,
+    });
+    room = advanceClock(
+      startCountdown(room, "p1", { text: "unused", seed: 3, nowMs: 0 }),
+      3_000,
+    );
+    expect(room.phase).toBe("racing");
+
+    const darts = room.darts!;
+    const firstWord = darts.text.slice(0, darts.text.indexOf(" "));
+    for (const key of firstWord) {
+      room = typeInRoom(room, "p1", key, 4_000, () => 0);
+    }
+
+    // Every word is at least 2 characters, so Bob's 2 HP are gone.
+    expect(room.phase).toBe("results");
+    expect(room.darts?.winner).toBe("p1");
+
+    room = backToLobby(room, "p1");
+    expect(room.darts).toBeNull();
+  });
+
+  it("puts a Crazy Darts Player who leaves out", () => {
+    let room = updateSettings(roomWith("Anna", "Bob", "Cas"), "p1", {
+      mode: "crazyDarts",
+    });
+    room = advanceClock(
+      startCountdown(room, "p1", { text: "unused", seed: 3, nowMs: 0 }),
+      3_000,
+    );
+
+    room = leaveRoom(leaveRoom(room, "p2"), "p3");
+
+    expect(room.phase).toBe("results");
+    expect(room.darts?.outOrder).toEqual(["p2", "p3"]);
   });
 });

@@ -17,6 +17,7 @@ import {
   RaceTyping,
   Spectating,
 } from "./match-screens";
+import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
 import { useRoom } from "./use-room";
 
@@ -91,6 +92,18 @@ function ValidRoom({ code }: { code: string }) {
       <Countdown
         endsAtMs={view.countdownEndsAtMs}
         clockOffsetMs={room.clockOffsetMs}
+      />
+    );
+  }
+  if (view.phase === "racing" && view.darts) {
+    return (
+      <CrazyDartsMatch
+        darts={view.darts}
+        startingHp={view.settings.startingHp}
+        you={you}
+        nicknames={room.nicknames}
+        clockOffsetMs={room.clockOffsetMs}
+        onKey={room.key}
       />
     );
   }

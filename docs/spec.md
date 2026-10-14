@@ -67,7 +67,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Text per game:**
   - In an Online Classic Race, everyone types the same text at once.
   - Every Turn gets fresh Gibberish of the same length and Difficulty.
-  - Crazy Darts text is endless: more is generated ahead of the Players as they type.
+  - Crazy Darts text is endless in practice: 5,000 characters (about 15 minutes at 70 WPM), generated from a seed by both the Room and the browser so the text never has to be sent along with every update.
 
 ## Typing engine (shared by every Mode)
 

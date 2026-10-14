@@ -1,6 +1,13 @@
 import type { Difficulty } from "./gibberish";
 import { validateNicknames, type NicknameProblem } from "./nicknames";
 import {
+  crazyDartsText,
+  dropFromDarts,
+  startCrazyDarts,
+  typeInDarts,
+  type CrazyDarts,
+} from "./crazy-darts";
+import {
   advanceTimeTrial,
   dropFromTimeTrial,
   startOnlineTimeTrial,
@@ -21,7 +28,11 @@ export const MAX_ROOM_PLAYERS = 6;
 export const COUNTDOWN_MS = 3_000;
 
 /** Modes that can already be played Online. */
-export const ONLINE_MODES: readonly Mode[] = ["classicRace", "timeTrial"];
+export const ONLINE_MODES: readonly Mode[] = [
+  "classicRace",
+  "crazyDarts",
+  "timeTrial",
+];
 
 export type Mode = "classicRace" | "crazyDarts" | "timeTrial";
 
@@ -85,6 +96,8 @@ export interface Room {
   readonly race: OnlineRace | null;
   /** The current or last Time Trial; null in the lobby. */
   readonly timeTrial: OnlineTimeTrial | null;
+  /** The current or last Crazy Darts; null in the lobby. */
+  readonly darts: CrazyDarts | null;
   /** Seeds the Match's Gibberish where the Room generates it (Time Trial). */
   readonly seed: number;
 }
@@ -120,6 +133,7 @@ export function createRoom(): Room {
     text: null,
     race: null,
     timeTrial: null,
+    darts: null,
     seed: 0,
   };
 }
@@ -172,6 +186,12 @@ export function leaveRoom(room: Room, playerId: string): Room {
 
   if (left.phase !== "racing") {
     return left;
+  }
+  if (left.darts) {
+    return finishIfOver(
+      { ...left, darts: dropFromDarts(left.darts, playerId) },
+      -Infinity,
+    );
   }
   if (left.timeTrial) {
     return finishIfOver(
@@ -279,6 +299,22 @@ export function advanceClock(room: Room, nowMs: number): Room {
       countdownEndsAtMs: null,
     } as const;
 
+    if (room.settings.mode === "crazyDarts") {
+      const { difficulty, startingHp, dartDamagePerCharacter, typoHp } =
+        room.settings;
+
+      return {
+        ...started,
+        darts: startCrazyDarts({
+          players,
+          text: crazyDartsText(room.seed, difficulty),
+          startingHp,
+          dartDamagePerCharacter,
+          typoHp,
+        }),
+      };
+    }
+
     return room.settings.mode === "timeTrial"
       ? {
           ...started,
@@ -309,15 +345,24 @@ export function advanceClock(room: Room, nowMs: number): Room {
   return finishIfOver(room, nowMs);
 }
 
-/** A Player's keystroke during a race, timed on the Room's clock. */
+/**
+ * A Player's keystroke during a Match, timed on the Room's clock. `random`
+ * breaks ties when a Crazy Darts Dart picks its target.
+ */
 export function typeInRoom(
   room: Room,
   playerId: string,
   key: string,
   atMs: number,
+  random: () => number = Math.random,
 ): Room {
   if (room.phase !== "racing") {
     return room;
+  }
+  if (room.darts) {
+    const darts = typeInDarts(room.darts, playerId, key, atMs, random);
+
+    return darts === room.darts ? room : finishIfOver({ ...room, darts }, atMs);
   }
   if (room.timeTrial) {
     const timeTrial = typeInTimeTrial(room.timeTrial, playerId, key, atMs);
@@ -350,15 +395,18 @@ export function backToLobby(room: Room, byId: string): Room {
     text: null,
     race: null,
     timeTrial: null,
+    darts: null,
     players: room.players.map((player) => ({ ...player, spectator: false })),
   };
 }
 
 /** Ends a running race once it's over; Votes reset after every Match. */
 function finishIfOver(room: Room, nowMs: number): Room {
-  const over = room.timeTrial
-    ? room.timeTrial.trial.winner !== null
-    : room.race !== null && isRaceOver(room.race, nowMs);
+  const over = room.darts
+    ? room.darts.winner !== null
+    : room.timeTrial
+      ? room.timeTrial.trial.winner !== null
+      : room.race !== null && isRaceOver(room.race, nowMs);
   if (room.phase !== "racing" || !over) {
     return room;
   }

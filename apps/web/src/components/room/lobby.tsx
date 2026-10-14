@@ -152,7 +152,7 @@ function StartArea({
   const t = useTranslations("Room");
 
   if (!ONLINE_MODES.includes(mode)) {
-    return <p className="text-sm text-muted-foreground">{t("modeSoon")}</p>;
+    return null;
   }
   if (!isHost) {
     return (

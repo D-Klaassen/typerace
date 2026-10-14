@@ -1,7 +1,11 @@
 import {
   currentTimeBankMs,
+  getCrazyDartsResults,
   getOnlineRaceResults,
   getTimeTrialResults,
+  type CrazyDartsResult,
+  type Dart,
+  type Difficulty,
   type JoinError,
   type OnlineRaceResult,
   type Room,
@@ -108,24 +112,57 @@ export interface TimeTrialView {
   } | null;
 }
 
+/** How many recent Darts the clients get, to show who hit whom. */
+const RECENT_DARTS = 8;
+
+/** Crazy Darts as the clients see it. */
+export interface DartsView {
+  /**
+   * The browser rebuilds the long text from this seed rather than receiving
+   * it with every update; everyone sees the same text anyway.
+   */
+  textSeed: number;
+  difficulty: Difficulty;
+  players: {
+    playerId: string;
+    position: number;
+    hp: number;
+    out: boolean;
+  }[];
+  /** The latest Darts, oldest first. */
+  recentDarts: Dart[];
+}
+
 export type RoomResults =
   | { mode: "classicRace"; ranking: OnlineRaceResult[] }
+  | { mode: "crazyDarts"; ranking: CrazyDartsResult[] }
   | { mode: "timeTrial"; ranking: TimeTrialResult[] };
 
 /** The Room as sent to clients: no per-racer copies of the text. */
-export type RoomView = Omit<Room, "race" | "timeTrial" | "seed"> & {
+export type RoomView = Omit<Room, "race" | "timeTrial" | "darts" | "seed"> & {
   race: { text: string; startedAtMs: number; racers: RacerView[] } | null;
   timeTrial: TimeTrialView | null;
+  darts: DartsView | null;
   /** The ranking once a Match is over; null before that. */
   results: RoomResults | null;
 };
 
 export function toRoomView(room: Room): RoomView {
-  const { race, timeTrial, seed, ...rest } = room;
-  void seed; // stays on the server, so nobody can generate the coming texts
+  const { race, timeTrial, darts, seed, ...rest } = room;
 
   return {
     ...rest,
+    darts: darts && {
+      textSeed: seed,
+      difficulty: room.settings.difficulty,
+      players: darts.players.map(({ playerId, session, hp, out }) => ({
+        playerId,
+        position: session.position,
+        hp,
+        out,
+      })),
+      recentDarts: darts.darts.slice(-RECENT_DARTS),
+    },
     timeTrial: timeTrial && {
       trial: timeTrial.trial,
       turn: timeTrial.turn && {
@@ -154,6 +191,12 @@ export function toRoomView(room: Room): RoomView {
 function resultsOf(room: Room): RoomResults | null {
   if (room.phase !== "results") {
     return null;
+  }
+  if (room.darts) {
+    return {
+      mode: "crazyDarts",
+      ranking: getCrazyDartsResults(room.darts),
+    };
   }
   if (room.timeTrial) {
     return {

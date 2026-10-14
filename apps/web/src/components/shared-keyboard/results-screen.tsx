@@ -1,4 +1,3 @@
-import { getTimeTrialResults, type TimeTrial } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,34 +9,64 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+export interface ResultRow {
+  name: string;
+  /** Classic Race: the Turn's Time. */
+  timeMs?: number;
+  /** Time Trial: fastest finished Turn. */
+  bestTimeMs?: number | null;
+  /** Time Trial: number of Turns taken. */
+  turns?: number;
+  wpm: number;
+  accuracy: number;
+  typos: number;
+}
+
+type Column = "time" | "bestTime" | "turns" | "wpm" | "accuracy" | "typos";
+
+/** Final ranking for any Mode; `results` must already be in rank order. */
 export function ResultsScreen({
-  trial,
+  results,
+  columns,
   onPlayAgain,
   onBackToSetup,
 }: {
-  trial: TimeTrial;
+  results: ResultRow[];
+  columns: Column[];
   onPlayAgain: () => void;
   onBackToSetup: () => void;
 }) {
   const t = useTranslations("SharedKeyboard.Results");
   const common = useTranslations("Common");
-  const results = getTimeTrialResults(trial);
+  const seconds = (ms: number | null | undefined) =>
+    ms === null || ms === undefined
+      ? "–"
+      : common("seconds", { value: ms / 1000 });
+
+  const cell: Record<Column, (result: ResultRow) => string | number> = {
+    time: (result) => seconds(result.timeMs),
+    bestTime: (result) => seconds(result.bestTimeMs),
+    turns: (result) => result.turns ?? "–",
+    wpm: (result) => Math.round(result.wpm),
+    accuracy: (result) => common("percent", { value: result.accuracy }),
+    typos: (result) => result.typos,
+  };
 
   return (
     <div className="flex w-full max-w-3xl flex-col items-center gap-6">
       <h2 className="text-4xl font-bold">
-        {t("winner", { name: trial.winner ?? "" })}
+        {t("winner", { name: results[0]?.name ?? "" })}
       </h2>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>{t("rank")}</TableHead>
             <TableHead>{t("player")}</TableHead>
-            <TableHead className="text-right">{t("bestTime")}</TableHead>
-            <TableHead className="text-right">{t("turns")}</TableHead>
-            <TableHead className="text-right">{t("wpm")}</TableHead>
-            <TableHead className="text-right">{t("accuracy")}</TableHead>
-            <TableHead className="text-right">{t("typos")}</TableHead>
+            {columns.map((column) => (
+              <TableHead key={column} className="text-right">
+                {t(column)}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -45,23 +74,11 @@ export function ResultsScreen({
             <TableRow key={result.name}>
               <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{result.name}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {result.bestTimeMs === null
-                  ? "–"
-                  : common("seconds", { value: result.bestTimeMs / 1000 })}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {result.turns}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {Math.round(result.wpm)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {common("percent", { value: result.accuracy })}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {result.typos}
-              </TableCell>
+              {columns.map((column) => (
+                <TableCell key={column} className="text-right tabular-nums">
+                  {cell[column](result)}
+                </TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>

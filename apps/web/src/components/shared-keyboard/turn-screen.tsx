@@ -9,7 +9,10 @@ import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { cn } from "@/lib/utils";
 
-/** One Player's Turn: type `text` before the Time Bank runs out. */
+/**
+ * One Player's Turn. With a Time Bank the clock counts down and the Turn ends
+ * when it runs out; without one it is a stopwatch.
+ */
 export function TurnScreen({
   player,
   text,
@@ -20,10 +23,10 @@ export function TurnScreen({
 }: {
   player: string;
   text: string;
-  timeBankMs: number;
+  timeBankMs: number | null;
   fingerGuide: boolean;
   onComplete: (stats: TypingStats) => void;
-  onRunOutOfTime: (stats: TypingStats) => void;
+  onRunOutOfTime?: (stats: TypingStats) => void;
 }) {
   const t = useTranslations("SharedKeyboard.Turn");
   const { session, sessionRef } = useTyping(text, onComplete);
@@ -31,8 +34,15 @@ export function TurnScreen({
 
   const tick = useEffectEvent((time: number) => {
     const startedAt = sessionRef.current.firstKeyAtMs;
-    if (startedAt !== null && time - startedAt >= timeBankMs) {
-      onRunOutOfTime({ ...getStats(sessionRef.current), timeMs: timeBankMs });
+    if (
+      timeBankMs !== null &&
+      startedAt !== null &&
+      time - startedAt >= timeBankMs
+    ) {
+      onRunOutOfTime?.({
+        ...getStats(sessionRef.current),
+        timeMs: timeBankMs,
+      });
       return false;
     }
     setNow(time);
@@ -53,22 +63,32 @@ export function TurnScreen({
     session.firstKeyAtMs === null || now === null
       ? 0
       : Math.max(0, now - session.firstKeyAtMs);
-  const remainingMs = Math.max(0, timeBankMs - elapsedMs);
+  const remainingMs =
+    timeBankMs === null ? null : Math.max(0, timeBankMs - elapsedMs);
   const progress = session.position / text.length;
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
       <div className="flex items-baseline justify-between">
         <h2 className="text-2xl font-bold">{player}</h2>
-        <div
-          className={cn(
-            "font-mono text-3xl tabular-nums",
-            remainingMs < 10_000 && "text-destructive",
-          )}
-          aria-label={t("timeBank")}
-        >
-          {formatClock(remainingMs)}
-        </div>
+        {remainingMs === null ? (
+          <div
+            className="font-mono text-3xl tabular-nums"
+            aria-label={t("stopwatch")}
+          >
+            {formatClock(Math.floor(elapsedMs / 1000))}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "font-mono text-3xl tabular-nums",
+              remainingMs < 10_000 && "text-destructive",
+            )}
+            aria-label={t("timeBank")}
+          >
+            {formatClock(Math.ceil(remainingMs / 1000))}
+          </div>
+        )}
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
@@ -85,8 +105,7 @@ export function TurnScreen({
   );
 }
 
-function formatClock(ms: number): string {
-  const totalSeconds = Math.ceil(ms / 1000);
+function formatClock(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 

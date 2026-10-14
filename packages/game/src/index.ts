@@ -31,3 +31,10 @@ export {
   type Hand,
   type KeyGuide,
 } from "./finger-guide";
+export {
+  finishRaceTurn,
+  getClassicRaceResults,
+  startClassicRace,
+  type ClassicRace,
+  type ClassicRaceResult,
+} from "./classic-race";

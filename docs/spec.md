@@ -106,7 +106,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - Anyone who hasn't finished is ranked by progress.
 - **Shared Keyboard:**
   - Each Player takes one Turn.
-  - The fastest Time wins.
+  - The fastest Time wins. On a tie, the higher Accuracy wins, then whoever went first.
 
 ### Crazy Darts (Online only)
 

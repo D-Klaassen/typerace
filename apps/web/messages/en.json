@@ -38,7 +38,14 @@
         "nicknameTaken": "Two Players can't share a nickname."
       },
       "fingerGuide": "Finger Guide",
-      "fingerGuideFor": "Finger Guide for {name}"
+      "fingerGuideFor": "Finger Guide for {name}",
+      "classicRace": "Classic Race",
+      "textLength": "Text length",
+      "textLengths": {
+        "short": "Short",
+        "medium": "Medium",
+        "long": "Long"
+      }
     },
     "Handover": {
       "turnOf": "{name}'s turn",
@@ -47,14 +54,16 @@
     },
     "Turn": {
       "timeBank": "Time Bank",
-      "progress": "{typed} / {total}"
+      "progress": "{typed} / {total}",
+      "stopwatch": "Time"
     },
     "Standings": {
       "player": "Player",
       "bestTime": "Best time",
       "timeBank": "Time Bank",
       "eliminated": "Eliminated",
-      "noTimeYet": "–"
+      "noTimeYet": "–",
+      "time": "Time"
     },
     "Results": {
       "winner": "{name} wins!",
@@ -66,7 +75,8 @@
       "accuracy": "Accuracy",
       "typos": "Typos",
       "playAgain": "Play again",
-      "backToSetup": "Back to setup"
+      "backToSetup": "Back to setup",
+      "time": "Time"
     }
   }
 }

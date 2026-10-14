@@ -1,17 +1,16 @@
 "use client";
 
-import type { TimeTrial } from "@typerace/game";
 import { useTranslations } from "next-intl";
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Standings } from "./standings";
 
 export function HandoverScreen({
-  trial,
+  standings,
   player,
   onReady,
 }: {
-  trial: TimeTrial;
+  /** The Mode's standings so far, shown while the keyboard is passed on. */
+  standings: ReactNode;
   player: string;
   onReady: () => void;
 }) {
@@ -39,7 +38,7 @@ export function HandoverScreen({
       <Button size="lg" onClick={onReady}>
         {t("start")}
       </Button>
-      <Standings trial={trial} />
+      {standings}
     </div>
   );
 }

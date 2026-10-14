@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e",
-    "test:e2e": "pnpm --filter web test:e2e"
+    "test:e2e": "pnpm --filter web test:e2e",
+    "deploy:rooms": "pnpm --filter rooms run deploy"
   },
   "devDependencies": {
     "prettier": "^3"

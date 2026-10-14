@@ -10,3 +10,13 @@ export {
   type TypingSession,
   type TypingStats,
 } from "./typing";
+export {
+  completeTurn,
+  getTimeTrialResults,
+  runOutOfTime,
+  startTimeTrial,
+  type TimeTrial,
+  type TimeTrialOptions,
+  type TimeTrialPlayer,
+  type TimeTrialResult,
+} from "./time-trial";

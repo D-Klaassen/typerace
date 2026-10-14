@@ -21,6 +21,10 @@ export function useRoom(code: string, intent: "create" | "join") {
   const [error, setError] = useState<RoomError | null>(null);
   /** The nickname we joined with, to rejoin after a reconnect. */
   const nicknameRef = useRef<string | null>(null);
+  /** Room clock minus our clock, to show the countdown. */
+  const [clockOffsetMs, setClockOffsetMs] = useState(0);
+  /** Every nickname seen, so results can name Players who already left. */
+  const [nicknames, setNicknames] = useState<Record<string, string>>({});
 
   const socket = usePartySocket({
     host: ROOMS_HOST,
@@ -36,6 +40,13 @@ export function useRoom(code: string, intent: "create" | "join") {
       if (message?.type === "state") {
         setState(message);
         setError(null);
+        setClockOffsetMs(message.serverNowMs - Date.now());
+        setNicknames((known) => ({
+          ...known,
+          ...Object.fromEntries(
+            message.room.players.map((player) => [player.id, player.nickname]),
+          ),
+        }));
       } else if (message?.type === "error") {
         nicknameRef.current = null;
         setError(message.reason);
@@ -50,6 +61,8 @@ export function useRoom(code: string, intent: "create" | "join") {
   return {
     state,
     error,
+    clockOffsetMs,
+    nicknames,
     join(nickname: string) {
       nicknameRef.current = nickname;
       send({ type: "join", nickname, intent });
@@ -59,6 +72,15 @@ export function useRoom(code: string, intent: "create" | "join") {
     },
     vote(vote: Vote) {
       send({ type: "vote", vote });
+    },
+    start() {
+      send({ type: "start" });
+    },
+    key(key: string) {
+      send({ type: "key", key });
+    },
+    backToLobby() {
+      send({ type: "backToLobby" });
     },
   };
 }

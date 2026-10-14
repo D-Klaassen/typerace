@@ -117,7 +117,6 @@
     "startingHp": "Starting HP",
     "dartDamage": "Dart damage per character",
     "typoHp": "HP lost per Typo",
-    "startSoon": "Starting a Match is coming in the next update.",
     "modes": {
       "classicRace": "Classic Race",
       "crazyDarts": "Crazy Darts",
@@ -139,6 +138,23 @@
       "nicknameRequired": "Enter a nickname.",
       "nicknameTooLong": "Nicknames can be at most 16 characters.",
       "nicknameTaken": "Someone in this Room already uses that nickname."
-    }
+    },
+    "start": "Start Match",
+    "needTwoPlayers": "You need at least two Players to start.",
+    "waitingForStart": "Waiting for the Host to start the Match.",
+    "modeSoon": "This Mode can’t be played Online yet. Pick Classic Race to start a Match.",
+    "getReady": "Get ready…",
+    "progressLabel": "Race progress",
+    "finishedWaiting": "Finished! Waiting for the others…",
+    "fingerGuide": "Finger Guide",
+    "spectating": "A Match is running. You’ll play in the next one.",
+    "winner": "{name} wins!",
+    "player": "Player",
+    "time": "Time",
+    "wpm": "WPM",
+    "accuracy": "Accuracy",
+    "typos": "Typos",
+    "backToLobby": "Back to lobby",
+    "waitingForHost": "Waiting for the Host to go back to the lobby."
   }
 }

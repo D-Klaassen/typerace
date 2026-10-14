@@ -192,11 +192,11 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
   - Time is passed in rather than read from the clock, so everything is deterministic and testable.
   - Both apps use it.
 - **`apps/rooms` owns Online state:**
-  - Clients send every keystroke (and the time it happened, as the client measured it) to the Room.
+  - Clients send every keystroke to the Room, which times it on its own clock when it arrives. Clients' clocks aren't in sync, and this way a client can't fake its times.
   - The Room applies the keystrokes through `packages/game` and decides progress, Typos, Darts, HP, eliminations and the winner.
   - It broadcasts the state to everyone in the Room.
   - The client applies keystrokes locally at once for a responsive feel, and reconciles when the Room's state arrives.
-  - The Room is the authority for anything that crosses Players. Each Player's own typing timing comes from their keystroke timestamps.
+  - The Room is the authority for everything Online, including timing: a Player's Time runs from the Room's start signal to their last character. Typing only unlocks when the Room's "go" arrives, so nobody can start early.
 - **Messages:**
   - From clients to the Room: join, update settings (Host only), Vote, start (Host only), keystroke, ready for Turn, rematch (Host only).
   - From the Room to clients: full state snapshots, plus events such as Dart thrown, Player eliminated and Match ended.

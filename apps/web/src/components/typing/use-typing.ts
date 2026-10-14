@@ -16,6 +16,8 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 export function useTyping(
   text: string,
   onFinish: (stats: TypingStats) => void,
+  /** Called for every counted keystroke, correct or a Typo. */
+  onKey?: (key: string) => void,
 ): { session: TypingSession; sessionRef: { readonly current: TypingSession } } {
   const [session, setSession] = useState(() => startTyping(text));
   const sessionRef = useRef(session);
@@ -37,6 +39,7 @@ export function useTyping(
 
     sessionRef.current = next;
     setSession(next);
+    onKey?.(event.key);
     if (next.finished) {
       onFinish(getStats(next));
     }

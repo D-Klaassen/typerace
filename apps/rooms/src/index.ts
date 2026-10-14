@@ -1,17 +1,27 @@
 import {
+  advanceClock,
+  backToLobby,
   castVote,
   createRoom,
+  generateGibberish,
   getVoteCounts,
   joinRoom,
   leaveRoom,
+  startCountdown,
+  TEXT_LENGTH_CHARACTERS,
+  typeInRoom,
   updateSettings,
   type Room,
 } from "@typerace/game";
 import {
   parseClientMessage,
+  toRoomView,
   type RoomError,
   type ServerMessage,
 } from "@typerace/protocol";
+
+/** How often a running Room checks its clock (countdown end, grace period). */
+const CLOCK_TICK_MS = 250;
 import { routePartykitRequest, Server, type Connection } from "partyserver";
 
 /**
@@ -22,6 +32,7 @@ export class Rooms extends Server<Env> {
   private room: Room = createRoom();
   /** Set by the first "create" join; a "join" into an uncreated Room fails. */
   private created = false;
+  private clock: ReturnType<typeof setInterval> | null = null;
 
   onMessage(connection: Connection, raw: string | ArrayBuffer) {
     if (typeof raw !== "string") {
@@ -65,6 +76,30 @@ export class Rooms extends Server<Env> {
       case "vote":
         this.setRoom(castVote(this.room, connection.id, message.vote));
         return;
+
+      case "start": {
+        const { difficulty, textLength } = this.room.settings;
+        const text = generateGibberish({
+          seed: Math.floor(Math.random() * 2 ** 31),
+          difficulty,
+          minLength: TEXT_LENGTH_CHARACTERS[textLength],
+        });
+        this.setRoom(
+          startCountdown(this.room, connection.id, { text, nowMs: Date.now() }),
+        );
+        return;
+      }
+
+      case "key":
+        // Keystrokes are timed on the Room's clock (see docs/spec.md).
+        this.setRoom(
+          typeInRoom(this.room, connection.id, message.key, Date.now()),
+        );
+        return;
+
+      case "backToLobby":
+        this.setRoom(backToLobby(this.room, connection.id));
+        return;
     }
   }
 
@@ -83,6 +118,7 @@ export class Rooms extends Server<Env> {
     if (this.room.players.length === 0) {
       this.room = createRoom();
       this.created = false;
+      this.runClockWhileNeeded();
     }
   }
 
@@ -91,12 +127,37 @@ export class Rooms extends Server<Env> {
       return;
     }
     this.room = room;
+    this.runClockWhileNeeded();
 
+    const view = toRoomView(room);
     const voteCounts = getVoteCounts(room);
+    const serverNowMs = Date.now();
     for (const player of room.players) {
       this.getConnection(player.id)?.send(
-        serialize({ type: "state", room, voteCounts, you: player.id }),
+        serialize({
+          type: "state",
+          room: view,
+          voteCounts,
+          you: player.id,
+          serverNowMs,
+        }),
       );
+    }
+  }
+
+  /** The countdown and the race's grace period need the clock to move on. */
+  private runClockWhileNeeded() {
+    const needsClock =
+      this.room.phase === "countdown" || this.room.phase === "racing";
+
+    if (needsClock && !this.clock) {
+      this.clock = setInterval(
+        () => this.setRoom(advanceClock(this.room, Date.now())),
+        CLOCK_TICK_MS,
+      );
+    } else if (!needsClock && this.clock) {
+      clearInterval(this.clock);
+      this.clock = null;
     }
   }
 

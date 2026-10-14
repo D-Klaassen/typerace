@@ -11,6 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lobby } from "./lobby";
+import {
+  Countdown,
+  OnlineResults,
+  RaceTyping,
+  Spectating,
+} from "./match-screens";
 import { useRoom } from "./use-room";
 
 export function RoomScreen() {
@@ -44,14 +50,54 @@ function ValidRoom({ code }: { code: string }) {
     return <NicknameForm code={code} error={room.error} onJoin={room.join} />;
   }
 
-  return (
-    <Lobby
-      code={code}
-      state={room.state}
-      onUpdateSettings={room.updateSettings}
-      onVote={room.vote}
-    />
-  );
+  const { room: view, you } = room.state;
+  const me = view.players.find((player) => player.id === you);
+  const isHost = view.hostId === you;
+
+  if (view.phase === "lobby") {
+    return (
+      <Lobby
+        code={code}
+        state={room.state}
+        onUpdateSettings={room.updateSettings}
+        onVote={room.vote}
+        onStart={room.start}
+      />
+    );
+  }
+  if (view.phase === "results") {
+    return (
+      <OnlineResults
+        room={view}
+        isHost={isHost}
+        nicknames={room.nicknames}
+        onBackToLobby={room.backToLobby}
+      />
+    );
+  }
+  if (me?.spectator) {
+    return <Spectating race={view.race} you={you} nicknames={room.nicknames} />;
+  }
+  if (view.phase === "countdown" && view.countdownEndsAtMs !== null) {
+    return (
+      <Countdown
+        endsAtMs={view.countdownEndsAtMs}
+        clockOffsetMs={room.clockOffsetMs}
+      />
+    );
+  }
+  if (view.phase === "racing" && view.race) {
+    return (
+      <RaceTyping
+        race={view.race}
+        you={you}
+        nicknames={room.nicknames}
+        onKey={room.key}
+      />
+    );
+  }
+
+  return null;
 }
 
 function NicknameForm({

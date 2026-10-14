@@ -34,11 +34,13 @@ export function Lobby({
   state,
   onUpdateSettings,
   onVote,
+  onStart,
 }: {
   code: string;
   state: RoomState;
   onUpdateSettings: (changes: Partial<RoomSettings>) => void;
   onVote: (vote: Vote) => void;
+  onStart: () => void;
 }) {
   const t = useTranslations("Room");
   const { room, voteCounts, you } = state;
@@ -123,9 +125,51 @@ export function Lobby({
               />
             </section>
           )}
-          <p className="text-sm text-muted-foreground">{t("startSoon")}</p>
+          <StartArea
+            isHost={isHost}
+            playerCount={room.players.length}
+            mode={room.settings.mode}
+            onStart={onStart}
+          />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/** Modes that can be played Online so far. */
+const ONLINE_MODES: Mode[] = ["classicRace"];
+
+function StartArea({
+  isHost,
+  playerCount,
+  mode,
+  onStart,
+}: {
+  isHost: boolean;
+  playerCount: number;
+  mode: Mode;
+  onStart: () => void;
+}) {
+  const t = useTranslations("Room");
+
+  if (!ONLINE_MODES.includes(mode)) {
+    return <p className="text-sm text-muted-foreground">{t("modeSoon")}</p>;
+  }
+  if (!isHost) {
+    return (
+      <p className="text-sm text-muted-foreground">{t("waitingForStart")}</p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Button size="lg" disabled={playerCount < 2} onClick={onStart}>
+        {t("start")}
+      </Button>
+      {playerCount < 2 && (
+        <p className="text-sm text-muted-foreground">{t("needTwoPlayers")}</p>
+      )}
     </div>
   );
 }

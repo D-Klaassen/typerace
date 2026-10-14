@@ -1,4 +1,10 @@
-import type { JoinError, Room, VoteCounts } from "@typerace/game";
+import {
+  getOnlineRaceResults,
+  type JoinError,
+  type OnlineRaceResult,
+  type Room,
+  type VoteCounts,
+} from "@typerace/game";
 import { z } from "zod";
 
 // Letters only, without I and O so codes are easy to read aloud and type.
@@ -47,6 +53,9 @@ const clientMessage = z.discriminatedUnion("type", [
     intent: z.enum(["create", "join"]),
   }),
   z.object({ type: z.literal("updateSettings"), changes: settingsChanges }),
+  z.object({ type: z.literal("start") }),
+  z.object({ type: z.literal("key"), key: z.string().length(1) }),
+  z.object({ type: z.literal("backToLobby") }),
   z.object({
     type: z.literal("vote"),
     vote: z.union([
@@ -71,13 +80,52 @@ export function parseClientMessage(raw: string): ClientMessage | null {
 
 export type RoomError = JoinError | "roomNotFound";
 
+/** One racer's progress as the clients see it. */
+export interface RacerView {
+  playerId: string;
+  position: number;
+  typos: number;
+  finished: boolean;
+  dropped: boolean;
+}
+
+/** The Room as sent to clients: the race without per-racer copies of the text. */
+export type RoomView = Omit<Room, "race"> & {
+  race: { text: string; startedAtMs: number; racers: RacerView[] } | null;
+  /** The ranking once a Match is over; null before that. */
+  results: OnlineRaceResult[] | null;
+};
+
+export function toRoomView(room: Room): RoomView {
+  const { race, ...rest } = room;
+
+  return {
+    ...rest,
+    race: race && {
+      text: race.text,
+      startedAtMs: race.startedAtMs,
+      racers: race.entries.map(({ playerId, session, dropped }) => ({
+        playerId,
+        position: session.position,
+        typos: session.typos,
+        finished: session.finished,
+        dropped,
+      })),
+    },
+    results:
+      room.phase === "results" && race ? getOnlineRaceResults(race) : null,
+  };
+}
+
 export type ServerMessage =
   | {
       type: "state";
-      room: Room;
+      room: RoomView;
       voteCounts: VoteCounts;
       /** The receiving Player's id. */
       you: string;
+      /** The Room's clock when this was sent, to show the countdown. */
+      serverNowMs: number;
     }
   | { type: "error"; reason: RoomError };
 

@@ -109,6 +109,16 @@ export function runOutOfTime(trial: TimeTrial, stats: TypingStats): TimeTrial {
   });
 }
 
+/** Takes a Player out without a Turn, e.g. because they left. */
+export function eliminatePlayer(trial: TimeTrial, name: string): TimeTrial {
+  const player = trial.players.find((p) => p.name === name);
+  if (!player || player.eliminated || trial.winner !== null) {
+    return trial;
+  }
+
+  return settle(trial, { ...player, timeBankMs: 0, eliminated: true }, false);
+}
+
 /** Ranking: the winner first, then everyone else in reverse order of elimination. */
 export function getTimeTrialResults(trial: TimeTrial): TimeTrialResult[] {
   const ranked = [
@@ -156,6 +166,15 @@ function recordTurn(
 }
 
 function afterTurn(trial: TimeTrial, updated: TimeTrialPlayer): TimeTrial {
+  return settle(trial, updated, true);
+}
+
+/** Applies a changed Player and decides who goes next, or who won. */
+function settle(
+  trial: TimeTrial,
+  updated: TimeTrialPlayer,
+  tookTurn: boolean,
+): TimeTrial {
   const players = trial.players.map((player) =>
     player.name === updated.name ? updated : player,
   );
@@ -169,7 +188,7 @@ function afterTurn(trial: TimeTrial, updated: TimeTrialPlayer): TimeTrial {
     players,
     eliminated,
     winner,
-    turnsTaken: trial.turnsTaken + 1,
+    turnsTaken: trial.turnsTaken + (tookTurn ? 1 : 0),
     currentPlayer: winner === null ? nextPlayer(remaining) : null,
   };
 }

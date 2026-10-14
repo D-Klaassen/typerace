@@ -12,6 +12,7 @@ export {
 } from "./typing";
 export {
   completeTurn,
+  eliminatePlayer,
   getTimeTrialResults,
   runOutOfTime,
   startTimeTrial,
@@ -49,6 +50,7 @@ export {
   joinRoom,
   leaveRoom,
   MAX_ROOM_PLAYERS,
+  ONLINE_MODES,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
   typeInRoom,
@@ -76,3 +78,12 @@ export {
   type OnlineRaceResult,
   type RaceEntry,
 } from "./online-race";
+export {
+  advanceTimeTrial,
+  currentTimeBankMs,
+  dropFromTimeTrial,
+  startOnlineTimeTrial,
+  TIME_TRIAL_TURN_LENGTH,
+  typeInTimeTrial,
+  type OnlineTimeTrial,
+} from "./online-time-trial";

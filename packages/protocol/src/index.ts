@@ -1,8 +1,12 @@
 import {
+  currentTimeBankMs,
   getOnlineRaceResults,
+  getTimeTrialResults,
   type JoinError,
   type OnlineRaceResult,
   type Room,
+  type TimeTrial,
+  type TimeTrialResult,
   type VoteCounts,
 } from "@typerace/game";
 import { z } from "zod";
@@ -89,18 +93,49 @@ export interface RacerView {
   dropped: boolean;
 }
 
-/** The Room as sent to clients: the race without per-racer copies of the text. */
-export type RoomView = Omit<Room, "race"> & {
+/** A Time Trial as the clients see it; Player names are Player ids. */
+export interface TimeTrialView {
+  trial: TimeTrial;
+  /** The current Turn, so the others can watch it fill in. */
+  turn: {
+    text: string;
+    position: number;
+    inError: boolean;
+    /** On the Room's clock; null until the first keystroke. */
+    firstKeyAtMs: number | null;
+    /** What was left of the Time Bank when the Turn began. */
+    timeBankMs: number;
+  } | null;
+}
+
+export type RoomResults =
+  | { mode: "classicRace"; ranking: OnlineRaceResult[] }
+  | { mode: "timeTrial"; ranking: TimeTrialResult[] };
+
+/** The Room as sent to clients: no per-racer copies of the text. */
+export type RoomView = Omit<Room, "race" | "timeTrial" | "seed"> & {
   race: { text: string; startedAtMs: number; racers: RacerView[] } | null;
+  timeTrial: TimeTrialView | null;
   /** The ranking once a Match is over; null before that. */
-  results: OnlineRaceResult[] | null;
+  results: RoomResults | null;
 };
 
 export function toRoomView(room: Room): RoomView {
-  const { race, ...rest } = room;
+  const { race, timeTrial, seed, ...rest } = room;
+  void seed; // stays on the server, so nobody can generate the coming texts
 
   return {
     ...rest,
+    timeTrial: timeTrial && {
+      trial: timeTrial.trial,
+      turn: timeTrial.turn && {
+        text: timeTrial.turn.text,
+        position: timeTrial.turn.position,
+        inError: timeTrial.turn.inError,
+        firstKeyAtMs: timeTrial.turn.firstKeyAtMs,
+        timeBankMs: currentTimeBankMs(timeTrial) ?? 0,
+      },
+    },
     race: race && {
       text: race.text,
       startedAtMs: race.startedAtMs,
@@ -112,9 +147,24 @@ export function toRoomView(room: Room): RoomView {
         dropped,
       })),
     },
-    results:
-      room.phase === "results" && race ? getOnlineRaceResults(race) : null,
+    results: resultsOf(room),
   };
+}
+
+function resultsOf(room: Room): RoomResults | null {
+  if (room.phase !== "results") {
+    return null;
+  }
+  if (room.timeTrial) {
+    return {
+      mode: "timeTrial",
+      ranking: getTimeTrialResults(room.timeTrial.trial),
+    };
+  }
+
+  return room.race
+    ? { mode: "classicRace", ranking: getOnlineRaceResults(room.race) }
+    : null;
 }
 
 export type ServerMessage =

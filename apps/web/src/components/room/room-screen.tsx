@@ -17,6 +17,7 @@ import {
   RaceTyping,
   Spectating,
 } from "./match-screens";
+import { OnlineTimeTrial } from "./time-trial-screens";
 import { useRoom } from "./use-room";
 
 export function RoomScreen() {
@@ -76,13 +77,31 @@ function ValidRoom({ code }: { code: string }) {
     );
   }
   if (me?.spectator) {
-    return <Spectating race={view.race} you={you} nicknames={room.nicknames} />;
+    return (
+      <Spectating
+        room={view}
+        you={you}
+        nicknames={room.nicknames}
+        clockOffsetMs={room.clockOffsetMs}
+      />
+    );
   }
   if (view.phase === "countdown" && view.countdownEndsAtMs !== null) {
     return (
       <Countdown
         endsAtMs={view.countdownEndsAtMs}
         clockOffsetMs={room.clockOffsetMs}
+      />
+    );
+  }
+  if (view.phase === "racing" && view.timeTrial) {
+    return (
+      <OnlineTimeTrial
+        timeTrial={view.timeTrial}
+        you={you}
+        nicknames={room.nicknames}
+        clockOffsetMs={room.clockOffsetMs}
+        onKey={room.key}
       />
     );
   }

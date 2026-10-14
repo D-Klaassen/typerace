@@ -79,13 +79,18 @@ export class Rooms extends Server<Env> {
 
       case "start": {
         const { difficulty, textLength } = this.room.settings;
+        const seed = Math.floor(Math.random() * 2 ** 31);
         const text = generateGibberish({
-          seed: Math.floor(Math.random() * 2 ** 31),
+          seed,
           difficulty,
           minLength: TEXT_LENGTH_CHARACTERS[textLength],
         });
         this.setRoom(
-          startCountdown(this.room, connection.id, { text, nowMs: Date.now() }),
+          startCountdown(this.room, connection.id, {
+            text,
+            seed,
+            nowMs: Date.now(),
+          }),
         );
         return;
       }

@@ -11,7 +11,14 @@ import {
 import { cn } from "@/lib/utils";
 
 /** Best times and remaining Time Banks during a Time Trial. */
-export function TimeTrialStandings({ trial }: { trial: TimeTrial }) {
+export function TimeTrialStandings({
+  trial,
+  nameOf = (name) => name,
+}: {
+  trial: TimeTrial;
+  /** Online, Players are named by id; this turns that into a nickname. */
+  nameOf?: (name: string) => string;
+}) {
   const t = useTranslations("SharedKeyboard.Standings");
   const common = useTranslations("Common");
 
@@ -33,7 +40,7 @@ export function TimeTrialStandings({ trial }: { trial: TimeTrial }) {
               player.eliminated && "text-muted-foreground line-through",
             )}
           >
-            <TableCell>{player.name}</TableCell>
+            <TableCell>{nameOf(player.name)}</TableCell>
             <TableCell className="text-right tabular-nums">
               {player.bestTimeMs === null
                 ? t("noTimeYet")

@@ -13,7 +13,7 @@ function racingRoom(): Room {
   let room = createRoom();
   room = joinRoom(room, { id: "a", nickname: "Anna" }).room;
   room = joinRoom(room, { id: "b", nickname: "Bob" }).room;
-  room = startCountdown(room, "a", { text: "ab", nowMs: 0 });
+  room = startCountdown(room, "a", { text: "ab", seed: 1, nowMs: 0 });
   return advanceClock(room, 3_000);
 }
 
@@ -57,9 +57,11 @@ describe("toRoomView", () => {
       room = typeInRoom(room, player, key, at);
     }
 
-    expect(toRoomView(room).results?.map((result) => result.playerId)).toEqual([
-      "b",
-      "a",
-    ]);
+    const results = toRoomView(room).results;
+    expect(results?.mode).toBe("classicRace");
+    expect(
+      results?.mode === "classicRace" &&
+        results.ranking.map((result) => result.playerId),
+    ).toEqual(["b", "a"]);
   });
 });

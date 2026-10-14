@@ -5,6 +5,7 @@ import { getStats } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { FingerGuide } from "@/components/finger-guide/finger-guide";
+import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { cn } from "@/lib/utils";
@@ -103,11 +104,4 @@ export function TurnScreen({
       {fingerGuide && <FingerGuide nextChar={text[session.position]} />}
     </div>
   );
-}
-
-function formatClock(totalSeconds: number): string {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }

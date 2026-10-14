@@ -227,9 +227,9 @@ Each step is a vertical slice that is playable or testable when it lands:
 5. **Classic Race on a Shared Keyboard.**
 6. **Rooms:**
    - The PartyServer Room, create and join by code or link.
-   - The Host, the 6-Player cap, Spectators and the Host handover.
+   - The Host, the 6-Player cap and the Host handover.
    - Live settings and Votes.
-7. **Online Classic Race.**
+7. **Online Classic Race,** including Spectators (they only exist once a Match can run).
 8. **Online Time Trial** with live watching.
 9. **Crazy Darts.**
 10. **Deploy:** a `/wizard` script to link Vercel and Cloudflare, then the first deploy.

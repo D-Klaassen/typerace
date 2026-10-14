@@ -7,7 +7,9 @@
     "title": "Typerace",
     "tagline": "Race your friends at typing.",
     "sharedKeyboard": "Play on a Shared Keyboard",
-    "sharedKeyboardDescription": "One device, pass the keyboard around."
+    "sharedKeyboardDescription": "One device, pass the keyboard around.",
+    "online": "Play Online",
+    "onlineDescription": "Everyone on their own device, in a Room."
   },
   "Common": {
     "seconds": "{value, number, ::.0}s",
@@ -77,6 +79,66 @@
       "playAgain": "Play again",
       "backToSetup": "Back to setup",
       "time": "Time"
+    }
+  },
+  "Online": {
+    "metadataTitle": "Online · Typerace",
+    "createTitle": "Create a Room",
+    "createDescription": "Start a Room and share the link with your friends.",
+    "create": "Create Room",
+    "joinTitle": "Join a Room",
+    "joinDescription": "Enter the 6-letter code someone shared with you.",
+    "code": "Room code",
+    "invalidCode": "A Room code is 6 letters.",
+    "join": "Join"
+  },
+  "Room": {
+    "metadataTitle": "Room · Typerace",
+    "title": "Room {code}",
+    "nickname": "Your nickname",
+    "enter": "Enter Room",
+    "backToOnline": "Back to Online",
+    "shareHint": "Share this Room so others can join.",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "players": "Players",
+    "host": "Host",
+    "you": "(you)",
+    "settings": "Settings",
+    "hostHint": "You are the Host. Numbers show what the others voted for.",
+    "guestHint": "The Host picks the settings. Vote to tell them what you would like.",
+    "voteTitle": "Your Vote",
+    "voteMode": "Mode",
+    "voteDifficulty": "Difficulty",
+    "mode": "Mode",
+    "difficulty": "Difficulty",
+    "textLength": "Text length",
+    "timeBank": "Time Bank (minutes)",
+    "startingHp": "Starting HP",
+    "dartDamage": "Dart damage per character",
+    "typoHp": "HP lost per Typo",
+    "startSoon": "Starting a Match is coming in the next update.",
+    "modes": {
+      "classicRace": "Classic Race",
+      "crazyDarts": "Crazy Darts",
+      "timeTrial": "Time Trial"
+    },
+    "difficulties": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "textLengths": {
+      "short": "Short",
+      "medium": "Medium",
+      "long": "Long"
+    },
+    "errors": {
+      "roomNotFound": "Room not found",
+      "roomFull": "This Room is full.",
+      "nicknameRequired": "Enter a nickname.",
+      "nicknameTooLong": "Nicknames can be at most 16 characters.",
+      "nicknameTaken": "Someone in this Room already uses that nickname."
     }
   }
 }

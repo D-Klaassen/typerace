@@ -15,6 +15,7 @@ test("two Players play a Time Trial until one runs out of time", async ({
 
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByPlaceholder("Player 2").fill("Bob");
+  await page.getByText("Time Trial", { exact: true }).click();
   await page.getByText("1", { exact: true }).click(); // 1-minute Time Bank
   await page.getByRole("button", { name: "Start" }).click();
 

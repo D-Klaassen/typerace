@@ -23,11 +23,15 @@ import { Label } from "@/components/ui/label";
 import {
   MAX_PLAYERS,
   MIN_PLAYERS,
+  type SharedKeyboardMode,
   type SharedKeyboardPlayer,
   type SharedKeyboardSettings,
+  type TextLength,
 } from "./settings";
 
+const MODES: SharedKeyboardMode[] = ["classicRace", "timeTrial"];
 const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
+const TEXT_LENGTH_OPTIONS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
 
 export function SetupForm({
@@ -39,8 +43,10 @@ export function SetupForm({
 }) {
   const t = useTranslations("SharedKeyboard.Setup");
   const common = useTranslations("Common");
+  const [mode, setMode] = useState(initial.mode);
   const [players, setPlayers] = useState(initial.players);
   const [difficulty, setDifficulty] = useState(initial.difficulty);
+  const [textLength, setTextLength] = useState(initial.textLength);
   const [timeBankMs, setTimeBankMs] = useState(initial.timeBankMs);
   const [problem, setProblem] = useState<NicknameProblem | null>(null);
 
@@ -50,6 +56,8 @@ export function SetupForm({
     setProblem(found);
     if (!found) {
       onStart({
+        mode,
+        textLength,
         players: players.map((player) => ({
           ...player,
           name: player.name.trim(),
@@ -140,10 +148,13 @@ export function SetupForm({
             )}
           </fieldset>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium">{t("mode")}</span>
-            <span className="text-muted-foreground">{t("timeTrial")}</span>
-          </div>
+          <ChoiceGroup
+            legend={t("mode")}
+            name="mode"
+            options={MODES.map((value) => ({ value, label: t(value) }))}
+            value={mode}
+            onChange={setMode}
+          />
 
           <ChoiceGroup
             legend={t("difficulty")}
@@ -156,16 +167,29 @@ export function SetupForm({
             onChange={setDifficulty}
           />
 
-          <ChoiceGroup
-            legend={t("timeBank")}
-            name="time-bank"
-            options={TIME_BANK_MINUTES.map((minutes) => ({
-              value: minutes * 60_000,
-              label: String(minutes),
-            }))}
-            value={timeBankMs}
-            onChange={setTimeBankMs}
-          />
+          {mode === "classicRace" ? (
+            <ChoiceGroup
+              legend={t("textLength")}
+              name="text-length"
+              options={TEXT_LENGTH_OPTIONS.map((value) => ({
+                value,
+                label: t(`textLengths.${value}`),
+              }))}
+              value={textLength}
+              onChange={setTextLength}
+            />
+          ) : (
+            <ChoiceGroup
+              legend={t("timeBank")}
+              name="time-bank"
+              options={TIME_BANK_MINUTES.map((minutes) => ({
+                value: minutes * 60_000,
+                label: String(minutes),
+              }))}
+              value={timeBankMs}
+              onChange={setTimeBankMs}
+            />
+          )}
         </CardContent>
         <CardFooter className="mt-6">
           <Button type="submit" size="lg" className="w-full">

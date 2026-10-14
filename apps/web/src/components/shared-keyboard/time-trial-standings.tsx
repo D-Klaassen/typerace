@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /** Best times and remaining Time Banks during a Time Trial. */
-export function Standings({ trial }: { trial: TimeTrial }) {
+export function TimeTrialStandings({ trial }: { trial: TimeTrial }) {
   const t = useTranslations("SharedKeyboard.Standings");
   const common = useTranslations("Common");
 

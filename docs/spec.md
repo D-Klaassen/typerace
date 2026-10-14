@@ -94,10 +94,10 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Classic Race
 
-| Setting | Options | Default |
-|---|---|---|
-| Difficulty | Easy / Medium / Hard | Medium |
-| Text length | Short ~100 / Medium ~250 / Long ~500 characters | Medium |
+| Setting     | Options                                         | Default |
+| ----------- | ----------------------------------------------- | ------- |
+| Difficulty  | Easy / Medium / Hard                            | Medium  |
+| Text length | Short ~100 / Medium ~250 / Long ~500 characters | Medium  |
 
 - **Online:**
   - Everyone types the same text at once.
@@ -110,12 +110,12 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Crazy Darts (Online only)
 
-| Setting | Default |
-|---|---|
-| Difficulty | Medium |
-| Starting HP | 100 |
-| Damage per character of a word | 1 |
-| HP lost per Typo | 2 |
+| Setting                        | Default |
+| ------------------------------ | ------- |
+| Difficulty                     | Medium  |
+| Starting HP                    | 100     |
+| Damage per character of a word | 1       |
+| HP lost per Typo               | 2       |
 
 - **Text:** the same endless text for everyone.
 - **Throwing:** a Dart is thrown the moment a word's last character is typed. It does damage equal to the word's length × the damage setting.
@@ -129,11 +129,11 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Time Trial (Online and Shared Keyboard)
 
-| Setting | Default |
-|---|---|
-| Difficulty | Medium |
-| Turn text length | ~150 characters **(spec default)** |
-| Time Bank per Player | 2:00 |
+| Setting              | Default                            |
+| -------------------- | ---------------------------------- |
+| Difficulty           | Medium                             |
+| Turn text length     | ~150 characters **(spec default)** |
+| Time Bank per Player | 2:00                               |
 
 1. **Opening round:** every Player takes one Turn, in join or setup order.
 2. **Who goes next:** the slowest Player (highest best Time) takes the next Turn.
@@ -165,17 +165,17 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **On a Typo,** the guide keeps pointing at the expected key.
 - **Finger map:**
 
-| Finger | Keys |
-|---|---|
-| Left pinky | `` ` `` `1` `q` `a` `z`, left Shift |
-| Left ring | `2` `w` `s` `x` |
-| Left middle | `3` `e` `d` `c` |
-| Left index | `4` `5` `r` `t` `f` `g` `v` `b` |
-| Right index | `6` `7` `y` `u` `h` `j` `n` `m` |
-| Right middle | `8` `i` `k` `,` |
-| Right ring | `9` `o` `l` `.` |
-| Right pinky | `0` `-` `=` `p` `[` `]` `\` `;` `'` `/`, right Shift |
-| Thumbs | Space |
+| Finger       | Keys                                                 |
+| ------------ | ---------------------------------------------------- |
+| Left pinky   | `` ` `` `1` `q` `a` `z`, left Shift                  |
+| Left ring    | `2` `w` `s` `x`                                      |
+| Left middle  | `3` `e` `d` `c`                                      |
+| Left index   | `4` `5` `r` `t` `f` `g` `v` `b`                      |
+| Right index  | `6` `7` `y` `u` `h` `j` `n` `m`                      |
+| Right middle | `8` `i` `k` `,`                                      |
+| Right ring   | `9` `o` `l` `.`                                      |
+| Right pinky  | `0` `-` `=` `p` `[` `]` `\` `;` `'` `/`, right Shift |
+| Thumbs       | Space                                                |
 
 ## Architecture
 

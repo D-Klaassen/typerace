@@ -232,4 +232,4 @@ Each step is a vertical slice that is playable or testable when it lands:
 7. **Online Classic Race,** including Spectators (they only exist once a Match can run).
 8. **Online Time Trial** with live watching.
 9. **Crazy Darts.**
-10. **Deploy:** a `/wizard` script to link Vercel and Cloudflare, then the first deploy.
+10. **Deploy:** `scripts/deploy-wizard.sh` walks through logging in to Cloudflare, deploying the Rooms server and creating the Vercel project; then the first deploy.

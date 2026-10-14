@@ -36,7 +36,9 @@
         "nicknameRequired": "Every Player needs a nickname.",
         "nicknameTooLong": "Nicknames can be at most 16 characters.",
         "nicknameTaken": "Two Players can't share a nickname."
-      }
+      },
+      "fingerGuide": "Finger Guide",
+      "fingerGuideFor": "Finger Guide for {name}"
     },
     "Handover": {
       "turnOf": "{name}'s turn",

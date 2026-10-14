@@ -35,7 +35,7 @@ export function SharedKeyboardGame() {
     setGame({
       phase: "handover",
       trial: startTimeTrial({
-        players: chosen.players,
+        players: chosen.players.map((player) => player.name),
         timeBankMs: chosen.timeBankMs,
       }),
       seed: Math.floor(Math.random() * 2 ** 31),
@@ -72,6 +72,9 @@ export function SharedKeyboardGame() {
     case "turn": {
       const { trial, seed } = game;
       const player = trial.players.find((p) => p.name === trial.currentPlayer);
+      const fingerGuide = settings.players.some(
+        (p) => p.name === trial.currentPlayer && p.fingerGuide,
+      );
       // Every Turn gets fresh Gibberish of the same length and Difficulty.
       const text = generateGibberish({
         seed: seed + trial.turnsTaken,
@@ -85,6 +88,7 @@ export function SharedKeyboardGame() {
           player={trial.currentPlayer ?? ""}
           text={text}
           timeBankMs={player?.timeBankMs ?? 0}
+          fingerGuide={fingerGuide}
           onComplete={(stats) => endTurn(seed, trial, stats, completeTurn)}
           onRunOutOfTime={(stats) => endTurn(seed, trial, stats, runOutOfTime)}
         />

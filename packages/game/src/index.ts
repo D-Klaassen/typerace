@@ -25,3 +25,9 @@ export {
   validateNicknames,
   type NicknameProblem,
 } from "./nicknames";
+export {
+  getKeyGuide,
+  type Finger,
+  type Hand,
+  type KeyGuide,
+} from "./finger-guide";

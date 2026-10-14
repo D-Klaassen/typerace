@@ -4,6 +4,7 @@ import type { TypingStats } from "@typerace/game";
 import { getStats } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
+import { FingerGuide } from "@/components/finger-guide/finger-guide";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { cn } from "@/lib/utils";
@@ -13,12 +14,14 @@ export function TurnScreen({
   player,
   text,
   timeBankMs,
+  fingerGuide,
   onComplete,
   onRunOutOfTime,
 }: {
   player: string;
   text: string;
   timeBankMs: number;
+  fingerGuide: boolean;
   onComplete: (stats: TypingStats) => void;
   onRunOutOfTime: (stats: TypingStats) => void;
 }) {
@@ -77,6 +80,7 @@ export function TurnScreen({
       <p className="text-sm text-muted-foreground tabular-nums">
         {t("progress", { typed: session.position, total: text.length })}
       </p>
+      {fingerGuide && <FingerGuide nextChar={text[session.position]} />}
     </div>
   );
 }

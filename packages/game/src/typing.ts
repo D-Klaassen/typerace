@@ -21,6 +21,10 @@ export interface TypingStats {
   /** Correct keystrokes ÷ all keystrokes; 1 before any keystroke. */
   accuracy: number;
   typos: number;
+  /** Correctly typed characters. */
+  characters: number;
+  /** All counted keystrokes, correct ones and Typos. */
+  keystrokes: number;
 }
 
 const CHARACTERS_PER_WORD = 5;
@@ -86,5 +90,7 @@ export function getStats(session: TypingSession): TypingStats {
         : position / CHARACTERS_PER_WORD / (timeMs / MS_PER_MINUTE),
     accuracy: keystrokes === 0 ? 1 : position / keystrokes,
     typos,
+    characters: position,
+    keystrokes,
   };
 }

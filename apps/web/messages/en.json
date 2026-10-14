@@ -5,6 +5,66 @@
   },
   "Home": {
     "title": "Typerace",
-    "tagline": "Race your friends at typing."
+    "tagline": "Race your friends at typing.",
+    "sharedKeyboard": "Play on a Shared Keyboard",
+    "sharedKeyboardDescription": "One device, pass the keyboard around."
+  },
+  "Common": {
+    "seconds": "{value, number, ::.0}s",
+    "percent": "{value, number, ::percent}",
+    "wpm": "{value, number, ::.} WPM",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    }
+  },
+  "SharedKeyboard": {
+    "metadataTitle": "Shared Keyboard · Typerace",
+    "Setup": {
+      "title": "Shared Keyboard",
+      "players": "Players",
+      "playerLabel": "Player {number}",
+      "addPlayer": "Add player",
+      "removePlayer": "Remove {name}",
+      "mode": "Mode",
+      "timeTrial": "Time Trial",
+      "difficulty": "Difficulty",
+      "timeBank": "Time Bank (minutes)",
+      "start": "Start",
+      "errors": {
+        "nicknameRequired": "Every Player needs a nickname.",
+        "nicknameTooLong": "Nicknames can be at most 16 characters.",
+        "nicknameTaken": "Two Players can't share a nickname."
+      }
+    },
+    "Handover": {
+      "turnOf": "{name}'s turn",
+      "pressSpace": "Pass the keyboard to {name}, then press Space when ready.",
+      "start": "Start Turn"
+    },
+    "Turn": {
+      "timeBank": "Time Bank",
+      "progress": "{typed} / {total}"
+    },
+    "Standings": {
+      "player": "Player",
+      "bestTime": "Best time",
+      "timeBank": "Time Bank",
+      "eliminated": "Eliminated",
+      "noTimeYet": "–"
+    },
+    "Results": {
+      "winner": "{name} wins!",
+      "rank": "#",
+      "player": "Player",
+      "bestTime": "Best time",
+      "turns": "Turns",
+      "wpm": "WPM",
+      "accuracy": "Accuracy",
+      "typos": "Typos",
+      "playAgain": "Play again",
+      "backToSetup": "Back to setup"
+    }
   }
 }

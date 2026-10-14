@@ -74,6 +74,8 @@ describe("typing", () => {
     expect(stats.wpm).toBe(5);
     expect(stats.accuracy).toBeCloseTo(5 / 6);
     expect(stats.typos).toBe(1);
+    expect(stats.characters).toBe(5);
+    expect(stats.keystrokes).toBe(6);
   });
 
   it("reports empty stats before the first keystroke", () => {
@@ -82,6 +84,8 @@ describe("typing", () => {
       wpm: 0,
       accuracy: 1,
       typos: 0,
+      characters: 0,
+      keystrokes: 0,
     });
   });
 });

@@ -2,7 +2,11 @@ import type { TypingSession } from "@typerace/game";
 import { cn } from "@/lib/utils";
 
 /** The text being typed: done characters dimmed, the next one marked. */
-export function TypingText({ session }: { session: TypingSession }) {
+export function TypingText({
+  session,
+}: {
+  session: Pick<TypingSession, "text" | "position" | "inError">;
+}) {
   const { text, position, inError } = session;
 
   return (

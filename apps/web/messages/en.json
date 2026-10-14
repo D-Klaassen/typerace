@@ -142,7 +142,7 @@
     "start": "Start Match",
     "needTwoPlayers": "You need at least two Players to start.",
     "waitingForStart": "Waiting for the Host to start the Match.",
-    "modeSoon": "This Mode can’t be played Online yet. Pick Classic Race to start a Match.",
+    "modeSoon": "Crazy Darts can’t be played Online yet. Pick another Mode to start a Match.",
     "getReady": "Get ready…",
     "progressLabel": "Race progress",
     "finishedWaiting": "Finished! Waiting for the others…",
@@ -155,6 +155,11 @@
     "accuracy": "Accuracy",
     "typos": "Typos",
     "backToLobby": "Back to lobby",
-    "waitingForHost": "Waiting for the Host to go back to the lobby."
+    "waitingForHost": "Waiting for the Host to go back to the lobby.",
+    "yourTurn": "Your Turn",
+    "theirTurn": "{name}’s Turn",
+    "turnDone": "Done! Next up…",
+    "bestTime": "Best time",
+    "turns": "Turns"
   }
 }

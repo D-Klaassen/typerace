@@ -1,11 +1,12 @@
 "use client";
 
-import type {
-  Difficulty,
-  Mode,
-  RoomSettings,
-  TextLength,
-  Vote,
+import {
+  ONLINE_MODES,
+  type Difficulty,
+  type Mode,
+  type RoomSettings,
+  type TextLength,
+  type Vote,
 } from "@typerace/game";
 import { CheckIcon, CopyIcon, CrownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -136,9 +137,6 @@ export function Lobby({
     </div>
   );
 }
-
-/** Modes that can be played Online so far. */
-const ONLINE_MODES: Mode[] = ["classicRace"];
 
 function StartArea({
   isHost,

@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RaceProgress } from "./race-progress";
+import { OnlineTimeTrial } from "./time-trial-screens";
 
 type Race = NonNullable<RoomView["race"]>;
 
@@ -100,31 +101,52 @@ export function RaceTyping({
 }
 
 export function Spectating({
-  race,
+  room,
   you,
   nicknames,
+  clockOffsetMs,
 }: {
-  race: Race | null;
+  room: RoomView;
   you: string;
   nicknames: Record<string, string>;
+  clockOffsetMs: number;
 }) {
   const t = useTranslations("Room");
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6">
+    <div className="flex w-full max-w-3xl flex-col items-center gap-6">
       <p className="text-center text-muted-foreground" role="status">
         {t("spectating")}
       </p>
-      {race && (
+      {room.race && (
         <RaceProgress
-          racers={race.racers}
-          textLength={race.text.length}
+          racers={room.race.racers}
+          textLength={room.race.text.length}
           nicknames={nicknames}
           you={you}
         />
       )}
+      {room.timeTrial && (
+        <OnlineTimeTrial
+          timeTrial={room.timeTrial}
+          you={you}
+          nicknames={nicknames}
+          clockOffsetMs={clockOffsetMs}
+          onKey={() => {}}
+        />
+      )}
     </div>
   );
+}
+
+interface ResultRow {
+  playerId: string;
+  /** Classic Race: Time, or progress when unfinished. Time Trial: best Time. */
+  time: string;
+  turns?: number;
+  wpm: number;
+  accuracy: number;
+  typos: number;
 }
 
 export function OnlineResults({
@@ -140,8 +162,31 @@ export function OnlineResults({
 }) {
   const t = useTranslations("Room");
   const common = useTranslations("Common");
-  const results = room.results ?? [];
-  const winner = results[0];
+  const seconds = (ms: number) => common("seconds", { value: ms / 1000 });
+  const results = room.results;
+  const isTimeTrial = results?.mode === "timeTrial";
+
+  const rows: ResultRow[] =
+    results?.mode === "timeTrial"
+      ? results.ranking.map((result) => ({
+          playerId: result.name,
+          time: result.bestTimeMs === null ? "–" : seconds(result.bestTimeMs),
+          turns: result.turns,
+          wpm: result.wpm,
+          accuracy: result.accuracy,
+          typos: result.typos,
+        }))
+      : (results?.ranking ?? []).map((result) => ({
+          playerId: result.playerId,
+          time:
+            result.timeMs === null
+              ? common("percent", { value: result.progress })
+              : seconds(result.timeMs),
+          wpm: result.wpm,
+          accuracy: result.accuracy,
+          typos: result.typos,
+        }));
+  const winner = rows[0];
 
   return (
     <div className="flex w-full max-w-3xl flex-col items-center gap-6">
@@ -155,32 +200,40 @@ export function OnlineResults({
           <TableRow>
             <TableHead>#</TableHead>
             <TableHead>{t("player")}</TableHead>
-            <TableHead className="text-right">{t("time")}</TableHead>
+            <TableHead className="text-right">
+              {isTimeTrial ? t("bestTime") : t("time")}
+            </TableHead>
+            {isTimeTrial && (
+              <TableHead className="text-right">{t("turns")}</TableHead>
+            )}
             <TableHead className="text-right">{t("wpm")}</TableHead>
             <TableHead className="text-right">{t("accuracy")}</TableHead>
             <TableHead className="text-right">{t("typos")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {results.map((result, index) => (
-            <TableRow key={result.playerId}>
+          {rows.map((row, index) => (
+            <TableRow key={row.playerId}>
               <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">
-                {nicknames[result.playerId] ?? "?"}
+                {nicknames[row.playerId] ?? "?"}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {result.timeMs === null
-                  ? common("percent", { value: result.progress })
-                  : common("seconds", { value: result.timeMs / 1000 })}
+                {row.time}
+              </TableCell>
+              {isTimeTrial && (
+                <TableCell className="text-right tabular-nums">
+                  {row.turns}
+                </TableCell>
+              )}
+              <TableCell className="text-right tabular-nums">
+                {Math.round(row.wpm)}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {Math.round(result.wpm)}
+                {common("percent", { value: row.accuracy })}
               </TableCell>
               <TableCell className="text-right tabular-nums">
-                {common("percent", { value: result.accuracy })}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {result.typos}
+                {row.typos}
               </TableCell>
             </TableRow>
           ))}

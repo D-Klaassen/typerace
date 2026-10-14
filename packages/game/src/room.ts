@@ -1,6 +1,13 @@
 import type { Difficulty } from "./gibberish";
 import { validateNicknames, type NicknameProblem } from "./nicknames";
 import {
+  advanceTimeTrial,
+  dropFromTimeTrial,
+  startOnlineTimeTrial,
+  typeInTimeTrial,
+  type OnlineTimeTrial,
+} from "./online-time-trial";
+import {
   dropFromRace,
   isRaceOver,
   startOnlineRace,
@@ -14,7 +21,7 @@ export const MAX_ROOM_PLAYERS = 6;
 export const COUNTDOWN_MS = 3_000;
 
 /** Modes that can already be played Online. */
-const ONLINE_MODES: readonly Mode[] = ["classicRace"];
+export const ONLINE_MODES: readonly Mode[] = ["classicRace", "timeTrial"];
 
 export type Mode = "classicRace" | "crazyDarts" | "timeTrial";
 
@@ -74,8 +81,12 @@ export interface Room {
   readonly countdownEndsAtMs: number | null;
   /** The text of the coming or current Match. */
   readonly text: string | null;
-  /** The current or last Match's race; null in the lobby. */
+  /** The current or last Classic Race; null in the lobby. */
   readonly race: OnlineRace | null;
+  /** The current or last Time Trial; null in the lobby. */
+  readonly timeTrial: OnlineTimeTrial | null;
+  /** Seeds the Match's Gibberish where the Room generates it (Time Trial). */
+  readonly seed: number;
 }
 
 export interface PlayerVotes {
@@ -108,6 +119,8 @@ export function createRoom(): Room {
     countdownEndsAtMs: null,
     text: null,
     race: null,
+    timeTrial: null,
+    seed: 0,
   };
 }
 
@@ -157,7 +170,16 @@ export function leaveRoom(room: Room, playerId: string): Room {
   );
   const left = { ...room, players, hostId, votes };
 
-  if (left.phase !== "racing" || !left.race) {
+  if (left.phase !== "racing") {
+    return left;
+  }
+  if (left.timeTrial) {
+    return finishIfOver(
+      { ...left, timeTrial: dropFromTimeTrial(left.timeTrial, playerId) },
+      -Infinity,
+    );
+  }
+  if (!left.race) {
     return left;
   }
 
@@ -168,13 +190,13 @@ export function leaveRoom(room: Room, playerId: string): Room {
   );
 }
 
-/** Only the Host can change settings; anyone else's change is ignored. */
+/** Only the Host can change settings, and only in the lobby. */
 export function updateSettings(
   room: Room,
   byId: string,
   changes: Partial<RoomSettings>,
 ): Room {
-  if (byId !== room.hostId) {
+  if (byId !== room.hostId || room.phase !== "lobby") {
     return room;
   }
 
@@ -221,7 +243,7 @@ export function getVoteCounts(room: Room): VoteCounts {
 export function startCountdown(
   room: Room,
   byId: string,
-  { text, nowMs }: { text: string; nowMs: number },
+  { text, seed, nowMs }: { text: string; seed: number; nowMs: number },
 ): Room {
   const canStart =
     byId === room.hostId &&
@@ -237,6 +259,7 @@ export function startCountdown(
     phase: "countdown",
     countdownEndsAtMs: nowMs + COUNTDOWN_MS,
     text,
+    seed,
   };
 }
 
@@ -247,18 +270,40 @@ export function advanceClock(room: Room, nowMs: number): Room {
     room.countdownEndsAtMs !== null &&
     nowMs >= room.countdownEndsAtMs
   ) {
-    return {
+    const players = room.players
+      .filter((player) => !player.spectator)
+      .map((player) => player.id);
+    const started = {
       ...room,
       phase: "racing",
       countdownEndsAtMs: null,
-      race: startOnlineRace({
-        players: room.players
-          .filter((player) => !player.spectator)
-          .map((player) => player.id),
-        text: room.text ?? "",
-        startedAtMs: room.countdownEndsAtMs,
-      }),
-    };
+    } as const;
+
+    return room.settings.mode === "timeTrial"
+      ? {
+          ...started,
+          timeTrial: startOnlineTimeTrial({
+            players,
+            timeBankMs: room.settings.timeBankMs,
+            difficulty: room.settings.difficulty,
+            seed: room.seed,
+          }),
+        }
+      : {
+          ...started,
+          race: startOnlineRace({
+            players,
+            text: room.text ?? "",
+            startedAtMs: room.countdownEndsAtMs,
+          }),
+        };
+  }
+
+  if (room.phase === "racing" && room.timeTrial) {
+    return finishIfOver(
+      { ...room, timeTrial: advanceTimeTrial(room.timeTrial, nowMs) },
+      nowMs,
+    );
   }
 
   return finishIfOver(room, nowMs);
@@ -271,7 +316,17 @@ export function typeInRoom(
   key: string,
   atMs: number,
 ): Room {
-  if (room.phase !== "racing" || !room.race) {
+  if (room.phase !== "racing") {
+    return room;
+  }
+  if (room.timeTrial) {
+    const timeTrial = typeInTimeTrial(room.timeTrial, playerId, key, atMs);
+
+    return timeTrial === room.timeTrial
+      ? room
+      : finishIfOver({ ...room, timeTrial }, atMs);
+  }
+  if (!room.race) {
     return room;
   }
 
@@ -294,13 +349,17 @@ export function backToLobby(room: Room, byId: string): Room {
     phase: "lobby",
     text: null,
     race: null,
+    timeTrial: null,
     players: room.players.map((player) => ({ ...player, spectator: false })),
   };
 }
 
 /** Ends a running race once it's over; Votes reset after every Match. */
 function finishIfOver(room: Room, nowMs: number): Room {
-  if (room.phase !== "racing" || !room.race || !isRaceOver(room.race, nowMs)) {
+  const over = room.timeTrial
+    ? room.timeTrial.trial.winner !== null
+    : room.race !== null && isRaceOver(room.race, nowMs);
+  if (room.phase !== "racing" || !over) {
     return room;
   }
 

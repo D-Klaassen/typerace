@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   completeTurn,
+  eliminatePlayer,
   getTimeTrialResults,
   runOutOfTime,
   startTimeTrial,
@@ -146,5 +147,22 @@ describe("Time Trial", () => {
 
     expect(trial.winner).toBe("Anna");
     expect(trial.eliminated).toEqual(["Bob"]);
+  });
+
+  it("can eliminate a Player who is waiting for their Turn", () => {
+    let trial = startTimeTrial({
+      players: ["Anna", "Bob", "Cas"],
+      timeBankMs: 120_000,
+    });
+    trial = completeTurn(trial, turnTaking(40_000));
+    trial = completeTurn(trial, turnTaking(50_000));
+
+    trial = eliminatePlayer(trial, "Bob");
+    expect(trial.currentPlayer).toBe("Cas");
+    expect(trial.eliminated).toEqual(["Bob"]);
+
+    trial = eliminatePlayer(trial, "Cas");
+    expect(trial.winner).toBe("Anna");
+    expect(trial.currentPlayer).toBeNull();
   });
 });

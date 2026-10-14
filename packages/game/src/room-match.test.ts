@@ -16,7 +16,11 @@ import {
 /** Anna (Host) and Bob racing on "ab" since t = 3 s. */
 function racingRoom(): Room {
   return advanceClock(
-    startCountdown(roomWith("Anna", "Bob"), "p1", { text: "ab", nowMs: 0 }),
+    startCountdown(roomWith("Anna", "Bob"), "p1", {
+      text: "ab",
+      seed: 1,
+      nowMs: 0,
+    }),
     3_000,
   );
 }
@@ -33,12 +37,19 @@ describe("Room Matches", () => {
   it("lets only the Host start a countdown, with at least two Players", () => {
     const room = roomWith("Anna", "Bob");
 
-    expect(startCountdown(room, "p2", { text: "ab", nowMs: 0 })).toBe(room);
+    expect(startCountdown(room, "p2", { text: "ab", seed: 1, nowMs: 0 })).toBe(
+      room,
+    );
     expect(
-      startCountdown(roomWith("Anna"), "p1", { text: "ab", nowMs: 0 }).phase,
+      startCountdown(roomWith("Anna"), "p1", { text: "ab", seed: 1, nowMs: 0 })
+        .phase,
     ).toBe("lobby");
 
-    const counting = startCountdown(room, "p1", { text: "ab", nowMs: 1_000 });
+    const counting = startCountdown(room, "p1", {
+      text: "ab",
+      seed: 1,
+      nowMs: 1_000,
+    });
     expect(counting.phase).toBe("countdown");
     expect(counting.countdownEndsAtMs).toBe(4_000);
   });
@@ -48,12 +59,15 @@ describe("Room Matches", () => {
       mode: "crazyDarts",
     });
 
-    expect(startCountdown(room, "p1", { text: "ab", nowMs: 0 })).toBe(room);
+    expect(startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 })).toBe(
+      room,
+    );
   });
 
   it("starts racing when the countdown ends", () => {
     let room = startCountdown(roomWith("Anna", "Bob"), "p1", {
       text: "ab",
+      seed: 1,
       nowMs: 0,
     });
 
@@ -71,6 +85,7 @@ describe("Room Matches", () => {
   it("ignores keystrokes until the race has started", () => {
     const counting = startCountdown(roomWith("Anna", "Bob"), "p1", {
       text: "ab",
+      seed: 1,
       nowMs: 0,
     });
 
@@ -80,7 +95,7 @@ describe("Room Matches", () => {
   it("shows results once everyone has finished, and resets the Votes", () => {
     let room = castVote(roomWith("Anna", "Bob"), "p2", { mode: "timeTrial" });
     room = advanceClock(
-      startCountdown(room, "p1", { text: "ab", nowMs: 0 }),
+      startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 }),
       3_000,
     );
 
@@ -139,5 +154,56 @@ describe("Room Matches", () => {
       false,
       false,
     ]);
+  });
+
+  it("locks the settings while a Match is on", () => {
+    const room = racingRoom();
+
+    expect(updateSettings(room, "p1", { difficulty: "hard" })).toBe(room);
+  });
+
+  it("plays a Time Trial: the current Player types, leaving eliminates", () => {
+    let room = updateSettings(roomWith("Anna", "Bob", "Cas"), "p1", {
+      mode: "timeTrial",
+    });
+    room = advanceClock(
+      startCountdown(room, "p1", { text: "unused", seed: 1, nowMs: 0 }),
+      3_000,
+    );
+
+    expect(room.phase).toBe("racing");
+    expect(room.race).toBeNull();
+    expect(room.timeTrial?.trial.currentPlayer).toBe("p1");
+
+    const firstKey = room.timeTrial!.turn!.text[0]!;
+    room = typeInRoom(room, "p1", firstKey, 4_000);
+    expect(room.timeTrial?.turn?.position).toBe(1);
+
+    room = leaveRoom(room, "p1");
+    expect(room.timeTrial?.trial.currentPlayer).toBe("p2");
+
+    room = leaveRoom(room, "p3");
+    expect(room.phase).toBe("results");
+    expect(room.timeTrial?.trial.winner).toBe("p2");
+
+    room = backToLobby(room, "p2");
+    expect(room.timeTrial).toBeNull();
+  });
+
+  it("eliminates a Time Trial Player whose Time Bank runs out", () => {
+    let room = updateSettings(roomWith("Anna", "Bob"), "p1", {
+      mode: "timeTrial",
+      timeBankMs: 60_000,
+    });
+    room = advanceClock(
+      startCountdown(room, "p1", { text: "unused", seed: 1, nowMs: 0 }),
+      3_000,
+    );
+    room = typeInRoom(room, "p1", room.timeTrial!.turn!.text[0]!, 4_000);
+
+    room = advanceClock(room, 64_000);
+
+    expect(room.phase).toBe("results");
+    expect(room.timeTrial?.trial.winner).toBe("p2");
   });
 });

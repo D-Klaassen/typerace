@@ -20,3 +20,8 @@ export {
   type TimeTrialPlayer,
   type TimeTrialResult,
 } from "./time-trial";
+export {
+  MAX_NICKNAME_LENGTH,
+  validateNicknames,
+  type NicknameProblem,
+} from "./nicknames";

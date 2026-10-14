@@ -14,6 +14,6 @@ A multiplayer typing game. Read these before changing anything:
 
 ## Checks
 
-Run `pnpm check` (format, lint, typecheck, test) before every commit; it must be green. `pnpm format` fixes formatting.
+Run `pnpm check` (format, lint, typecheck, unit tests, Playwright e2e) before every commit; it must be green. `pnpm format` fixes formatting.
 
 All user-facing text goes through next-intl (`apps/web/messages/en.json`), never hard-coded in components.

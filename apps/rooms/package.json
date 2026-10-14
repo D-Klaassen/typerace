@@ -1,0 +1,25 @@
+{
+  "name": "rooms",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "lint": "eslint",
+    "typecheck": "wrangler types && tsc --noEmit",
+    "test": "echo \"rooms: covered by game unit tests and web e2e\""
+  },
+  "dependencies": {
+    "@typerace/game": "workspace:*",
+    "@typerace/protocol": "workspace:*",
+    "partyserver": "^0.5.10"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
+    "typescript": "^5",
+    "typescript-eslint": "^8",
+    "wrangler": "^4"
+  }
+}

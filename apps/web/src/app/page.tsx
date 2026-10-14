@@ -11,13 +11,26 @@ export default function Home() {
         <h1 className="text-5xl font-bold">{t("title")}</h1>
         <p className="text-lg text-muted-foreground">{t("tagline")}</p>
       </div>
-      <div className="flex flex-col items-center gap-2">
-        <Link href="/play" className={buttonVariants({ size: "lg" })}>
-          {t("sharedKeyboard")}
-        </Link>
-        <p className="text-sm text-muted-foreground">
-          {t("sharedKeyboardDescription")}
-        </p>
+      <div className="flex flex-col gap-6 sm:flex-row">
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/online" className={buttonVariants({ size: "lg" })}>
+            {t("online")}
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            {t("onlineDescription")}
+          </p>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <Link
+            href="/play"
+            className={buttonVariants({ size: "lg", variant: "outline" })}
+          >
+            {t("sharedKeyboard")}
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            {t("sharedKeyboardDescription")}
+          </p>
+        </div>
       </div>
     </main>
   );

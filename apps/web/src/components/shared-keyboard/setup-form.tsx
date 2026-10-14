@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { ChoiceGroup } from "@/components/choice-group";
 import { Label } from "@/components/ui/label";
 import {
   MAX_PLAYERS,
@@ -198,42 +199,5 @@ export function SetupForm({
         </CardFooter>
       </form>
     </Card>
-  );
-}
-
-function ChoiceGroup<T extends string | number>({
-  legend,
-  name,
-  options,
-  value,
-  onChange,
-}: {
-  legend: string;
-  name: string;
-  options: { value: T; label: string }[];
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mb-2 text-sm font-medium">{legend}</legend>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <label
-            key={option.value}
-            className="cursor-pointer rounded-md border px-3 py-1.5 text-sm has-checked:border-primary has-checked:bg-primary has-checked:text-primary-foreground has-focus-visible:ring-2 has-focus-visible:ring-ring"
-          >
-            <input
-              type="radio"
-              name={name}
-              className="sr-only"
-              checked={option.value === value}
-              onChange={() => onChange(option.value)}
-            />
-            {option.label}
-          </label>
-        ))}
-      </div>
-    </fieldset>
   );
 }

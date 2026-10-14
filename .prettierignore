@@ -4,3 +4,5 @@ coverage
 next-env.d.ts
 test-results
 playwright-report
+worker-configuration.d.ts
+.wrangler

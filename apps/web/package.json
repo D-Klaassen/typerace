@@ -14,11 +14,13 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@typerace/game": "workspace:*",
+    "@typerace/protocol": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "lucide-react": "^1.56.0",
     "next": "16.4.0",
     "next-intl": "^4.14.9",
+    "partysocket": "^1.3.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "shadcn": "^4.21.4",

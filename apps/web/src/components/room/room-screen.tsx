@@ -1,0 +1,117 @@
+"use client";
+
+import { MAX_NICKNAME_LENGTH } from "@typerace/game";
+import { isRoomCode } from "@typerace/protocol";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Lobby } from "./lobby";
+import { useRoom } from "./use-room";
+
+export function RoomScreen() {
+  const { code } = useParams<{ code: string }>();
+
+  if (!isRoomCode(code)) {
+    return <RoomNotFound />;
+  }
+
+  return <ValidRoom code={code} />;
+}
+
+function ValidRoom({ code }: { code: string }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const intent = searchParams.has("create") ? "create" : "join";
+  const room = useRoom(code, intent);
+  const joined = room.state !== null;
+
+  // Once the Room exists, the address bar should hold a plain join link.
+  useEffect(() => {
+    if (joined && intent === "create") {
+      router.replace(`/room/${code}`);
+    }
+  }, [joined, intent, code, router]);
+
+  if (room.error === "roomNotFound") {
+    return <RoomNotFound />;
+  }
+  if (!room.state) {
+    return <NicknameForm code={code} error={room.error} onJoin={room.join} />;
+  }
+
+  return (
+    <Lobby
+      code={code}
+      state={room.state}
+      onUpdateSettings={room.updateSettings}
+      onVote={room.vote}
+    />
+  );
+}
+
+function NicknameForm({
+  code,
+  error,
+  onJoin,
+}: {
+  code: string;
+  error: string | null;
+  onJoin: (nickname: string) => void;
+}) {
+  const t = useTranslations("Room");
+  const [nickname, setNickname] = useState("");
+
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl">{t("title", { code })}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form
+          noValidate
+          className="flex flex-col gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onJoin(nickname);
+          }}
+        >
+          <Label htmlFor="nickname">{t("nickname")}</Label>
+          <Input
+            id="nickname"
+            value={nickname}
+            maxLength={MAX_NICKNAME_LENGTH}
+            autoComplete="off"
+            autoFocus
+            onChange={(event) => setNickname(event.target.value)}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {t(`errors.${error}`)}
+            </p>
+          )}
+          <Button type="submit" size="lg">
+            {t("enter")}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function RoomNotFound() {
+  const t = useTranslations("Room");
+
+  return (
+    <div className="flex flex-col items-center gap-4 text-center">
+      <h1 className="text-2xl font-bold">{t("errors.roomNotFound")}</h1>
+      <Link href="/online" className={buttonVariants({ variant: "outline" })}>
+        {t("backToOnline")}
+      </Link>
+    </div>
+  );
+}

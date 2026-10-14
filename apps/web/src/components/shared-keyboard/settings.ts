@@ -1,7 +1,13 @@
 import type { Difficulty } from "@typerace/game";
 
+export interface SharedKeyboardPlayer {
+  name: string;
+  /** Whether this Player's Turns show the Finger Guide. */
+  fingerGuide: boolean;
+}
+
 export interface SharedKeyboardSettings {
-  players: string[];
+  players: SharedKeyboardPlayer[];
   difficulty: Difficulty;
   timeBankMs: number;
 }
@@ -13,7 +19,10 @@ export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
 
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
-  players: ["", ""],
+  players: [
+    { name: "", fingerGuide: false },
+    { name: "", fingerGuide: false },
+  ],
   difficulty: "medium",
   timeBankMs: 120_000,
 };

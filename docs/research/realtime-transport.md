@@ -33,6 +33,7 @@ Researched 2026-10-13. Prices, limits and beta status change often, so re-check 
   - Pusher client events need private or presence channels and are capped at 10 per second per client ([events](https://pusher.com/docs/channels/using_channels/events/))
 
   Each hit therefore costs an HTTP round trip plus a store write, and you still need Redis or a database.
+
 - **Free tiers:**
   - Ably: 6M messages per month and 200 connections ([free](https://ably.com/docs/pricing/free)). Fan-out and echo are counted ([counting](https://ably.com/docs/platform/pricing/message-counting)), so a Match is about 25K messages, or about 240 Matches per month.
   - Supabase: 2M messages per month and 200 connections. Delivered copies count, so that is about 90 Matches per month. Projects pause after a week of inactivity ([pricing](https://supabase.com/pricing), [counting](https://supabase.com/docs/guides/platform/manage-your-usage/realtime-messages)).
@@ -56,12 +57,12 @@ Researched 2026-10-13. Prices, limits and beta status change often, so re-check 
 
 ## Summary
 
-| Option | Server-owned state | Free tier fit | Extra infra | Lock-in |
-|---|---|---|---|---|
-| Vercel WebSockets | Via Redis, no single owner | Tight (Redis commands, 300 s cap) | Redis | Vercel, experimental API |
-| Durable Objects | Native, one object per Room | Generous | Cloudflare Worker | Cloudflare |
-| Hosted pub/sub | Via Function and store | Fan-out drains quotas | Vendor plus store | Vendor SDK |
-| Socket.IO server | Native, in-process | Small paid host | VM/container | Low |
+| Option            | Server-owned state          | Free tier fit                     | Extra infra       | Lock-in                  |
+| ----------------- | --------------------------- | --------------------------------- | ----------------- | ------------------------ |
+| Vercel WebSockets | Via Redis, no single owner  | Tight (Redis commands, 300 s cap) | Redis             | Vercel, experimental API |
+| Durable Objects   | Native, one object per Room | Generous                          | Cloudflare Worker | Cloudflare               |
+| Hosted pub/sub    | Via Function and store      | Fan-out drains quotas             | Vendor plus store | Vendor SDK               |
+| Socket.IO server  | Native, in-process          | Small paid host                   | VM/container      | Low                      |
 
 ## Recommendation
 

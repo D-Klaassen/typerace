@@ -19,23 +19,27 @@ import {
 } from "./match-screens";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
-import { useRoom } from "./use-room";
+import { ROOMS_HOST, useRoom } from "./use-room";
 
 export function RoomScreen() {
   const { code } = useParams<{ code: string }>();
+  const t = useTranslations("Room");
 
+  if (ROOMS_HOST === null) {
+    return <p role="alert">{t("notConfigured")}</p>;
+  }
   if (!isRoomCode(code)) {
     return <RoomNotFound />;
   }
 
-  return <ValidRoom code={code} />;
+  return <ValidRoom host={ROOMS_HOST} code={code} />;
 }
 
-function ValidRoom({ code }: { code: string }) {
+function ValidRoom({ host, code }: { host: string; code: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const intent = searchParams.has("create") ? "create" : "join";
-  const room = useRoom(code, intent);
+  const room = useRoom(host, code, intent);
   const joined = room.state !== null;
 
   // Once the Room exists, the address bar should hold a plain join link.

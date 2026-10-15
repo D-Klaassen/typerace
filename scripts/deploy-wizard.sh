@@ -198,24 +198,45 @@ banner "Deploy Typerace"
 stage "Cloudflare: log in"
 say "The Rooms server runs on Cloudflare (Durable Objects, free plan is fine)."
 if wrangler whoami 2>&1 | grep -qi "not authenticated"; then
-  step "Your browser will open a Cloudflare page: log in (or sign up) and click Allow."
-  pause "Press Enter to open the login page"
-  wrangler login
+  # An API token instead of `wrangler login`: the browser login needs a
+  # callback on localhost:8976, which doesn't work from every terminal.
+  say "We'll use a Cloudflare API token so wrangler can deploy for you."
+  open_url "https://dash.cloudflare.com/profile/api-tokens"
+  step "Log in (or sign up), then click ${BOLD}Create Token${RESET}."
+  step "Next to ${BOLD}Edit Cloudflare Workers${RESET}, click ${BOLD}Use template${RESET}."
+  step "Account Resources: Include → your account. Zone Resources: Include → All zones."
+  step "Click Continue to summary → Create Token, then copy the token."
+  note "The token is only used for this run; it isn't saved anywhere."
+  ask_secret CLOUDFLARE_API_TOKEN "Paste the API token (hidden):"
+  export CLOUDFLARE_API_TOKEN
 else
   note "You're already logged in to Cloudflare."
 fi
-wrangler whoami 2>&1 | grep -iE "logged in|email" | head -n 2 | while read -r line; do note "$line"; done
+if wrangler whoami 2>&1 | grep -qi "not authenticated"; then
+  warn "Cloudflare doesn't accept that token. Re-run the wizard to try again."
+  exit 1
+fi
+wrangler whoami 2>&1 | grep -iE "logged in|email|token" | head -n 2 | while read -r line; do note "$line"; done
 pause
 
 # ── 2. Deploy the Rooms Worker ────────────────────────────────────────────
 stage "Cloudflare: deploy the Rooms server"
 say "This uploads apps/rooms as the Worker 'typerace-rooms'."
-note "The first time, Cloudflare may ask you to pick a workers.dev subdomain."
+say "A new Cloudflare account first needs a workers.dev subdomain: if wrangler"
+say "asks 'Would you like to register a workers.dev subdomain now?', answer"
+say "yes and pick a name (e.g. your own)."
 ROOMS_HOST=""
 if confirm "Deploy the Rooms server to Cloudflare now?"; then
   DEPLOY_LOG=$(mktemp)
-  wrangler deploy 2>&1 | tee "$DEPLOY_LOG"
-  ROOMS_URL=$(grep -Eo 'https://[A-Za-z0-9.-]+\.workers\.dev' "$DEPLOY_LOG" | head -n 1 || true)
+  # `script` keeps a real terminal, so wrangler can still ask questions,
+  # while recording the output to read the Worker's address from.
+  if [[ "$(uname)" == "Darwin" ]]; then
+    script -q "$DEPLOY_LOG" pnpm --filter rooms exec wrangler deploy || true
+  else
+    script -q -c "pnpm --filter rooms exec wrangler deploy" "$DEPLOY_LOG" || true
+  fi
+  # The Worker's own address, not the bare subdomain wrangler may print first.
+  ROOMS_URL=$(grep -Eo 'https://typerace-rooms\.[A-Za-z0-9.-]+\.workers\.dev' "$DEPLOY_LOG" | head -n 1 || true)
   rm -f "$DEPLOY_LOG"
   ROOMS_HOST="${ROOMS_URL#https://}"
 fi
@@ -240,15 +261,18 @@ step "Root Directory: click Edit and choose ${BOLD}apps/web${RESET} (Framework: 
 step "Open 'Environment Variables' and add these two:"
 say "    ${BOLD}NEXT_PUBLIC_ROOMS_HOST${RESET} = ${BOLD}${ROOMS_HOST}${RESET}"
 say "    ${BOLD}ENABLE_EXPERIMENTAL_COREPACK${RESET} = ${BOLD}1${RESET}   (uses the repo's exact pnpm version)"
+note "Both are read during the build: change them later and you must Redeploy."
 step "Click Deploy and wait for the build to finish (a few minutes)."
 step "Copy the production URL Vercel shows (like https://typerace-xyz.vercel.app)."
 ask WEB_URL "Paste the Vercel URL:"
+[[ "$WEB_URL" == http* ]] || WEB_URL="https://$WEB_URL"
+WEB_URL="${WEB_URL%/}"
 write_env WEB_URL "$WEB_URL"
 pause
 
 # ── 4. Smoke test ─────────────────────────────────────────────────────────
 stage "Try it live"
-open_url "${WEB_URL%/}/online"
+open_url "$WEB_URL/online"
 step "Click Create Room and enter a nickname."
 step "Copy the Room link and open it in a private window; join with another nickname."
 step "As the Host, click Start Match and type a few words in both windows."

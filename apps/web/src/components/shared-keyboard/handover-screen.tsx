@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, type ReactNode } from "react";
+import { isDialogOpen } from "@/components/typing/dialog-open";
 import { Button } from "@/components/ui/button";
 
 export function HandoverScreen({
@@ -17,7 +18,7 @@ export function HandoverScreen({
   const t = useTranslations("SharedKeyboard.Handover");
 
   const handleKeyDown = useEffectEvent((event: KeyboardEvent) => {
-    if (event.key === " " && !event.repeat) {
+    if (event.key === " " && !event.repeat && !isDialogOpen()) {
       event.preventDefault();
       onReady();
     }

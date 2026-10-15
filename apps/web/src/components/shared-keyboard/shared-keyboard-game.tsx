@@ -15,12 +15,16 @@ import {
   type TimeTrial,
   type TypingStats,
 } from "@typerace/game";
-import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useState, type ReactNode } from "react";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import {
   LeaderboardNote,
   type LeaderboardStatus,
 } from "@/components/leaderboard/leaderboard-note";
+import { BackToMenu, MenuBar } from "@/components/navigation/menu-bar";
+import { QuitButton } from "@/components/navigation/quit-button";
 import { submitToLeaderboard } from "@/lib/leaderboard";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 import { HandoverScreen } from "./handover-screen";
@@ -46,6 +50,8 @@ type Game =
 
 /** Classic Race or Time Trial, played by passing one keyboard around. */
 export function SharedKeyboardGame() {
+  const t = useTranslations("SharedKeyboard.Quit");
+  const router = useRouter();
   const [settings, setSettings] =
     useState<SharedKeyboardSettings>(DEFAULT_SETTINGS);
   const [game, setGame] = useState<Game>({ phase: "setup" });
@@ -88,7 +94,14 @@ export function SharedKeyboardGame() {
   }
 
   if (game.phase === "setup") {
-    return <SetupForm initial={settings} onStart={start} />;
+    return (
+      <>
+        <MenuBar>
+          <BackToMenu />
+        </MenuBar>
+        <SetupForm initial={settings} onStart={start} />
+      </>
+    );
   }
 
   const { match, seed } = game;
@@ -103,9 +116,10 @@ export function SharedKeyboardGame() {
     }
   };
 
+  let screen: ReactNode;
   switch (game.phase) {
     case "handover":
-      return (
+      screen = (
         <HandoverScreen
           player={currentPlayer(match)}
           standings={
@@ -118,6 +132,7 @@ export function SharedKeyboardGame() {
           onReady={() => setGame({ ...game, phase: "turn" })}
         />
       );
+      break;
 
     case "turn": {
       const player = currentPlayer(match);
@@ -136,7 +151,7 @@ export function SharedKeyboardGame() {
         DEFAULT_DISPLAY;
 
       if (match.mode === "classicRace") {
-        return (
+        screen = (
           <TurnScreen
             key={turnNumber}
             player={player}
@@ -151,6 +166,7 @@ export function SharedKeyboardGame() {
             }
           />
         );
+        break;
       }
 
       const { trial } = match;
@@ -159,7 +175,7 @@ export function SharedKeyboardGame() {
         (stats: TypingStats) =>
           endTurn({ mode: "timeTrial", trial: end(trial, stats) });
 
-      return (
+      screen = (
         <TurnScreen
           key={turnNumber}
           player={player}
@@ -172,40 +188,60 @@ export function SharedKeyboardGame() {
           onRunOutOfTime={endTrialTurn(runOutOfTime)}
         />
       );
+      break;
     }
 
     case "results":
-      return match.mode === "timeTrial" ? (
-        <ResultsScreen
-          results={getTimeTrialResults(match.trial)}
-          columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
-          aidsOf={(name) =>
-            settings.players.find((player) => player.name === name)?.display
-          }
-          leaderboard={
-            ROOMS_HOST !== null && (
-              <LeaderboardNote
-                status={saved?.trial === match.trial ? saved.status : null}
-                keySet={settings.keySet}
-                capitals={settings.capitals}
-              />
-            )
-          }
-          onPlayAgain={() => start(settings)}
-          onBackToSetup={() => setGame({ phase: "setup" })}
-        />
-      ) : (
-        <ResultsScreen
-          results={getClassicRaceResults(match.race)}
-          columns={["time", "wpm", "accuracy", "typos"]}
-          aidsOf={(name) =>
-            settings.players.find((player) => player.name === name)?.display
-          }
-          onPlayAgain={() => start(settings)}
-          onBackToSetup={() => setGame({ phase: "setup" })}
-        />
-      );
+      screen =
+        match.mode === "timeTrial" ? (
+          <ResultsScreen
+            results={getTimeTrialResults(match.trial)}
+            columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
+            aidsOf={(name) =>
+              settings.players.find((player) => player.name === name)?.display
+            }
+            leaderboard={
+              ROOMS_HOST !== null && (
+                <LeaderboardNote
+                  status={saved?.trial === match.trial ? saved.status : null}
+                  keySet={settings.keySet}
+                  capitals={settings.capitals}
+                />
+              )
+            }
+            onPlayAgain={() => start(settings)}
+            onBackToSetup={() => setGame({ phase: "setup" })}
+          />
+        ) : (
+          <ResultsScreen
+            results={getClassicRaceResults(match.race)}
+            columns={["time", "wpm", "accuracy", "typos"]}
+            aidsOf={(name) =>
+              settings.players.find((player) => player.name === name)?.display
+            }
+            onPlayAgain={() => start(settings)}
+            onBackToSetup={() => setGame({ phase: "setup" })}
+          />
+        );
   }
+
+  return (
+    <>
+      <MenuBar>
+        {game.phase === "results" ? (
+          <BackToMenu />
+        ) : (
+          // Nothing is saved from an unfinished game, so ask first.
+          <QuitButton
+            label={t("quit")}
+            confirmation={{ title: t("title"), description: t("description") }}
+            onQuit={() => router.push("/")}
+          />
+        )}
+      </MenuBar>
+      {screen}
+    </>
+  );
 }
 
 function currentPlayer(match: Match): string {

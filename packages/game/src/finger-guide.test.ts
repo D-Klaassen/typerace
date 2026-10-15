@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getKeyGuide } from "./finger-guide";
 import { generateGibberish } from "./gibberish";
+import { KEY_SET_PRESETS, resolveKeySet } from "./key-sets";
 
 describe("getKeyGuide", () => {
   it("guides home-row letters to their own finger without Shift", () => {
@@ -53,16 +54,14 @@ describe("getKeyGuide with Shift", () => {
 });
 
 describe("getKeyGuide coverage", () => {
-  it("guides every character that Gibberish can produce", () => {
-    const text = ["easy", "medium", "hard"]
-      .map((difficulty) =>
-        generateGibberish({
-          seed: 3,
-          difficulty: difficulty as "easy" | "medium" | "hard",
-          minLength: 5000,
-        }),
-      )
-      .join(" ");
+  it("guides every character any preset can produce, with Capitals", () => {
+    const text = KEY_SET_PRESETS.map((preset) =>
+      generateGibberish({
+        seed: 3,
+        keySet: resolveKeySet({ preset: preset.id }, true),
+        minLength: 300,
+      }),
+    ).join(" ");
 
     const unguided = [...new Set(text)].filter((char) => !getKeyGuide(char));
 

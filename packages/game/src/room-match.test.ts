@@ -149,7 +149,7 @@ describe("Room Matches", () => {
   it("locks the settings while a Match is on", () => {
     const room = racingRoom();
 
-    expect(updateSettings(room, "p1", { difficulty: "hard" })).toBe(room);
+    expect(updateSettings(room, "p1", { capitals: true })).toBe(room);
   });
 
   it("plays a Time Trial: the current Player types, leaving eliminates", () => {

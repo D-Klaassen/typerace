@@ -1,4 +1,4 @@
-import type { Difficulty } from "@typerace/game";
+import { DEFAULT_KEY_SET_CHOICE, type KeySetChoice } from "@typerace/game";
 import {
   NO_DISPLAY_AIDS,
   type DisplayPreferences,
@@ -17,7 +17,8 @@ export interface SharedKeyboardPlayer {
 export interface SharedKeyboardSettings {
   mode: SharedKeyboardMode;
   players: SharedKeyboardPlayer[];
-  difficulty: Difficulty;
+  keySet: KeySetChoice;
+  capitals: boolean;
   /** Classic Race only. */
   textLength: TextLength;
   /** Time Trial only. */
@@ -43,7 +44,8 @@ export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
     { name: "", display: NO_DISPLAY_AIDS },
     { name: "", display: NO_DISPLAY_AIDS },
   ],
-  difficulty: "medium",
+  keySet: DEFAULT_KEY_SET_CHOICE,
+  capitals: false,
   textLength: "medium",
   timeBankMs: 120_000,
 };

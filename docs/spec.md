@@ -1,6 +1,6 @@
 # Typerace v1 — Spec
 
-A typing game where people who can already type compete against each other, either **Online** in a Room or on a **Shared Keyboard** passed between them. The domain terms used here (Player, Room, Host, Match, Mode, Turn, Time Bank, Dart, HP, Typo, Gibberish, Difficulty, Finger Guide, …) are defined in [`CONTEXT.md`](../CONTEXT.md). The transport choice is recorded in [ADR 0001](adr/0001-partyserver-durable-objects-for-rooms.md).
+A typing game where people who can already type compete against each other, either **Online** in a Room or on a **Shared Keyboard** passed between them. The domain terms used here (Player, Room, Host, Match, Mode, Turn, Time Bank, Dart, HP, Typo, Gibberish, Key Set, Lesson, Finger Guide, …) are defined in [`CONTEXT.md`](../CONTEXT.md). The transport choice is recorded in [ADR 0001](adr/0001-partyserver-durable-objects-for-rooms.md).
 
 Items marked **(spec default)** were not discussed in the grilling session. They are sensible defaults; change them if they're wrong.
 
@@ -39,7 +39,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **The Room is full** at 6 Players. Anyone else sees a "Room is full" message.
 - **Lobby:**
   - Everyone sees the Host's settings live as they change.
-  - Non-Host Players can cast one Vote for a Mode and one for a Difficulty. The Host sees the counts next to each option.
+  - Non-Host Players can cast one Vote for a Mode and one for a Key Set preset (not a custom set). The Host sees the counts next to each option.
   - Votes are advisory only, and they reset after every Match.
 - **Starting:** only the Host can start a Match, with at least 2 Players. A 3-2-1 countdown follows.
 - **Joining mid-Match:** the newcomer is a Spectator. They watch, and become a Player when the next Match starts.
@@ -57,16 +57,17 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Text Source:** Gibberish only.
 - **Gibberish:** "words" of 2–7 characters, separated by single spaces.
 - **Generation is seeded,** so the Room and every client produce identical text from the same seed.
-- **Difficulty:**
-  - **Easy:** `a s d f g h j k l ;`
-  - **Medium:** `a`–`z`
-  - **Hard:** Medium, plus:
-    - Some words start with a capital **(spec default: ~25 % of words)**.
-    - Some words are 2–4 digits **(spec default: ~10 % of words)**.
-    - Some words end in punctuation from `. , ; : ! ? ' -` **(spec default: ~15 % of words)**.
+- **Key Set:** the keys the text may contain. Every key in the set is equally likely.
+  - **Lessons:** 76 numbered Lessons in 8 stages (home row, top row, top + home, bottom row, bottom + home, columns per finger, numbers, review), modelled on typelesonline.nl: a pair of keys (one per hand), then pairs combined, then everything so far.
+  - **Rows:** home, top, bottom, numbers, home + top, home + bottom, all letter rows.
+  - **Fingers:** index, middle, ring, pinkies, left hand, right hand.
+  - **Classic:** Easy (home row), Medium (`a`–`z`, the default), Hard (letters, digits and `. , ; ' - /`, always with Capitals).
+  - **Custom:** keys clicked on the On-screen Keyboard, at least 2 (fewer falls back to all letters).
+  - **Capitals:** on top of any Key Set, about 25 % of words start with a capital, to practise Shift.
+  - The picker shows a sample of the text. Non-Host Players see the Key Set read-only on a keyboard.
 - **Text per game:**
   - In an Online Classic Race, everyone types the same text at once.
-  - Every Turn gets fresh Gibberish of the same length and Difficulty.
+  - Every Turn gets fresh Gibberish of the same length and Key Set.
   - Crazy Darts text is endless in practice: 5,000 characters (about 15 minutes at 70 WPM), generated from a seed by both the Room and the browser so the text never has to be sent along with every update.
 
 ## Typing engine (shared by every Mode)
@@ -96,7 +97,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 | Setting     | Options                                         | Default |
 | ----------- | ----------------------------------------------- | ------- |
-| Difficulty  | Easy / Medium / Hard                            | Medium  |
+| Key Set     | Lesson, row, fingers, classic or custom         | Medium  |
 | Text length | Short ~100 / Medium ~250 / Long ~500 characters | Medium  |
 
 - **Online:**
@@ -112,7 +113,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 | Setting                        | Default |
 | ------------------------------ | ------- |
-| Difficulty                     | Medium  |
+| Key Set                        | Medium  |
 | Starting HP                    | 100     |
 | Damage per character of a word | 1       |
 | HP lost per Typo               | 2       |
@@ -131,7 +132,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 | Setting              | Default                            |
 | -------------------- | ---------------------------------- |
-| Difficulty           | Medium                             |
+| Key Set              | Medium                             |
 | Turn text length     | ~150 characters **(spec default)** |
 | Time Bank per Player | 2:00                               |
 
@@ -221,7 +222,7 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
 Each step is a vertical slice that is playable or testable when it lands:
 
 1. **Scaffold:** the monorepo, tooling, the `check` script, an empty Next.js app with next-intl, and an empty `packages/game` with Vitest.
-2. **Text and typing engine** in `packages/game`: seeded Gibberish per Difficulty, Typos and stats.
+2. **Text and typing engine** in `packages/game`: seeded Gibberish per Difficulty (later replaced by Key Sets), Typos and stats.
 3. **Time Trial on a Shared Keyboard:** the setup, handover and results screens, plus Time Trial rules with the Time Bank and elimination.
 4. **Finger Guide:** the keyboard, the hands, the finger colours and Shift handling, with per-Player switches (later split into On-screen Keyboard and Finger Guide, set before the Match with a preview).
 5. **Classic Race on a Shared Keyboard.**

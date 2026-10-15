@@ -4,6 +4,7 @@ import {
   completeTurn,
   finishRaceTurn,
   generateGibberish,
+  resolveKeySet,
   getClassicRaceResults,
   getTimeTrialResults,
   runOutOfTime,
@@ -89,10 +90,10 @@ export function SharedKeyboardGame() {
     case "turn": {
       const player = currentPlayer(match);
       const turnNumber = turnsTaken(match);
-      // Every Turn gets fresh Gibberish of the same length and Difficulty.
+      // Every Turn gets fresh Gibberish of the same length and Key Set.
       const text = generateGibberish({
         seed: seed + turnNumber,
-        difficulty: settings.difficulty,
+        keySet: resolveKeySet(settings.keySet, settings.capitals),
         minLength:
           match.mode === "timeTrial"
             ? TIME_TRIAL_TURN_LENGTH

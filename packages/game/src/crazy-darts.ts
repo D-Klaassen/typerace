@@ -1,4 +1,5 @@
-import { generateGibberish, type Difficulty } from "./gibberish";
+import { generateGibberish } from "./gibberish";
+import type { KeySet } from "./key-sets";
 import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
 
 /**
@@ -7,10 +8,10 @@ import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
  */
 export const CRAZY_DARTS_TEXT_LENGTH = 5_000;
 
-export function crazyDartsText(seed: number, difficulty: Difficulty): string {
+export function crazyDartsText(seed: number, keySet: KeySet): string {
   return generateGibberish({
     seed,
-    difficulty,
+    keySet,
     minLength: CRAZY_DARTS_TEXT_LENGTH,
   });
 }

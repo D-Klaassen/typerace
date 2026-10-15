@@ -40,6 +40,28 @@ describe("parseClientMessage", () => {
     });
   });
 
+  it("accepts a Key Set preset or custom keys, Capitals, and preset Votes", () => {
+    for (const message of [
+      { type: "updateSettings", changes: { keySet: { preset: "lesson-14" } } },
+      {
+        type: "updateSettings",
+        changes: { keySet: { custom: "fjdk" }, capitals: true },
+      },
+      { type: "vote", vote: { keySet: "row-top" } },
+    ]) {
+      expect(parseClientMessage(JSON.stringify(message))).toEqual(message);
+    }
+  });
+
+  it("rejects unknown Key Set presets", () => {
+    for (const message of [
+      { type: "updateSettings", changes: { keySet: { preset: "lesson-999" } } },
+      { type: "vote", vote: { keySet: "nope" } },
+    ]) {
+      expect(parseClientMessage(JSON.stringify(message))).toBeNull();
+    }
+  });
+
   it("rejects unknown types, bad values and invalid JSON", () => {
     for (const raw of [
       "not json",

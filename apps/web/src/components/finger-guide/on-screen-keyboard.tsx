@@ -1,4 +1,9 @@
-import { getKeyGuide, type Finger, type KeyGuide } from "@typerace/game";
+import {
+  getKeyGuide,
+  TYPABLE_KEYS,
+  type Finger,
+  type KeyGuide,
+} from "@typerace/game";
 import { cn } from "@/lib/utils";
 import { fingerColors } from "./finger-colors";
 
@@ -49,13 +54,42 @@ const ROWS: KeyCap[][] = [
 
 const HOME_ROW_BUMPS = new Set(["f", "j"]);
 
-export function OnScreenKeyboard({ guide }: { guide: KeyGuide | null }) {
+/**
+ * The keyboard. With `guide` it lights up the next key (and Shift); with
+ * `selected` it shows a Key Set instead, and `onToggleKey` makes the keys
+ * clickable to change that set.
+ */
+export function OnScreenKeyboard({
+  guide = null,
+  selected,
+  onToggleKey,
+  label,
+}: {
+  guide?: KeyGuide | null;
+  selected?: ReadonlySet<string>;
+  onToggleKey?: (key: string) => void;
+  /** Accessible name, needed when the keys are clickable. */
+  label?: string;
+}) {
+  const interactive = onToggleKey !== undefined;
+
   return (
-    <div className="flex flex-col gap-1 select-none" aria-hidden>
+    <div
+      className="flex flex-col gap-1 select-none"
+      aria-hidden={interactive ? undefined : true}
+      role={interactive ? "group" : undefined}
+      aria-label={interactive ? label : undefined}
+    >
       {ROWS.map((row, rowIndex) => (
         <div key={rowIndex} className="flex gap-1">
           {row.map((cap) => (
-            <Key key={cap.id} cap={cap} guide={guide} />
+            <Key
+              key={cap.id}
+              cap={cap}
+              guide={guide}
+              selected={selected}
+              onToggleKey={onToggleKey}
+            />
           ))}
         </div>
       ))}
@@ -63,31 +97,70 @@ export function OnScreenKeyboard({ guide }: { guide: KeyGuide | null }) {
   );
 }
 
-function Key({ cap, guide }: { cap: KeyCap; guide: KeyGuide | null }) {
+function Key({
+  cap,
+  guide,
+  selected,
+  onToggleKey,
+}: {
+  cap: KeyCap;
+  guide: KeyGuide | null;
+  selected?: ReadonlySet<string>;
+  onToggleKey?: (key: string) => void;
+}) {
   const isGap = cap.id.endsWith("-gap");
   const finger = cap.finger ?? getKeyGuide(cap.id)?.finger;
-  const isActive =
-    guide !== null && (guide.key === cap.id || guide.shift === cap.id);
+  const typable = TYPABLE_KEYS.includes(cap.id) && cap.id.length === 1;
+  const isActive = selected
+    ? selected.has(cap.id)
+    : guide !== null && (guide.key === cap.id || guide.shift === cap.id);
   const colors = finger ? fingerColors(finger) : null;
-
-  return (
-    <div
-      data-key={cap.id}
-      data-active={isActive || undefined}
-      style={{ flexGrow: cap.width ?? 1, flexBasis: 0 }}
-      className={cn(
-        "relative flex h-10 items-center justify-center rounded-md font-mono text-sm transition-colors",
-        isGap
-          ? "invisible"
-          : cn("border", colors?.zone ?? "bg-muted text-muted-foreground"),
-        isActive &&
-          cn(colors?.active, "scale-105 border-transparent shadow-md"),
-      )}
-    >
+  const className = cn(
+    "relative flex h-10 items-center justify-center rounded-md font-mono text-sm transition-colors",
+    isGap
+      ? "invisible"
+      : selected && !isActive
+        ? "border bg-muted/40 text-muted-foreground"
+        : cn("border", colors?.zone ?? "bg-muted text-muted-foreground"),
+    isActive &&
+      cn(
+        colors?.active,
+        "border-transparent shadow-md",
+        !selected && "scale-105",
+      ),
+  );
+  const content = (
+    <>
       {cap.label}
       {HOME_ROW_BUMPS.has(cap.id) && (
         <span className="absolute bottom-1.5 h-0.5 w-2 rounded-full bg-current opacity-60" />
       )}
+    </>
+  );
+  const shared = {
+    "data-key": cap.id,
+    "data-active": isActive || undefined,
+    style: { flexGrow: cap.width ?? 1, flexBasis: 0 },
+  };
+
+  if (onToggleKey && typable) {
+    return (
+      <button
+        {...shared}
+        type="button"
+        aria-pressed={isActive}
+        aria-label={cap.id}
+        className={cn(className, "cursor-pointer hover:ring-2 hover:ring-ring")}
+        onClick={() => onToggleKey(cap.id)}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div {...shared} className={className}>
+      {content}
     </div>
   );
 }

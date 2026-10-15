@@ -14,12 +14,7 @@
   "Common": {
     "seconds": "{value, number, ::.0}s",
     "percent": "{value, number, ::percent}",
-    "wpm": "{value, number, ::.} WPM",
-    "difficulty": {
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard"
-    }
+    "wpm": "{value, number, ::.} WPM"
   },
   "SharedKeyboard": {
     "metadataTitle": "Shared Keyboard · Typerace",
@@ -31,7 +26,6 @@
       "removePlayer": "Remove {name}",
       "mode": "Mode",
       "timeTrial": "Time Trial",
-      "difficulty": "Difficulty",
       "timeBank": "Time Bank (minutes)",
       "start": "Start",
       "errors": {
@@ -108,9 +102,7 @@
     "guestHint": "The Host picks the settings. Vote to tell them what you would like.",
     "voteTitle": "Your Vote",
     "voteMode": "Mode",
-    "voteDifficulty": "Difficulty",
     "mode": "Mode",
-    "difficulty": "Difficulty",
     "textLength": "Text length",
     "timeBank": "Time Bank (minutes)",
     "startingHp": "Starting HP",
@@ -120,11 +112,6 @@
       "classicRace": "Classic Race",
       "crazyDarts": "Crazy Darts",
       "timeTrial": "Time Trial"
-    },
-    "difficulties": {
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard"
     },
     "textLengths": {
       "short": "Short",
@@ -177,5 +164,61 @@
     "fingerGuideFor": "Finger Guide for {name}",
     "preview": "Preview",
     "nothingExtra": "Just the text: no keyboard or hands while you type."
+  },
+  "KeySet": {
+    "title": "Keys",
+    "lessonLabel": "Lesson",
+    "pickLesson": "Pick a lesson…",
+    "lesson": "Lesson {number} · {keys}",
+    "votes": "{count, plural, one {# vote} other {# votes}}",
+    "vote": "Vote for the keys",
+    "noVote": "No vote yet",
+    "capitals": "Capitals (practise Shift)",
+    "sample": "Sample:",
+    "customHint": "Click keys to add or remove them.",
+    "customKeyboard": "Keys to practise",
+    "clear": "Clear",
+    "tooFewKeys": "Pick at least {count} keys; until then all letters are used.",
+    "quickAdd": {
+      "homeRow": "+ Home row",
+      "topRow": "+ Top row",
+      "bottomRow": "+ Bottom row",
+      "numbers": "+ Numbers"
+    },
+    "groups": {
+      "lesson": "Lessons",
+      "row": "Rows",
+      "finger": "Fingers",
+      "classic": "Classic",
+      "custom": "Custom"
+    },
+    "stages": {
+      "1": "Stage 1 · Home row",
+      "2": "Stage 2 · Top row",
+      "3": "Stage 3 · Top and home row",
+      "4": "Stage 4 · Bottom row",
+      "5": "Stage 5 · Bottom and home row",
+      "6": "Stage 6 · Columns per finger",
+      "7": "Stage 7 · Numbers",
+      "8": "Stage 8 · Review"
+    },
+    "presets": {
+      "row-home": "Home row",
+      "row-top": "Top row",
+      "row-bottom": "Bottom row",
+      "row-numbers": "Number row",
+      "row-home-top": "Home + top row",
+      "row-home-bottom": "Home + bottom row",
+      "row-letters": "All letter rows",
+      "finger-index": "Index fingers",
+      "finger-middle": "Middle fingers",
+      "finger-ring": "Ring fingers",
+      "finger-pinky": "Pinkies",
+      "finger-left": "Left hand",
+      "finger-right": "Right hand",
+      "classic-easy": "Easy",
+      "classic-medium": "Medium",
+      "classic-hard": "Hard"
+    }
   }
 }

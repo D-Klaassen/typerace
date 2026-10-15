@@ -27,7 +27,7 @@ The Player who created the Room, or took over when that Player left, and who dec
 _Avoid_: Owner, admin
 
 **Vote**:
-A non-Host Player's preference for the next Match's Mode or Difficulty. Votes are advisory to the Host and reset after every Match.
+A non-Host Player's preference for the next Match's Mode or Key Set preset. Votes are advisory to the Host and reset after every Match.
 _Avoid_: Poll, suggestion
 
 **Spectator**:
@@ -66,7 +66,7 @@ A Mode where Players take Turns against the clock. After everyone has had one Tu
 _Avoid_: Elimination, hot-seat race
 
 **Turn**:
-One attempt by a single Player to type a text from start to finish while the others wait or watch. Each Turn gets fresh Gibberish of the same length and Difficulty.
+One attempt by a single Player to type a text from start to finish while the others wait or watch. Each Turn gets fresh Gibberish of the same length and Key Set.
 _Avoid_: Go, attempt, try
 
 **Time Bank**:
@@ -79,12 +79,20 @@ _Avoid_: Timer, time limit
 Where a Match's text comes from. Only Gibberish exists for now; real words come later.
 
 **Gibberish**:
-Randomly generated nonsense words of 2–7 characters, separated by spaces.
+Randomly generated nonsense words of 2–7 characters from the Key Set, separated by spaces.
 _Avoid_: Random text, nonsense
 
-**Difficulty**:
-Which characters the text may contain: Easy (home row only), Medium (all lowercase letters) or Hard (adding capitals, digits and punctuation).
-_Avoid_: Level
+**Key Set**:
+The keys a Match's text may contain: a preset (a Lesson, a row, some fingers, or Easy, Medium and Hard) or a custom choice of keys. Chosen by the Host, or per game on a Shared Keyboard.
+_Avoid_: Difficulty, level, key preset
+
+**Lesson**:
+One step of the numbered ladder of Key Set presets (76 lessons in 8 stages), modelled on typelesonline.nl: pairs of keys, then the pairs combined.
+_Avoid_: Exercise, level
+
+**Capitals**:
+An option on top of any Key Set that lets some words start with a capital letter, to practise Shift.
+_Avoid_: Uppercase mode
 
 **Typo**:
 A wrong keystroke. It does not advance the text; the Player has to press the correct key to continue.

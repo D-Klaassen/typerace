@@ -1,11 +1,14 @@
 import {
   currentTimeBankMs,
+  findPreset,
+  roomKeySet,
+  TYPABLE_KEYS,
   getCrazyDartsResults,
   getOnlineRaceResults,
   getTimeTrialResults,
   type CrazyDartsResult,
   type Dart,
-  type Difficulty,
+  type KeySet,
   type JoinError,
   type OnlineRaceResult,
   type Room,
@@ -38,12 +41,20 @@ export function isRoomCode(value: string): boolean {
 export const ROOMS_PARTY = "rooms";
 
 const mode = z.enum(["classicRace", "crazyDarts", "timeTrial"]);
-const difficulty = z.enum(["easy", "medium", "hard"]);
+const presetId = z
+  .string()
+  .max(32)
+  .refine((id) => findPreset(id) !== undefined, "Unknown Key Set preset");
+const keySetChoice = z.union([
+  z.object({ preset: presetId }).strict(),
+  z.object({ custom: z.string().max(TYPABLE_KEYS.length * 2) }).strict(),
+]);
 
 const settingsChanges = z
   .object({
     mode,
-    difficulty,
+    keySet: keySetChoice,
+    capitals: z.boolean(),
     textLength: z.enum(["short", "medium", "long"]),
     timeBankMs: z.number().int().min(60_000).max(600_000),
     startingHp: z.number().int().min(10).max(500),
@@ -68,7 +79,7 @@ const clientMessage = z.discriminatedUnion("type", [
     type: z.literal("vote"),
     vote: z.union([
       z.object({ mode }).strict(),
-      z.object({ difficulty }).strict(),
+      z.object({ keySet: presetId }).strict(),
     ]),
   }),
 ]);
@@ -122,7 +133,7 @@ export interface DartsView {
    * it with every update; everyone sees the same text anyway.
    */
   textSeed: number;
-  difficulty: Difficulty;
+  keySet: KeySet;
   players: {
     playerId: string;
     position: number;
@@ -154,7 +165,7 @@ export function toRoomView(room: Room): RoomView {
     ...rest,
     darts: darts && {
       textSeed: seed,
-      difficulty: room.settings.difficulty,
+      keySet: roomKeySet(room),
       players: darts.players.map(({ playerId, session, hp, out }) => ({
         playerId,
         position: session.position,

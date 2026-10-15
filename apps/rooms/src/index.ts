@@ -7,6 +7,7 @@ import {
   getVoteCounts,
   joinRoom,
   leaveRoom,
+  roomKeySet,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
   typeInRoom,
@@ -78,11 +79,11 @@ export class Rooms extends Server<Env> {
         return;
 
       case "start": {
-        const { difficulty, textLength } = this.room.settings;
+        const { textLength } = this.room.settings;
         const seed = Math.floor(Math.random() * 2 ** 31);
         const text = generateGibberish({
           seed,
-          difficulty,
+          keySet: roomKeySet(this.room),
           minLength: TEXT_LENGTH_CHARACTERS[textLength],
         });
         this.setRoom(

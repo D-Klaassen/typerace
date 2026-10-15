@@ -27,15 +27,18 @@ test("two Players share a Room, its settings and Votes", async ({
     "Anna",
   );
 
-  // Anna's settings reach Bob live.
+  // Anna's Key Set reaches Bob live.
   await anna
-    .getByRole("group", { name: "Difficulty" })
-    .getByText("Hard")
+    .getByRole("group", { name: "Keys" })
+    .getByText("Lessons", { exact: true })
     .click();
-  const bobSettings = bob.getByRole("group", { name: "Difficulty" }).first();
-  await expect(bobSettings.getByRole("radio", { name: "Hard" })).toBeChecked();
+  await anna.getByLabel("Lesson", { exact: true }).selectOption("lesson-14");
+  await expect(bob.getByText("Keys: Lesson 14 · q p")).toBeVisible();
+  await expect(bob.getByTestId("key-set-sample")).toContainText(
+    /^Sample: [qp ]+$/,
+  );
 
-  // Bob's Vote reaches Anna as a count.
+  // Bob's Votes reach Anna as counts.
   await bob
     .getByRole("region", { name: "Your Vote" })
     .getByRole("group", { name: "Mode" })
@@ -43,6 +46,15 @@ test("two Players share a Room, its settings and Votes", async ({
     .click();
   await expect(
     anna.getByRole("group", { name: "Mode" }).getByText("Crazy Darts"),
+  ).toContainText("1");
+
+  await bob.getByLabel("Vote for the keys").selectOption("row-top");
+  await anna
+    .getByRole("group", { name: "Keys" })
+    .getByText("Rows", { exact: true })
+    .click();
+  await expect(
+    anna.getByRole("group", { name: "Rows" }).getByText(/^Top row/),
   ).toContainText("1");
 });
 

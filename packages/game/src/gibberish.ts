@@ -1,31 +1,22 @@
-export type Difficulty = "easy" | "medium" | "hard";
+import type { KeySet } from "./key-sets";
 
 export interface GibberishOptions {
   seed: number;
-  difficulty: Difficulty;
+  /** Which keys the text may contain, and whether letters may be capitals. */
+  keySet: KeySet;
   minLength: number;
 }
 
-const LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-const HOME_ROW = "asdfghjkl;";
+/** Share of words that start with a capital when Capitals is on (see docs/spec.md). */
+const CAPITAL_CHANCE = 0.25;
 
-const DIGITS = "0123456789";
-const PUNCTUATION = ".,;:!?'-";
-
-// Share of words on Hard that get each extra (see docs/spec.md).
-const HARD_NUMBER_CHANCE = 0.1;
-const HARD_CAPITAL_CHANCE = 0.25;
-const HARD_PUNCTUATION_CHANCE = 0.15;
-
-const ALPHABETS: Record<Difficulty, string> = {
-  easy: HOME_ROW,
-  medium: LOWERCASE,
-  hard: LOWERCASE,
-};
-
+/**
+ * Random "words" of 2–7 characters from the Key Set, separated by spaces,
+ * stopping at the first word boundary at or after `minLength`.
+ */
 export function generateGibberish({
   seed,
-  difficulty,
+  keySet,
   minLength,
 }: GibberishOptions): string {
   const random = seededRandom(seed);
@@ -33,10 +24,7 @@ export function generateGibberish({
   let length = 0;
 
   while (length < minLength) {
-    const word =
-      difficulty === "hard"
-        ? randomHardWord(random)
-        : randomWord(random, ALPHABETS[difficulty]);
+    const word = randomWord(random, keySet);
     words.push(word);
     length += word.length + (words.length > 1 ? 1 : 0);
   }
@@ -44,49 +32,19 @@ export function generateGibberish({
   return words.join(" ");
 }
 
-function randomHardWord(random: () => number): string {
-  if (random() < HARD_NUMBER_CHANCE) {
-    return randomChars(random, DIGITS, randomInt(random, 2, 4));
+function randomWord(random: () => number, { keys, capitals }: KeySet): string {
+  const wordLength = 2 + Math.floor(random() * 6);
+  let word = "";
+
+  for (let i = 0; i < wordLength; i++) {
+    word += keys[Math.floor(random() * keys.length)];
   }
 
-  const wordLength = randomInt(random, 2, 7);
-  const hasPunctuation = random() < HARD_PUNCTUATION_CHANCE;
-  let word = randomChars(
-    random,
-    LOWERCASE,
-    hasPunctuation ? wordLength - 1 : wordLength,
-  );
-
-  if (random() < HARD_CAPITAL_CHANCE) {
+  if (capitals && /^[a-z]/.test(word) && random() < CAPITAL_CHANCE) {
     word = word.charAt(0).toUpperCase() + word.slice(1);
-  }
-  if (hasPunctuation) {
-    word += randomChars(random, PUNCTUATION, 1);
   }
 
   return word;
-}
-
-function randomWord(random: () => number, alphabet: string): string {
-  return randomChars(random, alphabet, randomInt(random, 2, 7));
-}
-
-function randomChars(
-  random: () => number,
-  alphabet: string,
-  count: number,
-): string {
-  let chars = "";
-
-  for (let i = 0; i < count; i++) {
-    chars += alphabet[Math.floor(random() * alphabet.length)];
-  }
-
-  return chars;
-}
-
-function randomInt(random: () => number, min: number, max: number): number {
-  return min + Math.floor(random() * (max - min + 1));
 }
 
 // mulberry32: small, fast and good enough for game text.

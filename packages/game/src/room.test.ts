@@ -86,27 +86,29 @@ describe("Room", () => {
 
     const changedByHost = updateSettings(room, "p1", {
       mode: "crazyDarts",
-      difficulty: "hard",
+      keySet: { preset: "lesson-14" },
+      capitals: true,
     });
     expect(changedByHost.settings).toMatchObject({
       mode: "crazyDarts",
-      difficulty: "hard",
+      keySet: { preset: "lesson-14" },
+      capitals: true,
     });
 
-    expect(updateSettings(room, "p2", { difficulty: "easy" })).toBe(room);
+    expect(updateSettings(room, "p2", { capitals: true })).toBe(room);
   });
 
-  it("counts one Mode and one Difficulty Vote per non-Host Player", () => {
+  it("counts one Mode and one Key Set Vote per non-Host Player", () => {
     let room = roomWith("Anna", "Bob", "Cas");
     room = castVote(room, "p2", { mode: "crazyDarts" });
-    room = castVote(room, "p2", { difficulty: "hard" });
+    room = castVote(room, "p2", { keySet: "row-top" });
     room = castVote(room, "p3", { mode: "timeTrial" });
     room = castVote(room, "p3", { mode: "crazyDarts" }); // changed their mind
     room = castVote(room, "p1", { mode: "classicRace" }); // the Host can't vote
 
     expect(getVoteCounts(room)).toEqual({
       mode: { classicRace: 0, crazyDarts: 2, timeTrial: 0 },
-      difficulty: { easy: 0, medium: 0, hard: 1 },
+      keySet: { "row-top": 1 },
     });
   });
 

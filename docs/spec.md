@@ -25,12 +25,14 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 - A nickname is 1–16 characters, trimmed, and unique within the game (ignoring case).
 - Each game holds 2–6 Players.
+- **Back to the menu:** every screen except the home page has a control in its top-left corner that goes back to the home page. Outside a game it is "Back to menu". During a game it quits, and quitting a game in progress asks for confirmation first ("Keep playing" cancels). The game ignores keystrokes while the confirmation is open, but a running clock keeps running.
 
 ### Shared Keyboard
 
 1. **Setup screen:** enter 2–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Time Trial) and its settings.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
+4. **Quitting:** "Quit game" on the handover and Turn screens ends the game for everyone after a confirmation and goes to the home page. Nothing from the game is saved, so it never reaches the Leaderboard.
 
 ### Online
 
@@ -49,6 +51,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - Time Trial: they're eliminated.
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
+- **Leave Room:** every screen inside a Room has a "Leave Room" control that closes the connection, which the Room treats as leaving (see above), and goes to the home page. A Player in a countdown or a running Match confirms first, with a message saying what leaving costs in that Mode. In the lobby, as a Spectator and on the results it leaves at once. Before joining (the nickname form, "Room not found") there is "Back to menu" instead.
 - **Display:** in the lobby, each Player switches the On-screen Keyboard and the Finger Guide on or off for themselves, with a live preview. There are no switches during a Match. The Finger Guide is on and the keyboard off by default, and the browser remembers the choice. The Room records each Player's aids when a Match starts, and the results show them to everyone.
 - **After a Match:** Results, then a "Rematch" button for the Host. Everyone goes back to the lobby with the same settings.
 
@@ -222,7 +225,7 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
 - **Web app:** Next.js (App Router), Tailwind CSS and shadcn/ui
 - **Rooms:** PartyServer with Wrangler
 - **Translations:** next-intl
-- **Tests:** Vitest for `packages/game` (full rule coverage) and the Room logic; Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Time Trial, one Online Classic Race with two browser contexts, and one Online Crazy Darts.
+- **Tests:** Vitest for `packages/game` (full rule coverage) and the Room logic; Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Time Trial, one Online Classic Race with two browser contexts, one Online Crazy Darts, quitting a Shared Keyboard game, and leaving a Room.
 - **Lint and format:** ESLint and Prettier
 - **Root scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `format:check`, and `check`, which runs them all.
 - **Rule:** every commit and push requires a green `check`.

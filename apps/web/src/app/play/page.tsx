@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function PlayPage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center p-8">
+    <main className="relative flex flex-1 flex-col items-center justify-center p-8 pt-16">
       <SharedKeyboardGame />
     </main>
   );

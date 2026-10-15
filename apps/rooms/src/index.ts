@@ -8,6 +8,7 @@ import {
   joinRoom,
   leaveRoom,
   roomKeySet,
+  roomLeaderboardRecords,
   setDisplay,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
@@ -16,15 +17,19 @@ import {
   type Room,
 } from "@typerace/game";
 import {
+  LEADERBOARD_PATH,
   parseClientMessage,
   toRoomView,
   type RoomError,
   type ServerMessage,
 } from "@typerace/protocol";
+import { routePartykitRequest, Server, type Connection } from "partyserver";
+import { leaderboardOf, leaderboardResponse } from "./leaderboard";
+
+export { Leaderboard } from "./leaderboard";
 
 /** How often a running Room checks its clock (countdown end, grace period). */
 const CLOCK_TICK_MS = 250;
-import { routePartykitRequest, Server, type Connection } from "partyserver";
 
 /**
  * One Durable Object per Room (see docs/adr/0001). It owns the Room's state
@@ -137,8 +142,12 @@ export class Rooms extends Server<Env> {
     if (room === this.room) {
       return;
     }
+    const finished = room.phase === "results" && this.room.phase !== "results";
     this.room = room;
     this.runClockWhileNeeded();
+    if (finished) {
+      this.recordOnLeaderboard();
+    }
 
     const view = toRoomView(room);
     const voteCounts = getVoteCounts(room);
@@ -172,6 +181,16 @@ export class Rooms extends Server<Env> {
     }
   }
 
+  /** A finished Time Trial's best Times go on the Leaderboard. */
+  private recordOnLeaderboard() {
+    const finished = roomLeaderboardRecords(this.room);
+    if (finished && finished.records.length > 0) {
+      this.ctx.waitUntil(
+        leaderboardOf(this.env).record(finished.keySet, finished.records),
+      );
+    }
+  }
+
   private sendError(connection: Connection, reason: RoomError) {
     connection.send(serialize({ type: "error", reason }));
   }
@@ -183,6 +202,10 @@ function serialize(message: ServerMessage): string {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    if (new URL(request.url).pathname === LEADERBOARD_PATH) {
+      return leaderboardResponse(request, env);
+    }
+
     return (
       (await routePartykitRequest(request, env)) ??
       new Response("Not Found", { status: 404 })

@@ -4,7 +4,13 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "durable_objects": {
-    "bindings": [{ "name": "Rooms", "class_name": "Rooms" }],
+    "bindings": [
+      { "name": "Rooms", "class_name": "Rooms" },
+      { "name": "Leaderboard", "class_name": "Leaderboard" },
+    ],
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Rooms"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Rooms"] },
+    { "tag": "v2", "new_sqlite_classes": ["Leaderboard"] },
+  ],
 }

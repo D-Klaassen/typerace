@@ -63,6 +63,7 @@ export {
   leaveRoom,
   MAX_ROOM_PLAYERS,
   roomKeySet,
+  roomLeaderboardRecords,
   ONLINE_MODES,
   setDisplay,
   startCountdown,
@@ -114,3 +115,11 @@ export {
   type Dart,
   type DartsPlayer,
 } from "./crazy-darts";
+export {
+  addToLeaderboard,
+  LEADERBOARD_SIZE,
+  leaderboardBoard,
+  timeTrialRecords,
+  type LeaderboardEntry,
+  type LeaderboardRecord,
+} from "./leaderboard";

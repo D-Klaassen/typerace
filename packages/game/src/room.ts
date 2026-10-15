@@ -1,8 +1,10 @@
 import {
   DEFAULT_KEY_SET_CHOICE,
   resolveKeySet,
+  type KeySet,
   type KeySetChoice,
 } from "./key-sets";
+import { timeTrialRecords, type LeaderboardRecord } from "./leaderboard";
 import { validateNicknames, type NicknameProblem } from "./nicknames";
 import {
   crazyDartsText,
@@ -464,4 +466,24 @@ function finishIfOver(room: Room, nowMs: number): Room {
 /** The keys and Capitals the Room's settings stand for. */
 export function roomKeySet(room: Room) {
   return resolveKeySet(room.settings.keySet, room.settings.capitals);
+}
+
+/**
+ * The best Times of a finished Online Time Trial, for the Leaderboard. Only
+ * Players still in the Room are on it: the Room no longer knows who left.
+ */
+export function roomLeaderboardRecords(
+  room: Room,
+): { keySet: KeySet; records: LeaderboardRecord[] } | null {
+  if (room.phase !== "results" || !room.timeTrial) {
+    return null;
+  }
+
+  return {
+    keySet: room.timeTrial.keySet,
+    records: timeTrialRecords(
+      room.timeTrial.trial,
+      (id) => room.players.find((player) => player.id === id)?.nickname,
+    ),
+  };
 }

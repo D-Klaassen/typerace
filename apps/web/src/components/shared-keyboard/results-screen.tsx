@@ -1,5 +1,6 @@
 import type { Display } from "@typerace/game";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { AidsLabel } from "@/components/finger-guide/aids-label";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ export function ResultsScreen({
   results,
   columns,
   aidsOf,
+  leaderboard,
   onPlayAgain,
   onBackToSetup,
 }: {
@@ -38,6 +40,8 @@ export function ResultsScreen({
   columns: Column[];
   /** The aids a Player had on, by nickname. */
   aidsOf: (name: string) => Display | undefined;
+  /** Time Trial: how the best Times went to the Leaderboard. */
+  leaderboard?: ReactNode;
   onPlayAgain: () => void;
   onBackToSetup: () => void;
 }) {
@@ -92,6 +96,7 @@ export function ResultsScreen({
           ))}
         </TableBody>
       </Table>
+      {leaderboard}
       <div className="flex gap-3">
         <Button size="lg" onClick={onPlayAgain}>
           {t("playAgain")}

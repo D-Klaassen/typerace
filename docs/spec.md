@@ -13,7 +13,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ## Out of scope for v1
 
-- Accounts, profiles, history and leaderboards. Nothing persists after a Room or game ends.
+- Accounts, profiles and history. Nothing persists after a Room or game ends, except the Leaderboard.
 - Public matchmaking.
 - Real-word Text Sources (Gibberish only).
 - Visual Themes beyond one fixed look per Mode.
@@ -153,8 +153,17 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Results screen
 
 - **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide) they had on.
-- **Time Trial:** also each Player's best Time and number of Turns.
+- **Time Trial:** also each Player's best Time and number of Turns, whether the best Times reached the Leaderboard, and a link to it.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
+
+## Leaderboard
+
+- **What goes on it:** when a Time Trial ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it.
+- **One board per Key Set:** the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset. Each board keeps its fastest 20; equal Times rank in the order they were set.
+- **Online:** the Room records the Time Trial itself, using the Times it measured on its own clock.
+- **Shared Keyboard:** the browser sends the best Times to the Rooms server. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames and keys).
+- **The page** `/leaderboard`, linked from the home page and from Time Trial results, has a Key Set picker and shows that board. Its URL names the Key Set, so it can be shared.
+- **Nickname fields** say the nickname is shown on the Leaderboard after a Time Trial.
 
 ## On-screen Keyboard and Finger Guide
 
@@ -192,6 +201,7 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
   - A rules module for each Mode.
   - Time is passed in rather than read from the clock, so everything is deterministic and testable.
   - Both apps use it.
+- **The Leaderboard lives in `apps/rooms` too:** a single `Leaderboard` Durable Object stores every board, behind `GET` and `POST /leaderboard` on the Rooms Worker.
 - **`apps/rooms` owns Online state:**
   - Clients send every keystroke to the Room, which times it on its own clock when it arrives. Clients' clocks aren't in sync, and this way a client can't fake its times.
   - The Room applies the keystrokes through `packages/game` and decides progress, Typos, Darts, HP, eliminations and the winner.

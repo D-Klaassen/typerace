@@ -84,7 +84,13 @@ export function SetupForm({
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-2 text-sm font-medium">{t("players")}</legend>
+            <legend className="text-sm font-medium">{t("players")}</legend>
+            <p
+              id="nickname-hint"
+              className="mb-2 text-sm text-muted-foreground"
+            >
+              {t("nicknameHint")}
+            </p>
             {players.map((player, index) => {
               const label = t("playerLabel", { number: index + 1 });
               const update = (changes: Partial<SharedKeyboardPlayer>) =>
@@ -106,6 +112,7 @@ export function SetupForm({
                       maxLength={MAX_NICKNAME_LENGTH}
                       placeholder={label}
                       autoComplete="off"
+                      aria-describedby="nickname-hint"
                       onChange={(event) => update({ name: event.target.value })}
                     />
                     {players.length > MIN_PLAYERS && (

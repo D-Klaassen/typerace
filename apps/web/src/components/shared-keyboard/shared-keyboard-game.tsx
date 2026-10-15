@@ -10,12 +10,19 @@ import {
   runOutOfTime,
   startClassicRace,
   startTimeTrial,
+  timeTrialRecords,
   type ClassicRace,
   type TimeTrial,
   type TypingStats,
 } from "@typerace/game";
 import { useState } from "react";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
+import {
+  LeaderboardNote,
+  type LeaderboardStatus,
+} from "@/components/leaderboard/leaderboard-note";
+import { submitToLeaderboard } from "@/lib/leaderboard";
+import { ROOMS_HOST } from "@/lib/rooms-host";
 import { HandoverScreen } from "./handover-screen";
 import { RaceStandings } from "./race-standings";
 import { ResultsScreen } from "./results-screen";
@@ -42,6 +49,27 @@ export function SharedKeyboardGame() {
   const [settings, setSettings] =
     useState<SharedKeyboardSettings>(DEFAULT_SETTINGS);
   const [game, setGame] = useState<Game>({ phase: "setup" });
+  /** Which finished Time Trial was sent to the Leaderboard, and how it went. */
+  const [saved, setSaved] = useState<{
+    trial: TimeTrial;
+    status: LeaderboardStatus;
+  } | null>(null);
+
+  function saveToLeaderboard(trial: TimeTrial) {
+    const records = timeTrialRecords(trial);
+    if (ROOMS_HOST === null || records.length === 0) {
+      return;
+    }
+
+    setSaved({ trial, status: "saving" });
+    submitToLeaderboard(ROOMS_HOST, {
+      keySet: resolveKeySet(settings.keySet, settings.capitals),
+      records,
+    }).then(
+      () => setSaved({ trial, status: "saved" }),
+      () => setSaved({ trial, status: "failed" }),
+    );
+  }
 
   function start(chosen: SharedKeyboardSettings) {
     const players = chosen.players.map((player) => player.name);
@@ -64,12 +92,16 @@ export function SharedKeyboardGame() {
   }
 
   const { match, seed } = game;
-  const endTurn = (next: Match) =>
+  const endTurn = (next: Match) => {
     setGame({
       phase: isOver(next) ? "results" : "handover",
       match: next,
       seed,
     });
+    if (next.mode === "timeTrial" && isOver(next)) {
+      saveToLeaderboard(next.trial);
+    }
+  };
 
   switch (game.phase) {
     case "handover":
@@ -149,6 +181,15 @@ export function SharedKeyboardGame() {
           columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
           aidsOf={(name) =>
             settings.players.find((player) => player.name === name)?.display
+          }
+          leaderboard={
+            ROOMS_HOST !== null && (
+              <LeaderboardNote
+                status={saved?.trial === match.trial ? saved.status : null}
+                keySet={settings.keySet}
+                capitals={settings.capitals}
+              />
+            )
           }
           onPlayAgain={() => start(settings)}
           onBackToSetup={() => setGame({ phase: "setup" })}

@@ -104,5 +104,10 @@ export function useRoom(
     backToLobby() {
       send({ type: "backToLobby" });
     },
+    /** Closing the socket is leaving: the Room drops this Player. */
+    leave() {
+      nicknameRef.current = null;
+      socket.close();
+    },
   };
 }

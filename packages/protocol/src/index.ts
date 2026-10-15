@@ -7,15 +7,15 @@ import {
   TYPABLE_KEYS,
   getCrazyDartsResults,
   getOnlineRaceResults,
-  getTimeTrialResults,
+  getHotSeatResults,
   type CrazyDartsResult,
   type Dart,
   type JoinError,
   type OnlineRaceResult,
   type Room,
-  type TimeTrial,
+  type HotSeat,
   type TextSource,
-  type TimeTrialResult,
+  type HotSeatResult,
   type VoteCounts,
 } from "@typerace/game";
 import { z } from "zod";
@@ -42,7 +42,7 @@ export function isRoomCode(value: string): boolean {
 /** The PartyServer party that hosts Rooms (binding `Rooms`). */
 export const ROOMS_PARTY = "rooms";
 
-const mode = z.enum(["classicRace", "crazyDarts", "timeTrial"]);
+const mode = z.enum(["classicRace", "crazyDarts", "hotSeat"]);
 const presetId = z
   .string()
   .max(32)
@@ -118,9 +118,9 @@ export interface RacerView {
   dropped: boolean;
 }
 
-/** A Time Trial as the clients see it; Player names are Player ids. */
-export interface TimeTrialView {
-  trial: TimeTrial;
+/** A Hot Seat as the clients see it; Player names are Player ids. */
+export interface HotSeatView {
+  seat: HotSeat;
   /** The current Turn, so the others can watch it fill in. */
   turn: {
     text: string;
@@ -157,19 +157,19 @@ export interface DartsView {
 export type RoomResults =
   | { mode: "classicRace"; ranking: OnlineRaceResult[] }
   | { mode: "crazyDarts"; ranking: CrazyDartsResult[] }
-  | { mode: "timeTrial"; ranking: TimeTrialResult[] };
+  | { mode: "hotSeat"; ranking: HotSeatResult[] };
 
 /** The Room as sent to clients: no per-racer copies of the text. */
-export type RoomView = Omit<Room, "race" | "timeTrial" | "darts" | "seed"> & {
+export type RoomView = Omit<Room, "race" | "hotSeat" | "darts" | "seed"> & {
   race: { text: string; startedAtMs: number; racers: RacerView[] } | null;
-  timeTrial: TimeTrialView | null;
+  hotSeat: HotSeatView | null;
   darts: DartsView | null;
   /** The ranking once a Match is over; null before that. */
   results: RoomResults | null;
 };
 
 export function toRoomView(room: Room): RoomView {
-  const { race, timeTrial, darts, seed, ...rest } = room;
+  const { race, hotSeat, darts, seed, ...rest } = room;
 
   return {
     ...rest,
@@ -184,14 +184,14 @@ export function toRoomView(room: Room): RoomView {
       })),
       recentDarts: darts.darts.slice(-RECENT_DARTS),
     },
-    timeTrial: timeTrial && {
-      trial: timeTrial.trial,
-      turn: timeTrial.turn && {
-        text: timeTrial.turn.text,
-        position: timeTrial.turn.position,
-        inError: timeTrial.turn.inError,
-        firstKeyAtMs: timeTrial.turn.firstKeyAtMs,
-        timeBankMs: currentTimeBankMs(timeTrial) ?? 0,
+    hotSeat: hotSeat && {
+      seat: hotSeat.seat,
+      turn: hotSeat.turn && {
+        text: hotSeat.turn.text,
+        position: hotSeat.turn.position,
+        inError: hotSeat.turn.inError,
+        firstKeyAtMs: hotSeat.turn.firstKeyAtMs,
+        timeBankMs: currentTimeBankMs(hotSeat) ?? 0,
       },
     },
     race: race && {
@@ -219,10 +219,10 @@ function resultsOf(room: Room): RoomResults | null {
       ranking: getCrazyDartsResults(room.darts),
     };
   }
-  if (room.timeTrial) {
+  if (room.hotSeat) {
     return {
-      mode: "timeTrial",
-      ranking: getTimeTrialResults(room.timeTrial.trial),
+      mode: "hotSeat",
+      ranking: getHotSeatResults(room.hotSeat.seat),
     };
   }
 

@@ -16,9 +16,9 @@ export interface ResultRow {
   name: string;
   /** Classic Race: the Turn's Time. */
   timeMs?: number;
-  /** Time Trial: fastest finished Turn. */
+  /** Hot Seat: fastest finished Turn. */
   bestTimeMs?: number | null;
-  /** Time Trial: number of Turns taken. */
+  /** Hot Seat: number of Turns taken. */
   turns?: number;
   wpm: number;
   accuracy: number;
@@ -40,7 +40,7 @@ export function ResultsScreen({
   columns: Column[];
   /** The aids a Player had on, by nickname. */
   aidsOf: (name: string) => Display | undefined;
-  /** Time Trial: how the best Times went to the Leaderboard. */
+  /** Hot Seat or a solo race: how the Times went to the Leaderboard. */
   leaderboard?: ReactNode;
   onPlayAgain: () => void;
   onBackToSetup: () => void;
@@ -64,7 +64,9 @@ export function ResultsScreen({
   return (
     <div className="flex w-full max-w-3xl flex-col items-center gap-6">
       <h2 className="text-4xl font-bold">
-        {t("winner", { name: results[0]?.name ?? "" })}
+        {t(results.length === 1 ? "finished" : "winner", {
+          name: results[0]?.name ?? "",
+        })}
       </h2>
       <Table>
         <TableHeader>

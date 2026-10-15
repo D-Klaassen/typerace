@@ -27,15 +27,18 @@ import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import { Label } from "@/components/ui/label";
 import {
   MAX_PLAYERS,
+  MIN_HOT_SEAT_PLAYERS,
   MIN_PLAYERS,
   type SharedKeyboardMode,
   type SharedKeyboardPlayer,
   type SharedKeyboardSettings,
 } from "./settings";
 
-const MODES: SharedKeyboardMode[] = ["classicRace", "timeTrial"];
+const MODES: SharedKeyboardMode[] = ["classicRace", "hotSeat"];
 const TEXT_LENGTH_OPTIONS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
+
+type SetupProblem = NicknameProblem | "hotSeatNeedsTwo";
 
 export function SetupForm({
   initial,
@@ -57,7 +60,7 @@ export function SetupForm({
   });
   const [textLength, setTextLength] = useState(initial.textLength);
   const [timeBankMs, setTimeBankMs] = useState(initial.timeBankMs);
-  const [problem, setProblem] = useState<NicknameProblem | null>(null);
+  const [problem, setProblem] = useState<SetupProblem | null>(null);
   /** Whose display choice the preview shows: the last one changed. */
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const previewPlayer =
@@ -65,7 +68,10 @@ export function SetupForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const found = validateNicknames(players.map((player) => player.name));
+    const found: SetupProblem | null =
+      mode === "hotSeat" && players.length < MIN_HOT_SEAT_PLAYERS
+        ? "hotSeatNeedsTwo"
+        : validateNicknames(players.map((player) => player.name));
     setProblem(found);
     if (!found) {
       onStart({
@@ -198,16 +204,23 @@ export function SetupForm({
           )}
 
           {mode === "classicRace" ? (
-            <ChoiceGroup
-              legend={t("textLength")}
-              name="text-length"
-              options={TEXT_LENGTH_OPTIONS.map((value) => ({
-                value,
-                label: t(`textLengths.${value}`),
-              }))}
-              value={textLength}
-              onChange={setTextLength}
-            />
+            <div className="flex flex-col gap-2">
+              <ChoiceGroup
+                legend={t("textLength")}
+                name="text-length"
+                options={TEXT_LENGTH_OPTIONS.map((value) => ({
+                  value,
+                  label: t(`textLengths.${value}`),
+                }))}
+                value={textLength}
+                onChange={setTextLength}
+              />
+              {players.length === 1 && (
+                <p className="text-sm text-muted-foreground">
+                  {t("soloLeaderboardHint")}
+                </p>
+              )}
+            </div>
           ) : (
             <ChoiceGroup
               legend={t("timeBank")}

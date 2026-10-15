@@ -35,7 +35,7 @@ import {
 import { ROOMS_HOST } from "@/lib/rooms-host";
 
 /**
- * The fastest Time Trial Turns for the text picked on the page: a Key Set for
+ * The fastest Hot Seat Turns for the text picked on the page: a Key Set for
  * Gibberish, or a Text Source and Language.
  */
 export function LeaderboardScreen() {

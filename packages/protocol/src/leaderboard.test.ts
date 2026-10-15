@@ -12,14 +12,14 @@ describe("parseLeaderboardSubmission", () => {
     records: [{ nickname: " Anna ", timeMs: 30_000 }],
   };
 
-  it("accepts a finished Time Trial and trims nicknames", () => {
+  it("accepts a finished Hot Seat Match and trims nicknames", () => {
     expect(parseLeaderboardSubmission(valid)).toEqual({
       textSource: { kind: "gibberish", keySet: valid.keySet },
       records: [{ nickname: "Anna", timeMs: 30_000 }],
     });
   });
 
-  it("accepts a Time Trial with real text, by Text Source and Language", () => {
+  it("accepts a Hot Seat Match with real text, by Text Source and Language", () => {
     const records = [{ nickname: "Anna", timeMs: 30_000 }];
     const body = leaderboardSubmissionBody({
       textSource: { kind: "sentences", language: "nl" },

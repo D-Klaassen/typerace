@@ -11,8 +11,8 @@ Playing in a Room, where every Player uses their own device.
 _Avoid_: Multiplayer, remote, networked
 
 **Shared Keyboard**:
-Playing on a single device that the Players pass between them, with no Room and no Host.
-_Avoid_: Local, hot-seat, offline, couch play
+Playing on a single device, alone or passed between the Players, with no Room and no Host.
+_Avoid_: Local, offline, couch play
 
 **Player**:
 A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and best Time on the Leaderboard.
@@ -41,7 +41,7 @@ _Avoid_: Game, round, race (for the whole thing)
 ### Rules and presentation
 
 **Mode**:
-A set of game rules that decides how Players interact and who wins: Classic Race, Crazy Darts or Time Trial.
+A set of game rules that decides how Players interact and who wins: Classic Race, Crazy Darts or Hot Seat.
 _Avoid_: Theme (when talking about rules), game type
 
 **Theme**:
@@ -49,7 +49,7 @@ The visual look of the game, separate from its rules. Each Mode has a single fix
 _Avoid_: Mode, skin
 
 **Classic Race**:
-A Mode where the fastest Player to finish the text wins. Online, everyone types the same text at once. On a Shared Keyboard, Players take Turns.
+A Mode where the fastest Player to finish the text wins. Online, everyone types the same text at once. On a Shared Keyboard, Players take Turns, and a single Player can race on their own.
 
 **Crazy Darts**:
 A Mode where every completed word throws a Dart at an opponent, and the last Player with HP left wins. It can only be played Online.
@@ -61,16 +61,16 @@ The damage a word does in Crazy Darts, thrown the moment its last character is t
 A Player's remaining health in Crazy Darts. It drops when they are hit by a Dart or make a typo, and they are out at zero.
 _Avoid_: Health, lives
 
-**Time Trial**:
-A Mode where Players take Turns against the clock. After everyone has had one Turn, the slowest Player keeps taking Turns until they beat someone else's time, and that Player becomes the slowest. A Player whose Time Bank runs out is eliminated, and the last Player left wins.
-_Avoid_: Elimination, hot-seat race
+**Hot Seat**:
+A Mode where Players take Turns against the clock. After everyone has had one Turn, the slowest Player keeps taking Turns until they beat someone else's time, and that Player becomes the slowest. A Player whose Time Bank runs out is eliminated, and the last Player left wins. It needs at least two Players.
+_Avoid_: Time Trial, elimination
 
 **Turn**:
 One attempt by a single Player to type a text from start to finish while the others wait or watch. Each Turn gets fresh text of the same length from the same Text Source.
 _Avoid_: Go, attempt, try
 
 **Time Bank**:
-The total typing time a Player has across all their Turns in a Time Trial, set by the Host (2 minutes by default). The clock only runs while the Player is typing.
+The total typing time a Player has across all their Turns in a Hot Seat Match, set by the Host (2 minutes by default). The clock only runs while the Player is typing.
 _Avoid_: Timer, time limit
 
 ### Text
@@ -117,7 +117,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Time Trial Turns of everyone who ever finished a Time Trial, Online or on a Shared Keyboard, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
+The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids

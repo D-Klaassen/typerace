@@ -62,7 +62,7 @@ const submission = z.union([
   z.object({ ...realText, records }).strict(),
 ]);
 
-/** A Shared Keyboard's finished Time Trial, sent by the browser. */
+/** A Shared Keyboard's finished Hot Seat Match, sent by the browser. */
 export interface LeaderboardSubmission {
   textSource: TextSource;
   records: LeaderboardRecord[];

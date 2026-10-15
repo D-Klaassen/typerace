@@ -1,18 +1,20 @@
 import {
   currentTimeBankMs,
   findPreset,
-  roomKeySet,
+  LANGUAGES,
+  roomTextSource,
+  TEXT_SOURCE_KINDS,
   TYPABLE_KEYS,
   getCrazyDartsResults,
   getOnlineRaceResults,
   getTimeTrialResults,
   type CrazyDartsResult,
   type Dart,
-  type KeySet,
   type JoinError,
   type OnlineRaceResult,
   type Room,
   type TimeTrial,
+  type TextSource,
   type TimeTrialResult,
   type VoteCounts,
 } from "@typerace/game";
@@ -53,6 +55,8 @@ const keySetChoice = z.union([
 const settingsChanges = z
   .object({
     mode,
+    textSource: z.enum(TEXT_SOURCE_KINDS),
+    language: z.enum(LANGUAGES),
     keySet: keySetChoice,
     capitals: z.boolean(),
     textLength: z.enum(["short", "medium", "long"]),
@@ -139,7 +143,7 @@ export interface DartsView {
    * it with every update; everyone sees the same text anyway.
    */
   textSeed: number;
-  keySet: KeySet;
+  textSource: TextSource;
   players: {
     playerId: string;
     position: number;
@@ -171,7 +175,7 @@ export function toRoomView(room: Room): RoomView {
     ...rest,
     darts: darts && {
       textSeed: seed,
-      keySet: roomKeySet(room),
+      textSource: roomTextSource(room),
       players: darts.players.map(({ playerId, session, hp, out }) => ({
         playerId,
         position: session.position,

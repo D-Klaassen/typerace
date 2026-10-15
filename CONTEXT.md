@@ -66,7 +66,7 @@ A Mode where Players take Turns against the clock. After everyone has had one Tu
 _Avoid_: Elimination, hot-seat race
 
 **Turn**:
-One attempt by a single Player to type a text from start to finish while the others wait or watch. Each Turn gets fresh Gibberish of the same length and Key Set.
+One attempt by a single Player to type a text from start to finish while the others wait or watch. Each Turn gets fresh text of the same length from the same Text Source.
 _Avoid_: Go, attempt, try
 
 **Time Bank**:
@@ -76,14 +76,24 @@ _Avoid_: Timer, time limit
 ### Text
 
 **Text Source**:
-Where a Match's text comes from. Only Gibberish exists for now; real words come later.
+Where a Match's text comes from: Gibberish, Words or Sentences. Chosen by the Host, or per game on a Shared Keyboard.
+_Avoid_: Text type, content
 
 **Gibberish**:
 Randomly generated nonsense words of 2–7 characters from the Key Set, separated by spaces.
 _Avoid_: Random text, nonsense
 
+**Words**:
+Real words in a Language, picked at random, lowercase and separated by spaces.
+
+**Sentences**:
+Real sentences in a Language, with their capitals and punctuation, one after another.
+
+**Language**:
+The language of Words and Sentences: English or Dutch. Only the text changes, not the interface. Real text is written without accents, so every character is on the keyboard.
+
 **Key Set**:
-The keys a Match's text may contain: a preset (a Lesson, a row, some fingers, or Easy, Medium and Hard) or a custom choice of keys. Chosen by the Host, or per game on a Shared Keyboard.
+The keys a Match's Gibberish may contain: a preset (a Lesson, a row, some fingers, or Easy, Medium and Hard) or a custom choice of keys. Chosen by the Host, or per game on a Shared Keyboard.
 _Avoid_: Difficulty, level, key preset
 
 **Lesson**:
@@ -107,7 +117,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Time Trial Turns of everyone who ever finished a Time Trial, Online or on a Shared Keyboard, with one board per Key Set (its keys plus Capitals). Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
+The fastest Time Trial Turns of everyone who ever finished a Time Trial with Gibberish, Online or on a Shared Keyboard, with one board per Key Set (its keys plus Capitals). Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids

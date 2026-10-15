@@ -1,5 +1,15 @@
 export { generateGibberish, type GibberishOptions } from "./gibberish";
 export {
+  generateText,
+  LANGUAGES,
+  resolveTextSource,
+  TEXT_SOURCE_KINDS,
+  type Language,
+  type TextChoice,
+  type TextSource,
+  type TextSourceKind,
+} from "./text-source";
+export {
   DEFAULT_KEY_SET_CHOICE,
   findPreset,
   KEY_SET_PRESETS,
@@ -63,6 +73,7 @@ export {
   leaveRoom,
   MAX_ROOM_PLAYERS,
   roomKeySet,
+  roomTextSource,
   roomLeaderboardRecords,
   ONLINE_MODES,
   setDisplay,

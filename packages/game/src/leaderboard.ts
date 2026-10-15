@@ -4,6 +4,7 @@
  * plus Capitals, however the Key Set was chosen.
  */
 import { normalizeKeys, type KeySet } from "./key-sets";
+import { TIME_TRIAL_TURN_LENGTH } from "./online-time-trial";
 import type { TimeTrial } from "./time-trial";
 
 /** How many entries a board keeps and shows. */
@@ -20,9 +21,13 @@ export interface LeaderboardEntry extends LeaderboardRecord {
   recordedAtMs: number;
 }
 
-/** A stable name for the board of a Key Set, to store it under. */
+/**
+ * A stable name for the board of a Key Set, to store it under. It includes
+ * the Turn length, so Times from Turns of another length (150 characters
+ * before) stay in storage but never share a board with today's.
+ */
 export function leaderboardBoard({ keys, capitals }: KeySet): string {
-  return `${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
+  return `${TIME_TRIAL_TURN_LENGTH}:${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
 }
 
 /**

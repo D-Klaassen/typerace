@@ -1,12 +1,16 @@
-import { DEFAULT_KEY_SET_CHOICE, type KeySetChoice } from "@typerace/game";
+import {
+  DEFAULT_KEY_SET_CHOICE,
+  type KeySetChoice,
+  type Language,
+  type TextLength,
+  type TextSourceKind,
+} from "@typerace/game";
 import {
   DEFAULT_DISPLAY,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
 
 export type SharedKeyboardMode = "classicRace" | "timeTrial";
-
-export type TextLength = "short" | "medium" | "long";
 
 export interface SharedKeyboardPlayer {
   name: string;
@@ -17,6 +21,10 @@ export interface SharedKeyboardPlayer {
 export interface SharedKeyboardSettings {
   mode: SharedKeyboardMode;
   players: SharedKeyboardPlayer[];
+  textSource: TextSourceKind;
+  /** Words and Sentences only. */
+  language: Language;
+  /** Gibberish only. */
   keySet: KeySetChoice;
   capitals: boolean;
   /** Classic Race only. */
@@ -24,16 +32,6 @@ export interface SharedKeyboardSettings {
   /** Time Trial only. */
   timeBankMs: number;
 }
-
-/** Characters of Gibberish per Classic Race text (see docs/spec.md). */
-export const TEXT_LENGTHS: Record<TextLength, number> = {
-  short: 100,
-  medium: 250,
-  long: 500,
-};
-
-/** Characters of Gibberish per Time Trial Turn (see docs/spec.md). */
-export const TIME_TRIAL_TURN_LENGTH = 150;
 
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
@@ -44,6 +42,8 @@ export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
     { name: "", display: DEFAULT_DISPLAY },
     { name: "", display: DEFAULT_DISPLAY },
   ],
+  textSource: "gibberish",
+  language: "en",
   keySet: DEFAULT_KEY_SET_CHOICE,
   capitals: false,
   textLength: "medium",

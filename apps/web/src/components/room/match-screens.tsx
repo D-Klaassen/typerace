@@ -212,7 +212,9 @@ export function OnlineResults({
       {room.results?.mode === "timeTrial" && (
         // The Room puts the best Times on the Leaderboard itself.
         <LeaderboardNote
-          status="saved"
+          status={
+            room.settings.textSource === "gibberish" ? "saved" : "notCounted"
+          }
           keySet={room.settings.keySet}
           capitals={room.settings.capitals}
         />

@@ -261,8 +261,23 @@
     "status": {
       "saving": "Saving the best times to the leaderboard…",
       "saved": "The best times are on the leaderboard.",
-      "failed": "Couldn’t save the best times to the leaderboard."
+      "failed": "Couldn’t save the best times to the leaderboard.",
+      "notCounted": "Only Time Trials with Gibberish go on the leaderboard."
     },
     "view": "See the leaderboard"
+  },
+  "TextSource": {
+    "title": "Text",
+    "language": "Language",
+    "sample": "Sample:",
+    "kinds": {
+      "gibberish": "Gibberish",
+      "words": "Words",
+      "sentences": "Sentences"
+    },
+    "languages": {
+      "en": "English",
+      "nl": "Dutch"
+    }
   }
 }

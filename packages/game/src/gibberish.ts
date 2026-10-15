@@ -48,7 +48,7 @@ function randomWord(random: () => number, { keys, capitals }: KeySet): string {
 }
 
 // mulberry32: small, fast and good enough for game text.
-function seededRandom(seed: number): () => number {
+export function seededRandom(seed: number): () => number {
   let state = seed >>> 0;
 
   return () => {

@@ -5,6 +5,12 @@ import {
   type KeySetChoice,
 } from "./key-sets";
 import { timeTrialRecords, type LeaderboardRecord } from "./leaderboard";
+import {
+  resolveTextSource,
+  type Language,
+  type TextSource,
+  type TextSourceKind,
+} from "./text-source";
 import { validateNicknames, type NicknameProblem } from "./nicknames";
 import {
   crazyDartsText,
@@ -46,7 +52,11 @@ export type TextLength = "short" | "medium" | "long";
 
 export interface RoomSettings {
   mode: Mode;
-  /** Which keys the Gibberish may contain. */
+  /** Gibberish, Words or Sentences. */
+  textSource: TextSourceKind;
+  /** Words and Sentences only. */
+  language: Language;
+  /** Gibberish only: which keys it may contain. */
   keySet: KeySetChoice;
   /** Letters may start with a capital, to practise Shift. */
   capitals: boolean;
@@ -62,15 +72,17 @@ export interface RoomSettings {
   typoHp: number;
 }
 
-/** Characters of Gibberish per Classic Race text (see docs/spec.md). */
+/** Characters per Classic Race text (see docs/spec.md). */
 export const TEXT_LENGTH_CHARACTERS: Record<TextLength, number> = {
-  short: 100,
-  medium: 250,
-  long: 500,
+  short: 50,
+  medium: 100,
+  long: 200,
 };
 
 export const DEFAULT_ROOM_SETTINGS: RoomSettings = {
   mode: "classicRace",
+  textSource: "gibberish",
+  language: "en",
   keySet: DEFAULT_KEY_SET_CHOICE,
   capitals: false,
   textLength: "medium",
@@ -121,7 +133,7 @@ export interface Room {
   readonly darts: CrazyDarts | null;
   /** Each Player's aids as they were when the Match started. */
   readonly matchDisplays: Readonly<Record<string, Display>>;
-  /** Seeds the Match's Gibberish where the Room generates it (Time Trial). */
+  /** Seeds the Match's text where it isn't generated up front (Time Trial, Crazy Darts). */
   readonly seed: number;
 }
 
@@ -338,7 +350,7 @@ export function advanceClock(room: Room, nowMs: number): Room {
         ...started,
         darts: startCrazyDarts({
           players,
-          text: crazyDartsText(room.seed, roomKeySet(room)),
+          text: crazyDartsText(room.seed, roomTextSource(room)),
           startingHp,
           dartDamagePerCharacter,
           typoHp,
@@ -352,7 +364,7 @@ export function advanceClock(room: Room, nowMs: number): Room {
           timeTrial: startOnlineTimeTrial({
             players,
             timeBankMs: room.settings.timeBankMs,
-            keySet: roomKeySet(room),
+            textSource: roomTextSource(room),
             seed: room.seed,
           }),
         }
@@ -468,19 +480,30 @@ export function roomKeySet(room: Room) {
   return resolveKeySet(room.settings.keySet, room.settings.capitals);
 }
 
+/** Where the Room's text comes from, as its settings stand. */
+export function roomTextSource(room: Room): TextSource {
+  return resolveTextSource(room.settings);
+}
+
 /**
  * The best Times of a finished Online Time Trial, for the Leaderboard. Only
  * Players still in the Room are on it: the Room no longer knows who left.
+ * Boards are per Key Set, so only Gibberish Time Trials go on them.
  */
 export function roomLeaderboardRecords(
   room: Room,
 ): { keySet: KeySet; records: LeaderboardRecord[] } | null {
-  if (room.phase !== "results" || !room.timeTrial) {
+  const textSource = room.timeTrial?.textSource;
+  if (
+    room.phase !== "results" ||
+    !room.timeTrial ||
+    textSource?.kind !== "gibberish"
+  ) {
     return null;
   }
 
   return {
-    keySet: room.timeTrial.keySet,
+    keySet: textSource.keySet,
     records: timeTrialRecords(
       room.timeTrial.trial,
       (id) => room.players.find((player) => player.id === id)?.nickname,

@@ -1,5 +1,4 @@
-import { generateGibberish } from "./gibberish";
-import type { KeySet } from "./key-sets";
+import { generateText, type TextSource } from "./text-source";
 import {
   completeTurn,
   eliminatePlayer,
@@ -9,8 +8,8 @@ import {
 } from "./time-trial";
 import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
 
-/** Characters of Gibberish per Time Trial Turn (see docs/spec.md). */
-export const TIME_TRIAL_TURN_LENGTH = 150;
+/** Characters per Time Trial Turn (see docs/spec.md). */
+export const TIME_TRIAL_TURN_LENGTH = 100;
 
 /**
  * A Time Trial played Online: the Player whose Turn it is types on their own
@@ -18,7 +17,7 @@ export const TIME_TRIAL_TURN_LENGTH = 150;
  */
 export interface OnlineTimeTrial {
   readonly trial: TimeTrial;
-  readonly keySet: KeySet;
+  readonly textSource: TextSource;
   readonly seed: number;
   /** The current Turn's typing; null once there is a winner. */
   readonly turn: TypingSession | null;
@@ -27,17 +26,17 @@ export interface OnlineTimeTrial {
 export function startOnlineTimeTrial({
   players,
   timeBankMs,
-  keySet,
+  textSource,
   seed,
 }: {
   players: readonly string[];
   timeBankMs: number;
-  keySet: KeySet;
+  textSource: TextSource;
   seed: number;
 }): OnlineTimeTrial {
   return withTurn({
     trial: startTimeTrial({ players, timeBankMs }),
-    keySet,
+    textSource,
     seed,
     turn: null,
   });
@@ -113,7 +112,7 @@ export function currentTimeBankMs(match: OnlineTimeTrial): number | null {
   return current?.timeBankMs ?? null;
 }
 
-/** Sets up fresh Gibberish for whoever goes next, or nothing once there's a winner. */
+/** Sets up fresh text for whoever goes next, or nothing once there's a winner. */
 function withTurn(match: OnlineTimeTrial): OnlineTimeTrial {
   if (match.trial.currentPlayer === null) {
     return { ...match, turn: null };
@@ -122,13 +121,12 @@ function withTurn(match: OnlineTimeTrial): OnlineTimeTrial {
   return {
     ...match,
     turn: startTyping(
-      generateGibberish({
+      generateText(match.textSource, {
         // An elimination without a Turn (someone left) still needs new text.
         seed:
           match.seed +
           match.trial.turnsTaken +
           match.trial.eliminated.length * 1_000,
-        keySet: match.keySet,
         minLength: TIME_TRIAL_TURN_LENGTH,
       }),
     ),

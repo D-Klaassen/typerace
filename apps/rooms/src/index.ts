@@ -3,12 +3,12 @@ import {
   backToLobby,
   castVote,
   createRoom,
-  generateGibberish,
+  generateText,
   getVoteCounts,
   joinRoom,
   leaveRoom,
-  roomKeySet,
   roomLeaderboardRecords,
+  roomTextSource,
   setDisplay,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
@@ -87,9 +87,8 @@ export class Rooms extends Server<Env> {
       case "start": {
         const { textLength } = this.room.settings;
         const seed = Math.floor(Math.random() * 2 ** 31);
-        const text = generateGibberish({
+        const text = generateText(roomTextSource(this.room), {
           seed,
-          keySet: roomKeySet(this.room),
           minLength: TEXT_LENGTH_CHARACTERS[textLength],
         });
         this.setRoom(

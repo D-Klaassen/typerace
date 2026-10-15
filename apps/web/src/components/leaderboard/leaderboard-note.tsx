@@ -4,8 +4,11 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { leaderboardHref } from "@/lib/leaderboard";
 
-/** How sending a finished Time Trial to the Leaderboard went. */
-export type LeaderboardStatus = "saving" | "saved" | "failed";
+/**
+ * How sending a finished Time Trial to the Leaderboard went, or that it
+ * doesn't go on it because its text wasn't Gibberish.
+ */
+export type LeaderboardStatus = "saving" | "saved" | "failed" | "notCounted";
 
 /** Under Time Trial results: whether the best Times made it, and a link. */
 export function LeaderboardNote({

@@ -11,12 +11,18 @@ import {
 import usePartySocket from "partysocket/react";
 import { useRef, useState } from "react";
 
-const ROOMS_HOST = process.env.NEXT_PUBLIC_ROOMS_HOST ?? "localhost:8787";
+/**
+ * Where the Rooms server lives. Only development falls back to the local
+ * `wrangler dev`; a production build without it can't play Online.
+ */
+export const ROOMS_HOST =
+  process.env.NEXT_PUBLIC_ROOMS_HOST ??
+  (process.env.NODE_ENV === "development" ? "localhost:8787" : null);
 
 export type RoomState = Extract<ServerMessage, { type: "state" }>;
 
 /** Connects to a Room and exposes its state and the actions a Player can take. */
-export function useRoom(code: string, intent: "create" | "join") {
+export function useRoom(host: string, code: string, intent: "create" | "join") {
   const [state, setState] = useState<RoomState | null>(null);
   const [error, setError] = useState<RoomError | null>(null);
   /** The nickname we joined with, to rejoin after a reconnect. */
@@ -27,7 +33,7 @@ export function useRoom(code: string, intent: "create" | "join") {
   const [nicknames, setNicknames] = useState<Record<string, string>>({});
 
   const socket = usePartySocket({
-    host: ROOMS_HOST,
+    host,
     party: ROOMS_PARTY,
     room: code,
     onOpen() {

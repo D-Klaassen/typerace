@@ -19,6 +19,7 @@ import {
 } from "./match-screens";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
+import { useDisplayPreferences } from "@/components/finger-guide/use-display-preferences";
 import { ROOMS_HOST, useRoom } from "./use-room";
 
 export function RoomScreen() {
@@ -40,6 +41,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
   const router = useRouter();
   const intent = searchParams.has("create") ? "create" : "join";
   const room = useRoom(host, code, intent);
+  const [display, setDisplay] = useDisplayPreferences();
   const joined = room.state !== null;
 
   // Once the Room exists, the address bar should hold a plain join link.
@@ -68,6 +70,8 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         onUpdateSettings={room.updateSettings}
         onVote={room.vote}
         onStart={room.start}
+        display={display}
+        onDisplayChange={setDisplay}
       />
     );
   }
@@ -107,6 +111,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         you={you}
         nicknames={room.nicknames}
         clockOffsetMs={room.clockOffsetMs}
+        display={display}
         onKey={room.key}
       />
     );
@@ -118,6 +123,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         you={you}
         nicknames={room.nicknames}
         clockOffsetMs={room.clockOffsetMs}
+        display={display}
         onKey={room.key}
       />
     );
@@ -128,6 +134,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         race={view.race}
         you={you}
         nicknames={room.nicknames}
+        display={display}
         onKey={room.key}
       />
     );

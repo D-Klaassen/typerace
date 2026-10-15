@@ -3,13 +3,14 @@
 import { crazyDartsText } from "@typerace/game";
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { FingerGuide } from "@/components/finger-guide/finger-guide";
+import {
+  NO_DISPLAY_AIDS,
+  TypingAids,
+  type DisplayPreferences,
+} from "@/components/finger-guide/finger-guide";
 import { TypingText } from "@/components/typing/typing-text";
 import { useNow } from "@/components/typing/use-now";
 import { useTyping } from "@/components/typing/use-typing";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 type DartsView = NonNullable<RoomView["darts"]>;
@@ -27,6 +28,7 @@ export function CrazyDartsMatch({
   you,
   nicknames,
   clockOffsetMs,
+  display = NO_DISPLAY_AIDS,
   onKey,
 }: {
   darts: DartsView;
@@ -34,6 +36,7 @@ export function CrazyDartsMatch({
   you: string;
   nicknames: Record<string, string>;
   clockOffsetMs: number;
+  display?: DisplayPreferences;
   /** Absent for Spectators. */
   onKey?: (key: string) => void;
 }) {
@@ -55,7 +58,7 @@ export function CrazyDartsMatch({
             {t("youAreOut")}
           </p>
         ) : (
-          <DartsTyping darts={darts} onKey={onKey} />
+          <DartsTyping darts={darts} display={display} onKey={onKey} />
         )
       ) : null}
     </div>
@@ -64,13 +67,13 @@ export function CrazyDartsMatch({
 
 function DartsTyping({
   darts,
+  display,
   onKey,
 }: {
   darts: DartsView;
+  display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
-  const t = useTranslations("Room");
-  const [fingerGuide, setFingerGuide] = useState(false);
   const text = crazyDartsText(darts.textSeed, darts.difficulty);
   const { session } = useTyping(text, () => {}, onKey);
 
@@ -88,14 +91,7 @@ function DartsTyping({
   return (
     <>
       <TypingText session={visible} />
-      <Label className="gap-2 self-start font-normal">
-        <Checkbox
-          checked={fingerGuide}
-          onCheckedChange={(checked) => setFingerGuide(checked)}
-        />
-        {t("fingerGuide")}
-      </Label>
-      {fingerGuide && <FingerGuide nextChar={text[session.position]} />}
+      <TypingAids nextChar={text[session.position]} display={display} />
     </>
   );
 }

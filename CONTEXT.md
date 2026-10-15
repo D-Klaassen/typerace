@@ -101,5 +101,13 @@ The share of all keystrokes that were correct, so Typos lower it.
 ### Learning aids
 
 **Finger Guide**:
-An optional on-screen keyboard and pair of hands that highlights the next key and the finger, including which Shift, that should press it.
-_Avoid_: Hand helper, keyboard hint
+An optional pair of hands that highlights the finger, including the pinky for Shift, that should press the next key.
+_Avoid_: Hand helper
+
+**On-screen Keyboard**:
+An optional keyboard that highlights the next key, and the Shift key to hold with it.
+_Avoid_: Keyboard hint, virtual keyboard
+
+**Display**:
+A Player's own choice of whether they see the On-screen Keyboard and the Finger Guide while typing. It never affects the other Players.
+_Avoid_: Settings (those are the Host's)

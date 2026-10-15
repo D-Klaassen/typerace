@@ -39,7 +39,8 @@ scripts/deploy-wizard.sh
 After that:
 
 - Every push to `main` deploys the web app (Vercel's GitHub link).
-- After changing `apps/rooms`, `packages/game` or `packages/protocol`, redeploy the Rooms server with `pnpm deploy:rooms`. Wrangler needs a Cloudflare API token for that (the "Edit Cloudflare Workers" template): `export CLOUDFLARE_API_TOKEN=…` first, or run `pnpm --filter rooms exec wrangler login` once.
+- Every push to `main` that touches `apps/rooms`, `packages/game`, `packages/protocol` or `pnpm-lock.yaml` deploys the Rooms server ([`.github/workflows/deploy-rooms.yml`](.github/workflows/deploy-rooms.yml)). It needs the repo secret `CLOUDFLARE_API_TOKEN`: a Cloudflare API token from the "Edit Cloudflare Workers" template. Run it by hand from the Actions tab (Deploy Rooms → Run workflow) when needed.
+- To deploy the Rooms server from your own machine instead: `pnpm deploy:rooms`, after `export CLOUDFLARE_API_TOKEN=…` or `pnpm --filter rooms exec wrangler login` once.
 - `NEXT_PUBLIC_ROOMS_HOST` is baked into the web app at build time: after changing it in Vercel, redeploy.
 
 Live: https://typerace-puce.vercel.app

@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "typerace-rooms",
+  "account_id": "0cd3b472f8b7ccb8c18f014e6bf74e04",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "durable_objects": {

@@ -190,7 +190,7 @@ ENV_FILE=".env"
 
 wrangler() { pnpm --filter rooms exec wrangler "$@"; }
 
-TOTAL_STAGES=4
+TOTAL_STAGES=5
 
 banner "Deploy Typerace"
 
@@ -206,7 +206,7 @@ if wrangler whoami 2>&1 | grep -qi "not authenticated"; then
   step "Next to ${BOLD}Edit Cloudflare Workers${RESET}, click ${BOLD}Use template${RESET}."
   step "Account Resources: Include → your account. Zone Resources: Include → All zones."
   step "Click Continue to summary → Create Token, then copy the token."
-  note "The token is only used for this run; it isn't saved anywhere."
+  note "The token isn't saved locally; stage 3 can store it as a GitHub secret."
   ask_secret CLOUDFLARE_API_TOKEN "Paste the API token (hidden):"
   export CLOUDFLARE_API_TOKEN
 else
@@ -251,7 +251,24 @@ fi
 write_env ROOMS_HOST "$ROOMS_HOST"
 pause
 
-# ── 3. Vercel project ─────────────────────────────────────────────────────
+# ── 3. Auto-deploy the Rooms Worker ──────────────────────────────────────
+stage "GitHub: deploy the Rooms server on every push"
+say "A GitHub Action redeploys the Rooms server when its code changes on main."
+say "It needs a Cloudflare API token, stored as the repo secret CLOUDFLARE_API_TOKEN."
+if [[ -n "${CLOUDFLARE_API_TOKEN:-}" ]] && confirm "Use the API token from stage 1 for that?"; then
+  :
+else
+  open_url "https://dash.cloudflare.com/profile/api-tokens"
+  step "Click ${BOLD}Create Token${RESET}, then ${BOLD}Use template${RESET} next to ${BOLD}Edit Cloudflare Workers${RESET}."
+  step "Account Resources: Include → your account. Zone Resources: Include → All zones."
+  step "Click Continue to summary → Create Token, then copy the token."
+  CLOUDFLARE_API_TOKEN=""
+  ask_secret CLOUDFLARE_API_TOKEN "Paste the API token (hidden):"
+fi
+set_secret CLOUDFLARE_API_TOKEN "$CLOUDFLARE_API_TOKEN"
+pause
+
+# ── 4. Vercel project ─────────────────────────────────────────────────────
 stage "Vercel: create the web app"
 say "The web app deploys from GitHub, so every push to main goes live."
 open_url "https://vercel.com/new"
@@ -270,7 +287,7 @@ WEB_URL="${WEB_URL%/}"
 write_env WEB_URL "$WEB_URL"
 pause
 
-# ── 4. Smoke test ─────────────────────────────────────────────────────────
+# ── 5. Smoke test ─────────────────────────────────────────────────────────
 stage "Try it live"
 open_url "$WEB_URL/online"
 step "Click Create Room and enter a nickname."
@@ -287,5 +304,5 @@ pause
 finish
 note "Web app:      $WEB_URL"
 note "Rooms server: wss://$ROOMS_HOST"
-note "Redeploy the Rooms server after changes with: pnpm deploy:rooms"
+note "Pushes to main deploy both; deploy the Rooms server by hand with: pnpm deploy:rooms"
 printf '\n'

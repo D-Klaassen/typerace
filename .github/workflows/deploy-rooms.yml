@@ -1,0 +1,35 @@
+# Deploys the Rooms Worker to Cloudflare on every push to main that touches
+# its code, so it never falls behind the web app (which Vercel deploys).
+name: Deploy Rooms
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/rooms/**
+      - packages/game/**
+      - packages/protocol/**
+      - pnpm-lock.yaml
+      - .github/workflows/deploy-rooms.yml
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits rather than racing an older one.
+concurrency:
+  group: deploy-rooms
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm deploy:rooms
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

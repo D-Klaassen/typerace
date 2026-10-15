@@ -1,9 +1,9 @@
 import {
   addToLeaderboard,
   leaderboardBoard,
-  type KeySet,
   type LeaderboardEntry,
   type LeaderboardRecord,
+  type TextSource,
 } from "@typerace/game";
 import {
   parseLeaderboardSearch,
@@ -18,21 +18,21 @@ import { DurableObject } from "cloudflare:workers";
  * reading a board and writing it back can't lose a concurrent record.
  */
 export class Leaderboard extends DurableObject<Env> {
-  async top(keySet: KeySet): Promise<LeaderboardEntry[]> {
+  async top(textSource: TextSource): Promise<LeaderboardEntry[]> {
     return (
       (await this.ctx.storage.get<LeaderboardEntry[]>(
-        leaderboardBoard(keySet),
+        leaderboardBoard(textSource),
       )) ?? []
     );
   }
 
   async record(
-    keySet: KeySet,
+    textSource: TextSource,
     records: readonly LeaderboardRecord[],
   ): Promise<void> {
     await this.ctx.storage.put(
-      leaderboardBoard(keySet),
-      addToLeaderboard(await this.top(keySet), records, Date.now()),
+      leaderboardBoard(textSource),
+      addToLeaderboard(await this.top(textSource), records, Date.now()),
     );
   }
 }
@@ -49,7 +49,7 @@ const CORS_HEADERS = {
 };
 
 /**
- * GET a Key Set's board, or POST a Shared Keyboard's finished Time Trial.
+ * GET a Text Source's board, or POST a Shared Keyboard's finished Time Trial.
  * Online Time Trials are recorded by their Room, which timed them itself.
  */
 export async function leaderboardResponse(
@@ -61,12 +61,14 @@ export async function leaderboardResponse(
       return new Response(null, { status: 204, headers: CORS_HEADERS });
 
     case "GET": {
-      const keySet = parseLeaderboardSearch(new URL(request.url).searchParams);
-      if (!keySet) {
+      const textSource = parseLeaderboardSearch(
+        new URL(request.url).searchParams,
+      );
+      if (!textSource) {
         return text("Bad Request", 400);
       }
       const body: LeaderboardResponse = {
-        entries: await leaderboardOf(env).top(keySet),
+        entries: await leaderboardOf(env).top(textSource),
       };
 
       return Response.json(body, { headers: CORS_HEADERS });
@@ -79,7 +81,10 @@ export async function leaderboardResponse(
       if (!submission) {
         return text("Bad Request", 400);
       }
-      await leaderboardOf(env).record(submission.keySet, submission.records);
+      await leaderboardOf(env).record(
+        submission.textSource,
+        submission.records,
+      );
 
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }

@@ -249,20 +249,19 @@
   "Leaderboard": {
     "metadataTitle": "Leaderboard · Typerace",
     "title": "Leaderboard",
-    "description": "The fastest Time Trial Turns, Online and on a Shared Keyboard. Pick the keys to see their board.",
+    "description": "The fastest Time Trial Turns, Online and on a Shared Keyboard. Gibberish has a board for each set of keys, Words and Sentences one for each language.",
     "rank": "#",
     "player": "Player",
     "time": "Time",
     "date": "Date",
     "loading": "Loading…",
-    "empty": "No times for these keys yet. Finish a Time Trial to be the first!",
+    "empty": "No times on this board yet. Finish a Time Trial to be the first!",
     "failed": "Couldn’t load the leaderboard.",
     "notConfigured": "The leaderboard isn’t set up on this site yet: the Rooms server address is missing.",
     "status": {
       "saving": "Saving the best times to the leaderboard…",
       "saved": "The best times are on the leaderboard.",
-      "failed": "Couldn’t save the best times to the leaderboard.",
-      "notCounted": "Only Time Trials with Gibberish go on the leaderboard."
+      "failed": "Couldn’t save the best times to the leaderboard."
     },
     "view": "See the leaderboard"
   },

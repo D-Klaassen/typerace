@@ -1,7 +1,6 @@
 import {
   DEFAULT_KEY_SET_CHOICE,
   resolveKeySet,
-  type KeySet,
   type KeySetChoice,
 } from "./key-sets";
 import { timeTrialRecords, type LeaderboardRecord } from "./leaderboard";
@@ -488,22 +487,16 @@ export function roomTextSource(room: Room): TextSource {
 /**
  * The best Times of a finished Online Time Trial, for the Leaderboard. Only
  * Players still in the Room are on it: the Room no longer knows who left.
- * Boards are per Key Set, so only Gibberish Time Trials go on them.
  */
 export function roomLeaderboardRecords(
   room: Room,
-): { keySet: KeySet; records: LeaderboardRecord[] } | null {
-  const textSource = room.timeTrial?.textSource;
-  if (
-    room.phase !== "results" ||
-    !room.timeTrial ||
-    textSource?.kind !== "gibberish"
-  ) {
+): { textSource: TextSource; records: LeaderboardRecord[] } | null {
+  if (room.phase !== "results" || !room.timeTrial) {
     return null;
   }
 
   return {
-    keySet: textSource.keySet,
+    textSource: room.timeTrial.textSource,
     records: timeTrialRecords(
       room.timeTrial.trial,
       (id) => room.players.find((player) => player.id === id)?.nickname,

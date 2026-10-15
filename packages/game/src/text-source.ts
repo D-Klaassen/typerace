@@ -15,6 +15,11 @@ export const TEXT_SOURCE_KINDS: readonly TextSourceKind[] = [
   "sentences",
 ];
 
+/** The Text Sources with real text in a Language. */
+export type RealTextKind = Exclude<TextSourceKind, "gibberish">;
+
+export const REAL_TEXT_KINDS: readonly RealTextKind[] = ["words", "sentences"];
+
 export type Language = "en" | "nl";
 
 export const LANGUAGES: readonly Language[] = ["en", "nl"];
@@ -22,7 +27,7 @@ export const LANGUAGES: readonly Language[] = ["en", "nl"];
 /** Everything needed to generate a Match's text. */
 export type TextSource =
   | { kind: "gibberish"; keySet: KeySet }
-  | { kind: "words" | "sentences"; language: Language };
+  | { kind: RealTextKind; language: Language };
 
 /** The Host's or the setup screen's choices that decide the text. */
 export interface TextChoice {

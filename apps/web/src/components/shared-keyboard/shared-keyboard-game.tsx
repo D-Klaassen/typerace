@@ -4,7 +4,6 @@ import {
   completeTurn,
   finishRaceTurn,
   generateText,
-  resolveKeySet,
   resolveTextSource,
   getClassicRaceResults,
   getTimeTrialResults,
@@ -61,18 +60,13 @@ export function SharedKeyboardGame() {
 
   function saveToLeaderboard(trial: TimeTrial) {
     const records = timeTrialRecords(trial);
-    // Boards are per Key Set, so only Gibberish goes on them.
-    if (
-      ROOMS_HOST === null ||
-      records.length === 0 ||
-      settings.textSource !== "gibberish"
-    ) {
+    if (ROOMS_HOST === null || records.length === 0) {
       return;
     }
 
     setSaved({ trial, status: "saving" });
     submitToLeaderboard(ROOMS_HOST, {
-      keySet: resolveKeySet(settings.keySet, settings.capitals),
+      textSource: resolveTextSource(settings),
       records,
     }).then(
       () => setSaved({ trial, status: "saved" }),
@@ -205,15 +199,8 @@ export function SharedKeyboardGame() {
             leaderboard={
               ROOMS_HOST !== null && (
                 <LeaderboardNote
-                  status={
-                    settings.textSource !== "gibberish"
-                      ? "notCounted"
-                      : saved?.trial === match.trial
-                        ? saved.status
-                        : null
-                  }
-                  keySet={settings.keySet}
-                  capitals={settings.capitals}
+                  status={saved?.trial === match.trial ? saved.status : null}
+                  text={settings}
                 />
               )
             }

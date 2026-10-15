@@ -117,7 +117,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Time Trial Turns of everyone who ever finished a Time Trial with Gibberish, Online or on a Shared Keyboard, with one board per Key Set (its keys plus Capitals). Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
+The fastest Time Trial Turns of everyone who ever finished a Time Trial, Online or on a Shared Keyboard, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids

@@ -7,7 +7,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Goals
 
 - Friends and colleagues race each other in short, replayable Matches under three Modes.
-- A Finger Guide teaches correct finger placement while playing.
+- An On-screen Keyboard and a Finger Guide teach correct finger placement while playing.
 - The same game rules run both in the browser (Shared Keyboard) and on the server (Online).
 - The interface is English in v1, and is built so more languages can be added without touching components.
 
@@ -28,7 +28,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 2–6 nicknames, each with its own Finger Guide checkbox (off by default). Choose the Mode (Classic Race or Time Trial) and its settings.
+1. **Setup screen:** enter 2–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (off by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Time Trial) and its settings.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 
@@ -49,7 +49,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - Time Trial: they're eliminated.
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
-- **Finger Guide:** each Player switches it on or off for themselves, at any time, including mid-Match. It's off by default. Their browser remembers the choice for the session **(spec default)**.
+- **Display:** in the lobby, each Player switches the On-screen Keyboard and the Finger Guide on or off for themselves, with a live preview. There are no switches during a Match. Both are off by default, and the browser remembers the choice.
 - **After a Match:** Results, then a "Rematch" button for the Host. Everyone goes back to the lobby with the same settings.
 
 ## Text
@@ -155,9 +155,9 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Time Trial:** also each Player's best Time and number of Turns.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 
-## Finger Guide
+## On-screen Keyboard and Finger Guide
 
-- **Display:** an on-screen US QWERTY (ANSI) keyboard and a pair of hands, shown below the text.
+- **Two separate aids,** each switched on or off per Player, shown below the text: an On-screen Keyboard (US QWERTY, ANSI) and a Finger Guide (a pair of hands).
 - **Finger colours:** every finger has its own colour, and each key is tinted in its finger's colour.
 - **The next key** is strongly highlighted, along with the finger that should press it.
 - **For capitals and shifted symbols,** the Shift key on the **opposite** hand is highlighted too, with that hand's pinky.
@@ -223,7 +223,7 @@ Each step is a vertical slice that is playable or testable when it lands:
 1. **Scaffold:** the monorepo, tooling, the `check` script, an empty Next.js app with next-intl, and an empty `packages/game` with Vitest.
 2. **Text and typing engine** in `packages/game`: seeded Gibberish per Difficulty, Typos and stats.
 3. **Time Trial on a Shared Keyboard:** the setup, handover and results screens, plus Time Trial rules with the Time Bank and elimination.
-4. **Finger Guide:** the keyboard, the hands, the finger colours and Shift handling, with the per-Player toggle.
+4. **Finger Guide:** the keyboard, the hands, the finger colours and Shift handling, with per-Player switches (later split into On-screen Keyboard and Finger Guide, set before the Match with a preview).
 5. **Classic Race on a Shared Keyboard.**
 6. **Rooms:**
    - The PartyServer Room, create and join by code or link.

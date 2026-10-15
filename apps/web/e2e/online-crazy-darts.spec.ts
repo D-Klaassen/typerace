@@ -32,8 +32,11 @@ test("Crazy Darts: Anna's words knock Bob out", async ({ browser }) => {
   await anna.getByRole("button", { name: "Start Match" }).click();
 
   // Every word Anna completes throws a Dart at Bob, the only opponent.
+  // Wait for the board: the lobby's display preview also shows a text.
+  await expect(anna.getByRole("list", { name: "HP" })).toBeVisible({
+    timeout: 10_000,
+  });
   const text = anna.locator("[data-typing-text]");
-  await expect(text).toBeVisible({ timeout: 10_000 });
   const words = ((await text.textContent()) ?? "").split(" ");
   await anna.keyboard.type(`${words[0]} `);
   await expect(bob.getByRole("list", { name: "Latest Darts" })).toContainText(

@@ -2,15 +2,15 @@
 
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { FingerGuide } from "@/components/finger-guide/finger-guide";
+import {
+  TypingAids,
+  type DisplayPreferences,
+} from "@/components/finger-guide/finger-guide";
 import { TimeTrialStandings } from "@/components/shared-keyboard/time-trial-standings";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useNow } from "@/components/typing/use-now";
 import { useTyping } from "@/components/typing/use-typing";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 type TimeTrialView = NonNullable<RoomView["timeTrial"]>;
@@ -22,12 +22,14 @@ export function OnlineTimeTrial({
   you,
   nicknames,
   clockOffsetMs,
+  display,
   onKey,
 }: {
   timeTrial: TimeTrialView;
   you: string;
   nicknames: Record<string, string>;
   clockOffsetMs: number;
+  display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
   const { trial, turn } = timeTrial;
@@ -39,7 +41,7 @@ export function OnlineTimeTrial({
     <div className="flex w-full max-w-3xl flex-col gap-6">
       {turn &&
         (trial.currentPlayer === you ? (
-          <MyTurn key={turnKey} turn={turn} onKey={onKey} />
+          <MyTurn key={turnKey} turn={turn} display={display} onKey={onKey} />
         ) : (
           <WatchTurn
             turn={turn}
@@ -52,9 +54,16 @@ export function OnlineTimeTrial({
   );
 }
 
-function MyTurn({ turn, onKey }: { turn: Turn; onKey: (key: string) => void }) {
+function MyTurn({
+  turn,
+  display,
+  onKey,
+}: {
+  turn: Turn;
+  display: DisplayPreferences;
+  onKey: (key: string) => void;
+}) {
   const t = useTranslations("Room");
-  const [fingerGuide, setFingerGuide] = useState(false);
   const { session } = useTyping(turn.text, () => {}, onKey);
   const now = useNow(() => performance.now());
   const elapsedMs =
@@ -75,15 +84,8 @@ function MyTurn({ turn, onKey }: { turn: Turn; onKey: (key: string) => void }) {
       ) : (
         <TypingText session={session} />
       )}
-      <Label className="gap-2 self-start font-normal">
-        <Checkbox
-          checked={fingerGuide}
-          onCheckedChange={(checked) => setFingerGuide(checked)}
-        />
-        {t("fingerGuide")}
-      </Label>
-      {fingerGuide && !session.finished && (
-        <FingerGuide nextChar={turn.text[session.position]} />
+      {!session.finished && (
+        <TypingAids nextChar={turn.text[session.position]} display={display} />
       )}
     </>
   );

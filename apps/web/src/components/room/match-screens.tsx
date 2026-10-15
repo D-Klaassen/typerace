@@ -3,12 +3,14 @@
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { FingerGuide } from "@/components/finger-guide/finger-guide";
+import {
+  NO_DISPLAY_AIDS,
+  TypingAids,
+  type DisplayPreferences,
+} from "@/components/finger-guide/finger-guide";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -60,15 +62,16 @@ export function RaceTyping({
   race,
   you,
   nicknames,
+  display,
   onKey,
 }: {
   race: Race;
   you: string;
   nicknames: Record<string, string>;
+  display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
   const t = useTranslations("Room");
-  const [fingerGuide, setFingerGuide] = useState(false);
   const { session } = useTyping(race.text, () => {}, onKey);
 
   return (
@@ -87,15 +90,8 @@ export function RaceTyping({
       ) : (
         <TypingText session={session} />
       )}
-      <Label className="gap-2 self-start font-normal">
-        <Checkbox
-          checked={fingerGuide}
-          onCheckedChange={(checked) => setFingerGuide(checked)}
-        />
-        {t("fingerGuide")}
-      </Label>
-      {fingerGuide && !session.finished && (
-        <FingerGuide nextChar={race.text[session.position]} />
+      {!session.finished && (
+        <TypingAids nextChar={race.text[session.position]} display={display} />
       )}
     </div>
   );
@@ -142,6 +138,7 @@ export function Spectating({
           you={you}
           nicknames={nicknames}
           clockOffsetMs={clockOffsetMs}
+          display={NO_DISPLAY_AIDS}
           onKey={() => {}}
         />
       )}

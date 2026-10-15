@@ -39,15 +39,14 @@
         "nicknameTooLong": "Nicknames can be at most 16 characters.",
         "nicknameTaken": "Two Players can't share a nickname."
       },
-      "fingerGuide": "Finger Guide",
-      "fingerGuideFor": "Finger Guide for {name}",
       "classicRace": "Classic Race",
       "textLength": "Text length",
       "textLengths": {
         "short": "Short",
         "medium": "Medium",
         "long": "Long"
-      }
+      },
+      "previewFor": "Preview for {name}"
     },
     "Handover": {
       "turnOf": "{name}'s turn",
@@ -145,7 +144,6 @@
     "getReady": "Get ready…",
     "progressLabel": "Race progress",
     "finishedWaiting": "Finished! Waiting for the others…",
-    "fingerGuide": "Finger Guide",
     "spectating": "A Match is running. You’ll play in the next one.",
     "winner": "{name} wins!",
     "player": "Player",
@@ -169,5 +167,15 @@
     "hpLeft": "HP left",
     "damageDealt": "Damage dealt",
     "notConfigured": "Online play isn’t set up on this site yet: the Rooms server address is missing."
+  },
+  "Display": {
+    "title": "Your display",
+    "hint": "Only you see this. It’s used in every Match, so set it before you start.",
+    "keyboard": "On-screen Keyboard",
+    "keyboardFor": "On-screen Keyboard for {name}",
+    "fingerGuide": "Finger Guide",
+    "fingerGuideFor": "Finger Guide for {name}",
+    "preview": "Preview",
+    "nothingExtra": "Just the text: no keyboard or hands while you type."
   }
 }

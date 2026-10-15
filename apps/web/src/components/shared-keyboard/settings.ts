@@ -1,4 +1,8 @@
 import type { Difficulty } from "@typerace/game";
+import {
+  NO_DISPLAY_AIDS,
+  type DisplayPreferences,
+} from "@/components/finger-guide/finger-guide";
 
 export type SharedKeyboardMode = "classicRace" | "timeTrial";
 
@@ -6,8 +10,8 @@ export type TextLength = "short" | "medium" | "long";
 
 export interface SharedKeyboardPlayer {
   name: string;
-  /** Whether this Player's Turns show the Finger Guide. */
-  fingerGuide: boolean;
+  /** What this Player sees during their Turns. */
+  display: DisplayPreferences;
 }
 
 export interface SharedKeyboardSettings {
@@ -36,8 +40,8 @@ export const MAX_PLAYERS = 6;
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
   mode: "classicRace",
   players: [
-    { name: "", fingerGuide: false },
-    { name: "", fingerGuide: false },
+    { name: "", display: NO_DISPLAY_AIDS },
+    { name: "", display: NO_DISPLAY_AIDS },
   ],
   difficulty: "medium",
   textLength: "medium",

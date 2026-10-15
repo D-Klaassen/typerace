@@ -12,6 +12,9 @@ import { CheckIcon, CopyIcon, CrownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ChoiceGroup } from "@/components/choice-group";
+import { DisplayPreview } from "@/components/finger-guide/display-preview";
+import { DisplaySwitches } from "@/components/finger-guide/display-switches";
+import type { DisplayPreferences } from "@/components/finger-guide/finger-guide";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,14 +39,19 @@ export function Lobby({
   onUpdateSettings,
   onVote,
   onStart,
+  display,
+  onDisplayChange,
 }: {
   code: string;
   state: RoomState;
   onUpdateSettings: (changes: Partial<RoomSettings>) => void;
   onVote: (vote: Vote) => void;
   onStart: () => void;
+  display: DisplayPreferences;
+  onDisplayChange: (next: DisplayPreferences) => void;
 }) {
   const t = useTranslations("Room");
+  const tDisplay = useTranslations("Display");
   const { room, voteCounts, you } = state;
   const isHost = room.hostId === you;
   const myVotes = room.votes[you] ?? {};
@@ -132,6 +140,16 @@ export function Lobby({
             mode={room.settings.mode}
             onStart={onStart}
           />
+        </CardContent>
+      </Card>
+      <Card className="md:col-span-2">
+        <CardHeader>
+          <CardTitle>{tDisplay("title")}</CardTitle>
+          <CardDescription>{tDisplay("hint")}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-[auto_1fr] md:items-start">
+          <DisplaySwitches display={display} onChange={onDisplayChange} />
+          <DisplayPreview display={display} />
         </CardContent>
       </Card>
     </div>

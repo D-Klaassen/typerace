@@ -14,6 +14,7 @@ import {
   type TypingStats,
 } from "@typerace/game";
 import { useState } from "react";
+import { NO_DISPLAY_AIDS } from "@/components/finger-guide/finger-guide";
 import { HandoverScreen } from "./handover-screen";
 import { RaceStandings } from "./race-standings";
 import { ResultsScreen } from "./results-screen";
@@ -97,9 +98,9 @@ export function SharedKeyboardGame() {
             ? TIME_TRIAL_TURN_LENGTH
             : TEXT_LENGTHS[settings.textLength],
       });
-      const fingerGuide = settings.players.some(
-        (p) => p.name === player && p.fingerGuide,
-      );
+      const display =
+        settings.players.find((p) => p.name === player)?.display ??
+        NO_DISPLAY_AIDS;
 
       if (match.mode === "classicRace") {
         return (
@@ -108,7 +109,7 @@ export function SharedKeyboardGame() {
             player={player}
             text={text}
             timeBankMs={null}
-            fingerGuide={fingerGuide}
+            display={display}
             onComplete={(stats) =>
               endTurn({
                 mode: "classicRace",
@@ -133,7 +134,7 @@ export function SharedKeyboardGame() {
           timeBankMs={
             trial.players.find((p) => p.name === player)?.timeBankMs ?? 0
           }
-          fingerGuide={fingerGuide}
+          display={display}
           onComplete={endTrialTurn(completeTurn)}
           onRunOutOfTime={endTrialTurn(runOutOfTime)}
         />

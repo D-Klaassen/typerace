@@ -1,6 +1,6 @@
 import { DEFAULT_KEY_SET_CHOICE, type KeySetChoice } from "@typerace/game";
 import {
-  NO_DISPLAY_AIDS,
+  DEFAULT_DISPLAY,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
 
@@ -41,8 +41,8 @@ export const MAX_PLAYERS = 6;
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
   mode: "classicRace",
   players: [
-    { name: "", display: NO_DISPLAY_AIDS },
-    { name: "", display: NO_DISPLAY_AIDS },
+    { name: "", display: DEFAULT_DISPLAY },
+    { name: "", display: DEFAULT_DISPLAY },
   ],
   keySet: DEFAULT_KEY_SET_CHOICE,
   capitals: false,

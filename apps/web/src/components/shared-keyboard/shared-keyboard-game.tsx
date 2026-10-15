@@ -15,7 +15,7 @@ import {
   type TypingStats,
 } from "@typerace/game";
 import { useState } from "react";
-import { NO_DISPLAY_AIDS } from "@/components/finger-guide/finger-guide";
+import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import { HandoverScreen } from "./handover-screen";
 import { RaceStandings } from "./race-standings";
 import { ResultsScreen } from "./results-screen";
@@ -101,7 +101,7 @@ export function SharedKeyboardGame() {
       });
       const display =
         settings.players.find((p) => p.name === player)?.display ??
-        NO_DISPLAY_AIDS;
+        DEFAULT_DISPLAY;
 
       if (match.mode === "classicRace") {
         return (

@@ -1,26 +1,27 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
-test("each Shared Keyboard Player gets the aids they switched on", async ({
-  page,
-}) => {
+test("each Shared Keyboard Player gets their own aids", async ({ page }) => {
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByPlaceholder("Player 2").fill("Bob");
+  // Everyone starts with the Finger Guide on and the keyboard off.
+  await expect(
+    page.getByRole("checkbox", { name: "Finger Guide for Bob" }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("checkbox", { name: "On-screen Keyboard for Bob" }),
+  ).not.toBeChecked();
+
+  // Anna swaps the hands for the keyboard; the preview follows.
   await page
     .getByRole("checkbox", { name: "On-screen Keyboard for Anna" })
     .click();
-
-  // The preview shows Anna's choice straight away.
+  await page.getByRole("checkbox", { name: "Finger Guide for Anna" }).click();
   const preview = page.getByTestId("display-preview");
   await expect(page.getByText("Preview for Anna")).toBeVisible();
   await expect(preview.getByTestId("on-screen-keyboard")).toBeVisible();
   await expect(preview.getByTestId("finger-guide")).toHaveCount(0);
-
-  await page.getByRole("checkbox", { name: "Finger Guide for Bob" }).click();
-  await expect(page.getByText("Preview for Bob")).toBeVisible();
-  await expect(preview.getByTestId("finger-guide")).toBeVisible();
-  await expect(preview.getByTestId("on-screen-keyboard")).toHaveCount(0);
 
   await page
     .getByRole("group", { name: "Keys" })
@@ -43,7 +44,7 @@ test("each Shared Keyboard Player gets the aids they switched on", async ({
   );
   await page.keyboard.type(text);
 
-  // Bob's Turn: only the hands.
+  // Bob's Turn: the default, only the hands.
   await expect(page.getByRole("heading", { name: "Bob's turn" })).toBeVisible();
   await page.keyboard.press("Space");
   await expect(page.getByTestId("finger-guide")).toBeVisible();
@@ -72,11 +73,11 @@ test("Online, your display is set in the lobby and used in the Match", async ({
   await bob.goto(anna.url());
   await enterRoom(bob, "Bob");
 
-  // Anna turns on both aids and sees them in the preview.
+  // The Finger Guide is on by default; Anna adds the keyboard.
   const preview = anna.getByTestId("display-preview");
-  await expect(preview).toContainText("no keyboard or hands");
+  await expect(preview.getByTestId("finger-guide")).toBeVisible();
+  await expect(preview.getByTestId("on-screen-keyboard")).toHaveCount(0);
   await anna.getByRole("checkbox", { name: "On-screen Keyboard" }).click();
-  await anna.getByRole("checkbox", { name: "Finger Guide" }).click();
   await expect(preview.getByTestId("on-screen-keyboard")).toBeVisible();
   await expect(preview.getByTestId("finger-guide")).toBeVisible();
 
@@ -92,5 +93,6 @@ test("Online, your display is set in the lobby and used in the Match", async ({
   await expect(anna.getByTestId("finger-guide")).toBeVisible();
   await expect(anna.getByRole("checkbox")).toHaveCount(0);
   await expect(bob.getByRole("list", { name: "Race progress" })).toBeVisible();
+  await expect(bob.getByTestId("finger-guide")).toBeVisible();
   await expect(bob.getByTestId("on-screen-keyboard")).toHaveCount(0);
 });

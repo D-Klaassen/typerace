@@ -21,7 +21,7 @@ import { ChoiceGroup } from "@/components/choice-group";
 import { KeySetPicker } from "@/components/key-set/key-set-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
-import { NO_DISPLAY_AIDS } from "@/components/finger-guide/finger-guide";
+import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import { Label } from "@/components/ui/label";
 import {
   MAX_PLAYERS,
@@ -143,7 +143,7 @@ export function SetupForm({
                 onClick={() =>
                   setPlayers([
                     ...players,
-                    { name: "", display: NO_DISPLAY_AIDS },
+                    { name: "", display: DEFAULT_DISPLAY },
                   ])
                 }
               >

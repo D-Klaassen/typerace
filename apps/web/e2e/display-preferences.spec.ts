@@ -22,6 +22,10 @@ test("each Shared Keyboard Player gets the aids they switched on", async ({
   await expect(preview.getByTestId("finger-guide")).toBeVisible();
   await expect(preview.getByTestId("on-screen-keyboard")).toHaveCount(0);
 
+  await page
+    .getByRole("group", { name: "Keys" })
+    .getByText("Classic", { exact: true })
+    .click();
   await page.getByText("Hard", { exact: true }).click();
   await page.getByRole("button", { name: "Start" }).click();
 

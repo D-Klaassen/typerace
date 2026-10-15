@@ -1,8 +1,19 @@
+export { generateGibberish, type GibberishOptions } from "./gibberish";
 export {
-  generateGibberish,
-  type Difficulty,
-  type GibberishOptions,
-} from "./gibberish";
+  DEFAULT_KEY_SET_CHOICE,
+  findPreset,
+  KEY_SET_PRESETS,
+  LESSONS,
+  MIN_CUSTOM_KEYS,
+  normalizeKeys,
+  resolveKeySet,
+  TYPABLE_KEYS,
+  type KeySet,
+  type KeySetChoice,
+  type KeySetPreset,
+  type Lesson,
+  type PresetGroup,
+} from "./key-sets";
 export {
   getStats,
   startTyping,
@@ -50,6 +61,7 @@ export {
   joinRoom,
   leaveRoom,
   MAX_ROOM_PLAYERS,
+  roomKeySet,
   ONLINE_MODES,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,

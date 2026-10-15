@@ -11,7 +11,7 @@ function start(): OnlineTimeTrial {
   return startOnlineTimeTrial({
     players: ["a", "b"],
     timeBankMs: 60_000,
-    difficulty: "medium",
+    keySet: { keys: "abcdefghijklmnopqrstuvwxyz", capitals: false },
     seed: 7,
   });
 }
@@ -81,7 +81,7 @@ describe("Online Time Trial", () => {
     const three = startOnlineTimeTrial({
       players: ["a", "b", "c"],
       timeBankMs: 60_000,
-      difficulty: "easy",
+      keySet: { keys: "asdfghjkl;", capitals: false },
       seed: 1,
     });
 

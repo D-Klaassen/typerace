@@ -2,7 +2,6 @@
 
 import {
   ONLINE_MODES,
-  type Difficulty,
   type Mode,
   type RoomSettings,
   type TextLength,
@@ -12,6 +11,11 @@ import { CheckIcon, CopyIcon, CrownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ChoiceGroup } from "@/components/choice-group";
+import {
+  KeySetPicker,
+  KeySetSummary,
+} from "@/components/key-set/key-set-picker";
+import { KeySetVote } from "@/components/key-set/key-set-vote";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
 import type { DisplayPreferences } from "@/components/finger-guide/finger-guide";
@@ -26,7 +30,6 @@ import {
 import type { RoomState } from "./use-room";
 
 const MODES: Mode[] = ["classicRace", "crazyDarts", "timeTrial"];
-const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 const TEXT_LENGTHS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
 const STARTING_HP = [50, 100, 150, 200];
@@ -121,16 +124,10 @@ export function Lobby({
                 value={myVotes.mode}
                 onChange={(mode) => onVote({ mode })}
               />
-              <ChoiceGroup
-                legend={t("voteDifficulty")}
-                name="vote-difficulty"
-                options={DIFFICULTIES.map((value) => ({
-                  value,
-                  label: t(`difficulties.${value}`),
-                  badge: voteCounts.difficulty[value],
-                }))}
-                value={myVotes.difficulty}
-                onChange={(difficulty) => onVote({ difficulty })}
+              <KeySetVote
+                myVote={myVotes.keySet}
+                counts={voteCounts.keySet}
+                onVote={(keySet) => onVote({ keySet })}
               />
             </section>
           )}
@@ -218,18 +215,17 @@ function SettingsForm({
         value={settings.mode}
         onChange={(mode) => onChange({ mode })}
       />
-      <ChoiceGroup
-        {...shared}
-        legend={t("difficulty")}
-        name="difficulty"
-        options={DIFFICULTIES.map((value) => ({
-          value,
-          label: t(`difficulties.${value}`),
-          badge: editable ? voteCounts.difficulty[value] : undefined,
-        }))}
-        value={settings.difficulty}
-        onChange={(difficulty) => onChange({ difficulty })}
-      />
+      {editable ? (
+        <KeySetPicker
+          value={{ keySet: settings.keySet, capitals: settings.capitals }}
+          presetBadges={voteCounts.keySet}
+          onChange={(value) => onChange(value)}
+        />
+      ) : (
+        <KeySetSummary
+          value={{ keySet: settings.keySet, capitals: settings.capitals }}
+        />
+      )}
       {settings.mode === "classicRace" && (
         <ChoiceGroup
           {...shared}

@@ -3,7 +3,6 @@
 import {
   MAX_NICKNAME_LENGTH,
   validateNicknames,
-  type Difficulty,
   type NicknameProblem,
 } from "@typerace/game";
 import { XIcon } from "lucide-react";
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ChoiceGroup } from "@/components/choice-group";
+import { KeySetPicker } from "@/components/key-set/key-set-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
 import { NO_DISPLAY_AIDS } from "@/components/finger-guide/finger-guide";
@@ -33,7 +33,6 @@ import {
 } from "./settings";
 
 const MODES: SharedKeyboardMode[] = ["classicRace", "timeTrial"];
-const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 const TEXT_LENGTH_OPTIONS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
 
@@ -45,10 +44,12 @@ export function SetupForm({
   onStart: (settings: SharedKeyboardSettings) => void;
 }) {
   const t = useTranslations("SharedKeyboard.Setup");
-  const common = useTranslations("Common");
   const [mode, setMode] = useState(initial.mode);
   const [players, setPlayers] = useState(initial.players);
-  const [difficulty, setDifficulty] = useState(initial.difficulty);
+  const [keySet, setKeySet] = useState({
+    keySet: initial.keySet,
+    capitals: initial.capitals,
+  });
   const [textLength, setTextLength] = useState(initial.textLength);
   const [timeBankMs, setTimeBankMs] = useState(initial.timeBankMs);
   const [problem, setProblem] = useState<NicknameProblem | null>(null);
@@ -69,7 +70,7 @@ export function SetupForm({
           ...player,
           name: player.name.trim(),
         })),
-        difficulty,
+        ...keySet,
         timeBankMs,
       });
     }
@@ -177,16 +178,7 @@ export function SetupForm({
             onChange={setMode}
           />
 
-          <ChoiceGroup
-            legend={t("difficulty")}
-            name="difficulty"
-            options={DIFFICULTIES.map((value) => ({
-              value,
-              label: common(`difficulty.${value}`),
-            }))}
-            value={difficulty}
-            onChange={setDifficulty}
-          />
+          <KeySetPicker value={keySet} onChange={setKeySet} />
 
           {mode === "classicRace" ? (
             <ChoiceGroup

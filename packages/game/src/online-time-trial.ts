@@ -1,4 +1,5 @@
-import { generateGibberish, type Difficulty } from "./gibberish";
+import { generateGibberish } from "./gibberish";
+import type { KeySet } from "./key-sets";
 import {
   completeTurn,
   eliminatePlayer,
@@ -17,7 +18,7 @@ export const TIME_TRIAL_TURN_LENGTH = 150;
  */
 export interface OnlineTimeTrial {
   readonly trial: TimeTrial;
-  readonly difficulty: Difficulty;
+  readonly keySet: KeySet;
   readonly seed: number;
   /** The current Turn's typing; null once there is a winner. */
   readonly turn: TypingSession | null;
@@ -26,17 +27,17 @@ export interface OnlineTimeTrial {
 export function startOnlineTimeTrial({
   players,
   timeBankMs,
-  difficulty,
+  keySet,
   seed,
 }: {
   players: readonly string[];
   timeBankMs: number;
-  difficulty: Difficulty;
+  keySet: KeySet;
   seed: number;
 }): OnlineTimeTrial {
   return withTurn({
     trial: startTimeTrial({ players, timeBankMs }),
-    difficulty,
+    keySet,
     seed,
     turn: null,
   });
@@ -127,7 +128,7 @@ function withTurn(match: OnlineTimeTrial): OnlineTimeTrial {
           match.seed +
           match.trial.turnsTaken +
           match.trial.eliminated.length * 1_000,
-        difficulty: match.difficulty,
+        keySet: match.keySet,
         minLength: TIME_TRIAL_TURN_LENGTH,
       }),
     ),

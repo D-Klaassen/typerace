@@ -1,4 +1,8 @@
-import type { Difficulty } from "./gibberish";
+import {
+  DEFAULT_KEY_SET_CHOICE,
+  resolveKeySet,
+  type KeySetChoice,
+} from "./key-sets";
 import { validateNicknames, type NicknameProblem } from "./nicknames";
 import {
   crazyDartsText,
@@ -40,7 +44,10 @@ export type TextLength = "short" | "medium" | "long";
 
 export interface RoomSettings {
   mode: Mode;
-  difficulty: Difficulty;
+  /** Which keys the Gibberish may contain. */
+  keySet: KeySetChoice;
+  /** Letters may start with a capital, to practise Shift. */
+  capitals: boolean;
   /** Classic Race. */
   textLength: TextLength;
   /** Time Trial. */
@@ -62,7 +69,8 @@ export const TEXT_LENGTH_CHARACTERS: Record<TextLength, number> = {
 
 export const DEFAULT_ROOM_SETTINGS: RoomSettings = {
   mode: "classicRace",
-  difficulty: "medium",
+  keySet: DEFAULT_KEY_SET_CHOICE,
+  capitals: false,
   textLength: "medium",
   timeBankMs: 120_000,
   startingHp: 100,
@@ -104,14 +112,16 @@ export interface Room {
 
 export interface PlayerVotes {
   mode?: Mode;
-  difficulty?: Difficulty;
+  /** A preset id; custom Key Sets can't be voted for. */
+  keySet?: string;
 }
 
-export type Vote = { mode: Mode } | { difficulty: Difficulty };
+export type Vote = { mode: Mode } | { keySet: string };
 
 export interface VoteCounts {
   mode: Record<Mode, number>;
-  difficulty: Record<Difficulty, number>;
+  /** Only presets that have Votes appear. */
+  keySet: Record<string, number>;
 }
 
 export type JoinError = "roomFull" | NicknameProblem;
@@ -240,7 +250,7 @@ export function castVote(room: Room, byId: string, vote: Vote): Room {
 export function getVoteCounts(room: Room): VoteCounts {
   const counts: VoteCounts = {
     mode: { classicRace: 0, crazyDarts: 0, timeTrial: 0 },
-    difficulty: { easy: 0, medium: 0, hard: 0 },
+    keySet: {},
   };
 
   for (const player of room.players) {
@@ -251,8 +261,8 @@ export function getVoteCounts(room: Room): VoteCounts {
     if (votes.mode) {
       counts.mode[votes.mode] += 1;
     }
-    if (votes.difficulty) {
-      counts.difficulty[votes.difficulty] += 1;
+    if (votes.keySet) {
+      counts.keySet[votes.keySet] = (counts.keySet[votes.keySet] ?? 0) + 1;
     }
   }
 
@@ -300,14 +310,13 @@ export function advanceClock(room: Room, nowMs: number): Room {
     } as const;
 
     if (room.settings.mode === "crazyDarts") {
-      const { difficulty, startingHp, dartDamagePerCharacter, typoHp } =
-        room.settings;
+      const { startingHp, dartDamagePerCharacter, typoHp } = room.settings;
 
       return {
         ...started,
         darts: startCrazyDarts({
           players,
-          text: crazyDartsText(room.seed, difficulty),
+          text: crazyDartsText(room.seed, roomKeySet(room)),
           startingHp,
           dartDamagePerCharacter,
           typoHp,
@@ -321,7 +330,7 @@ export function advanceClock(room: Room, nowMs: number): Room {
           timeTrial: startOnlineTimeTrial({
             players,
             timeBankMs: room.settings.timeBankMs,
-            difficulty: room.settings.difficulty,
+            keySet: roomKeySet(room),
             seed: room.seed,
           }),
         }
@@ -412,4 +421,9 @@ function finishIfOver(room: Room, nowMs: number): Room {
   }
 
   return { ...room, phase: "results", votes: {} };
+}
+
+/** The keys and Capitals the Room's settings stand for. */
+export function roomKeySet(room: Room) {
+  return resolveKeySet(room.settings.keySet, room.settings.capitals);
 }

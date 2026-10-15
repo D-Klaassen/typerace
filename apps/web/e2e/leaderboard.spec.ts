@@ -31,7 +31,7 @@ async function typeTurnTaking(page: Page, ms: number) {
   await page.keyboard.type(text.slice(1));
 }
 
-test("a Time Trial with Dutch Words goes on the Dutch Words board", async ({
+test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   page,
 }) => {
   await page.clock.install();
@@ -39,7 +39,7 @@ test("a Time Trial with Dutch Words goes on the Dutch Words board", async ({
 
   await page.getByPlaceholder("Player 1").fill("Anke");
   await page.getByPlaceholder("Player 2").fill("Bram");
-  await page.getByText("Time Trial", { exact: true }).click();
+  await page.getByText("Hot Seat", { exact: true }).click();
   await page.getByText("1", { exact: true }).click(); // 1-minute Time Bank
   await page.getByText("Words", { exact: true }).click();
   await page.getByText("Dutch", { exact: true }).click();

@@ -31,13 +31,14 @@
       "addPlayer": "Add player",
       "removePlayer": "Remove {name}",
       "mode": "Mode",
-      "timeTrial": "Time Trial",
+      "hotSeat": "Hot Seat",
       "timeBank": "Time Bank (minutes)",
       "start": "Start",
       "errors": {
         "nicknameRequired": "Every Player needs a nickname.",
         "nicknameTooLong": "Nicknames can be at most 16 characters.",
-        "nicknameTaken": "Two Players can't share a nickname."
+        "nicknameTaken": "Two Players can't share a nickname.",
+        "hotSeatNeedsTwo": "Hot Seat needs at least two Players."
       },
       "classicRace": "Classic Race",
       "textLength": "Text length",
@@ -46,12 +47,14 @@
         "medium": "Medium",
         "long": "Long"
       },
+      "soloLeaderboardHint": "On your own, a Medium race goes on the leaderboard.",
       "previewFor": "Preview for {name}",
-      "nicknameHint": "Nicknames are shown on the leaderboard after a Time Trial."
+      "nicknameHint": "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race."
     },
     "Handover": {
       "turnOf": "{name}'s turn",
       "pressSpace": "Pass the keyboard to {name}, then press Space when ready.",
+      "pressSpaceSolo": "Press Space when you're ready.",
       "start": "Start Turn"
     },
     "Turn": {
@@ -69,6 +72,7 @@
     },
     "Results": {
       "winner": "{name} wins!",
+      "finished": "Well done, {name}!",
       "rank": "#",
       "player": "Player",
       "bestTime": "Best time",
@@ -124,7 +128,7 @@
     "modes": {
       "classicRace": "Classic Race",
       "crazyDarts": "Crazy Darts",
-      "timeTrial": "Time Trial"
+      "hotSeat": "Hot Seat"
     },
     "textLengths": {
       "short": "Short",
@@ -168,14 +172,14 @@
     "damageDealt": "Damage dealt",
     "notConfigured": "Online play isn’t set up on this site yet: the Rooms server address is missing.",
     "aids": "Aids",
-    "nicknameHint": "Your nickname is shown on the leaderboard when you finish a Time Trial.",
+    "nicknameHint": "Your nickname is shown on the leaderboard when you finish a Hot Seat Match.",
     "Leave": {
       "leave": "Leave Room",
       "title": "Leave this Match?",
       "description": {
         "classicRace": "You’ll leave the Room, and your progress in this race freezes where it is.",
         "crazyDarts": "You’ll leave the Room and count as out.",
-        "timeTrial": "You’ll leave the Room and be eliminated from this Time Trial."
+        "hotSeat": "You’ll leave the Room and be eliminated from this Hot Seat Match."
       }
     }
   },
@@ -249,13 +253,13 @@
   "Leaderboard": {
     "metadataTitle": "Leaderboard · Typerace",
     "title": "Leaderboard",
-    "description": "The fastest Time Trial Turns, Online and on a Shared Keyboard. Gibberish has a board for each set of keys, Words and Sentences one for each language.",
+    "description": "The fastest Hot Seat Turns, Online and on a Shared Keyboard, and solo Medium races. Gibberish has a board for each set of keys, Words and Sentences one for each language.",
     "rank": "#",
     "player": "Player",
     "time": "Time",
     "date": "Date",
     "loading": "Loading…",
-    "empty": "No times on this board yet. Finish a Time Trial to be the first!",
+    "empty": "No times on this board yet. Finish a Hot Seat Match or a solo Medium race to be the first!",
     "failed": "Couldn’t load the leaderboard.",
     "notConfigured": "The leaderboard isn’t set up on this site yet: the Rooms server address is missing.",
     "status": {

@@ -180,7 +180,7 @@ export class Rooms extends Server<Env> {
     }
   }
 
-  /** A finished Time Trial's best Times go on the Leaderboard. */
+  /** A finished Hot Seat Match's best Times go on the Leaderboard. */
   private recordOnLeaderboard() {
     const finished = roomLeaderboardRecords(this.room);
     if (finished && finished.records.length > 0) {

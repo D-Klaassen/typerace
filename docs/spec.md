@@ -23,12 +23,12 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Players and setup
 
 - A nickname is 1–16 characters, trimmed, and unique within the game (ignoring case).
-- Each game holds 2–6 Players.
+- Each game holds 2–6 Players, except a Classic Race on a Shared Keyboard, which can be played alone.
 - **Back to the menu:** every screen except the home page has a control in its top-left corner that goes back to the home page. Outside a game it is "Back to menu". During a game it quits, and quitting a game in progress asks for confirmation first ("Keep playing" cancels). The game ignores keystrokes while the confirmation is open, but a running clock keeps running.
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 2–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Time Trial) and its settings.
+1. **Setup screen:** enter 1–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 4. **Quitting:** "Quit game" on the handover and Turn screens ends the game for everyone after a confirmation and goes to the home page. Nothing from the game is saved, so it never reaches the Leaderboard.
@@ -47,7 +47,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Leaving or losing the connection:**
   - Classic Race: the Player's progress freezes.
   - Crazy Darts: they count as out (HP 0).
-  - Time Trial: they're eliminated.
+  - Hot Seat: they're eliminated.
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
 - **Leave Room:** every screen inside a Room has a "Leave Room" control that closes the connection, which the Room treats as leaving (see above), and goes to the home page. A Player in a countdown or a running Match confirms first, with a message saying what leaving costs in that Mode. In the lobby, as a Spectator and on the results it leaves at once. Before joining (the nickname form, "Room not found") there is "Back to menu" instead.
@@ -85,7 +85,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - It shows a red error state until the correct key is pressed.
   - Every wrong keystroke counts as one Typo.
 - **Ignored keys:** Backspace, Escape, Tab and modifier keys on their own. They are not keystrokes.
-- **Stats per Player per Match** (in Time Trial, per Turn and summed over the Match):
+- **Stats per Player per Match** (in Hot Seat, per Turn and summed over the Match):
   - **Time:** from the first keystroke until the last character is typed.
   - **WPM:** (correct characters ÷ 5) ÷ minutes.
   - **Accuracy:** correct keystrokes ÷ all keystrokes.
@@ -94,7 +94,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - The text.
   - Each Player's progress.
   - In Crazy Darts, each Player's HP.
-  - In Time Trial, the active Player's remaining Time Bank and the table of times.
+  - In Hot Seat, the active Player's remaining Time Bank and the table of times.
   - WPM is **not** shown while typing.
 
 ## Modes
@@ -115,6 +115,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Shared Keyboard:**
   - Each Player takes one Turn.
   - The fastest Time wins. On a tie, the higher Accuracy wins, then whoever went first.
+  - **Solo:** a single Player can race on their own. The handover skips "pass the keyboard", and the results say they finished instead of naming a winner. A solo race of Medium length goes on the Leaderboard.
 
 ### Crazy Darts (Online only)
 
@@ -135,7 +136,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Winning:** the last Player with HP left wins. The others are ranked in reverse order of going out.
 - **Feedback:** Darts get clear visual feedback, showing who threw at whom and the HP change. Exact visuals are decided during implementation.
 
-### Time Trial (Online and Shared Keyboard)
+### Hot Seat (Online and Shared Keyboard)
 
 | Setting              | Default         |
 | -------------------- | --------------- |
@@ -160,20 +161,20 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Results screen
 
 - **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide) they had on.
-- **Time Trial:** also each Player's best Time and number of Turns, whether the best Times reached the Leaderboard, and a link to it.
+- **Hot Seat:** also each Player's best Time and number of Turns, whether the best Times reached the Leaderboard, and a link to it.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 
 ## Leaderboard
 
-- **What goes on it:** when a Time Trial ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it.
+- **What goes on it:** when a Hot Seat Match ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it. A solo Classic Race on a Shared Keyboard counts too when its text is Medium, the same length as a Turn.
 - **One board per kind of text,** as Times only compare on the same text. Each board keeps its fastest 20; equal Times rank in the order they were set.
   - **Gibberish:** a board per Key Set: the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset.
   - **Words and Sentences:** a board per Text Source and Language: English Words, Dutch Words, English Sentences and Dutch Sentences.
 - **Per Turn length:** boards are stored under the Turn length too. Times from when Turns were 150 characters stay in storage but aren't on today's boards, so every Time on a board was set on a Turn of the same length.
-- **Online:** the Room records the Time Trial itself, using the Times it measured on its own clock.
+- **Online:** the Room records the Hot Seat Match itself, using the Times it measured on its own clock.
 - **Shared Keyboard:** the browser sends the best Times to the Rooms server, with the Key Set or the Text Source and Language. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames, and valid keys or a known Text Source and Language).
-- **The page** `/leaderboard`, linked from the home page and from Time Trial results, has a Text Source picker (with a Language for Words and Sentences, or a Key Set picker for Gibberish) and shows that board. Its URL names the board, so it can be shared, and the link from Time Trial results opens the board the Time Trial went on.
-- **Nickname fields** say the nickname is shown on the Leaderboard after a Time Trial.
+- **The page** `/leaderboard`, linked from the home page and from Hot Seat results, has a Text Source picker (with a Language for Words and Sentences, or a Key Set picker for Gibberish) and shows that board. Its URL names the board, so it can be shared, and the link from Hot Seat results opens the board the Hot Seat Match went on.
+- **Nickname fields** say the nickname is shown on the Leaderboard after a Hot Seat Match or a solo Medium race.
 
 ## On-screen Keyboard and Finger Guide
 
@@ -232,7 +233,7 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
 - **Web app:** Next.js (App Router), Tailwind CSS and shadcn/ui
 - **Rooms:** PartyServer with Wrangler
 - **Translations:** next-intl
-- **Tests:** Vitest for `packages/game` (full rule coverage) and the Room logic; Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Time Trial, one Online Classic Race with two browser contexts, one Online Crazy Darts, quitting a Shared Keyboard game, and leaving a Room.
+- **Tests:** Vitest for `packages/game` (full rule coverage) and the Room logic; Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Hot Seat, one Online Classic Race with two browser contexts, one Online Crazy Darts, quitting a Shared Keyboard game, and leaving a Room.
 - **Lint and format:** ESLint and Prettier
 - **Root scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `format:check`, and `check`, which runs them all.
 - **Rule:** every commit and push requires a green `check`.
@@ -243,7 +244,7 @@ Each step is a vertical slice that is playable or testable when it lands:
 
 1. **Scaffold:** the monorepo, tooling, the `check` script, an empty Next.js app with next-intl, and an empty `packages/game` with Vitest.
 2. **Text and typing engine** in `packages/game`: seeded Gibberish per Difficulty (later replaced by Key Sets), Typos and stats.
-3. **Time Trial on a Shared Keyboard:** the setup, handover and results screens, plus Time Trial rules with the Time Bank and elimination.
+3. **Hot Seat on a Shared Keyboard:** the setup, handover and results screens, plus Hot Seat rules with the Time Bank and elimination.
 4. **Finger Guide:** the keyboard, the hands, the finger colours and Shift handling, with per-Player switches (later split into On-screen Keyboard and Finger Guide, set before the Match with a preview).
 5. **Classic Race on a Shared Keyboard.**
 6. **Rooms:**
@@ -251,6 +252,6 @@ Each step is a vertical slice that is playable or testable when it lands:
    - The Host, the 6-Player cap and the Host handover.
    - Live settings and Votes.
 7. **Online Classic Race,** including Spectators (they only exist once a Match can run).
-8. **Online Time Trial** with live watching.
+8. **Online Hot Seat** with live watching.
 9. **Crazy Darts.**
 10. **Deploy:** `scripts/deploy-wizard.sh` walks through logging in to Cloudflare, deploying the Rooms server and creating the Vercel project; then the first deploy.

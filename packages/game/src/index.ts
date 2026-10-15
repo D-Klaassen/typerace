@@ -36,14 +36,14 @@ export {
 export {
   completeTurn,
   eliminatePlayer,
-  getTimeTrialResults,
+  getHotSeatResults,
   runOutOfTime,
-  startTimeTrial,
-  type TimeTrial,
-  type TimeTrialOptions,
-  type TimeTrialPlayer,
-  type TimeTrialResult,
-} from "./time-trial";
+  startHotSeat,
+  type HotSeat,
+  type HotSeatOptions,
+  type HotSeatPlayer,
+  type HotSeatResult,
+} from "./hot-seat";
 export {
   MAX_NICKNAME_LENGTH,
   validateNicknames,
@@ -108,14 +108,14 @@ export {
   type RaceEntry,
 } from "./online-race";
 export {
-  advanceTimeTrial,
+  advanceHotSeat,
   currentTimeBankMs,
-  dropFromTimeTrial,
-  startOnlineTimeTrial,
-  TIME_TRIAL_TURN_LENGTH,
-  typeInTimeTrial,
-  type OnlineTimeTrial,
-} from "./online-time-trial";
+  dropFromHotSeat,
+  startOnlineHotSeat,
+  HOT_SEAT_TURN_LENGTH,
+  typeInHotSeat,
+  type OnlineHotSeat,
+} from "./online-hot-seat";
 export {
   CRAZY_DARTS_TEXT_LENGTH,
   crazyDartsText,
@@ -132,7 +132,8 @@ export {
   addToLeaderboard,
   LEADERBOARD_SIZE,
   leaderboardBoard,
-  timeTrialRecords,
+  hotSeatRecords,
+  soloRaceRecords,
   type LeaderboardEntry,
   type LeaderboardRecord,
 } from "./leaderboard";

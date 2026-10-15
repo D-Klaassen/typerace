@@ -1,6 +1,6 @@
 # Typerace
 
-A multiplayer typing game. Race your friends Online in a Room, or pass one keyboard around. Three Modes: Classic Race, Crazy Darts and Time Trial, with an optional Finger Guide that shows which finger should press the next key.
+A multiplayer typing game. Race your friends Online in a Room, or pass one keyboard around. Three Modes: Classic Race, Crazy Darts and Hot Seat, with an optional Finger Guide that shows which finger should press the next key.
 
 - [`CONTEXT.md`](CONTEXT.md): the domain language (Player, Room, Match, Turn, Time Bank, …)
 - [`docs/spec.md`](docs/spec.md): what v1 does

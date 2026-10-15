@@ -3,7 +3,7 @@ import {
   resolveKeySet,
   type KeySetChoice,
 } from "./key-sets";
-import { timeTrialRecords, type LeaderboardRecord } from "./leaderboard";
+import { hotSeatRecords, type LeaderboardRecord } from "./leaderboard";
 import {
   resolveTextSource,
   type Language,
@@ -19,12 +19,12 @@ import {
   type CrazyDarts,
 } from "./crazy-darts";
 import {
-  advanceTimeTrial,
-  dropFromTimeTrial,
-  startOnlineTimeTrial,
-  typeInTimeTrial,
-  type OnlineTimeTrial,
-} from "./online-time-trial";
+  advanceHotSeat,
+  dropFromHotSeat,
+  startOnlineHotSeat,
+  typeInHotSeat,
+  type OnlineHotSeat,
+} from "./online-hot-seat";
 import {
   dropFromRace,
   isRaceOver,
@@ -42,10 +42,10 @@ export const COUNTDOWN_MS = 3_000;
 export const ONLINE_MODES: readonly Mode[] = [
   "classicRace",
   "crazyDarts",
-  "timeTrial",
+  "hotSeat",
 ];
 
-export type Mode = "classicRace" | "crazyDarts" | "timeTrial";
+export type Mode = "classicRace" | "crazyDarts" | "hotSeat";
 
 export type TextLength = "short" | "medium" | "long";
 
@@ -61,7 +61,7 @@ export interface RoomSettings {
   capitals: boolean;
   /** Classic Race. */
   textLength: TextLength;
-  /** Time Trial. */
+  /** Hot Seat. */
   timeBankMs: number;
   /** Crazy Darts. */
   startingHp: number;
@@ -126,13 +126,13 @@ export interface Room {
   readonly text: string | null;
   /** The current or last Classic Race; null in the lobby. */
   readonly race: OnlineRace | null;
-  /** The current or last Time Trial; null in the lobby. */
-  readonly timeTrial: OnlineTimeTrial | null;
+  /** The current or last Hot Seat; null in the lobby. */
+  readonly hotSeat: OnlineHotSeat | null;
   /** The current or last Crazy Darts; null in the lobby. */
   readonly darts: CrazyDarts | null;
   /** Each Player's aids as they were when the Match started. */
   readonly matchDisplays: Readonly<Record<string, Display>>;
-  /** Seeds the Match's text where it isn't generated up front (Time Trial, Crazy Darts). */
+  /** Seeds the Match's text where it isn't generated up front (Hot Seat, Crazy Darts). */
   readonly seed: number;
 }
 
@@ -168,7 +168,7 @@ export function createRoom(): Room {
     countdownEndsAtMs: null,
     text: null,
     race: null,
-    timeTrial: null,
+    hotSeat: null,
     darts: null,
     matchDisplays: {},
     seed: 0,
@@ -231,9 +231,9 @@ export function leaveRoom(room: Room, playerId: string): Room {
       -Infinity,
     );
   }
-  if (left.timeTrial) {
+  if (left.hotSeat) {
     return finishIfOver(
-      { ...left, timeTrial: dropFromTimeTrial(left.timeTrial, playerId) },
+      { ...left, hotSeat: dropFromHotSeat(left.hotSeat, playerId) },
       -Infinity,
     );
   }
@@ -277,7 +277,7 @@ export function castVote(room: Room, byId: string, vote: Vote): Room {
 /** Counts the Votes of Players who are still in the Room and not Host. */
 export function getVoteCounts(room: Room): VoteCounts {
   const counts: VoteCounts = {
-    mode: { classicRace: 0, crazyDarts: 0, timeTrial: 0 },
+    mode: { classicRace: 0, crazyDarts: 0, hotSeat: 0 },
     keySet: {},
   };
 
@@ -357,10 +357,10 @@ export function advanceClock(room: Room, nowMs: number): Room {
       };
     }
 
-    return room.settings.mode === "timeTrial"
+    return room.settings.mode === "hotSeat"
       ? {
           ...started,
-          timeTrial: startOnlineTimeTrial({
+          hotSeat: startOnlineHotSeat({
             players,
             timeBankMs: room.settings.timeBankMs,
             textSource: roomTextSource(room),
@@ -377,9 +377,9 @@ export function advanceClock(room: Room, nowMs: number): Room {
         };
   }
 
-  if (room.phase === "racing" && room.timeTrial) {
+  if (room.phase === "racing" && room.hotSeat) {
     return finishIfOver(
-      { ...room, timeTrial: advanceTimeTrial(room.timeTrial, nowMs) },
+      { ...room, hotSeat: advanceHotSeat(room.hotSeat, nowMs) },
       nowMs,
     );
   }
@@ -406,12 +406,12 @@ export function typeInRoom(
 
     return darts === room.darts ? room : finishIfOver({ ...room, darts }, atMs);
   }
-  if (room.timeTrial) {
-    const timeTrial = typeInTimeTrial(room.timeTrial, playerId, key, atMs);
+  if (room.hotSeat) {
+    const hotSeat = typeInHotSeat(room.hotSeat, playerId, key, atMs);
 
-    return timeTrial === room.timeTrial
+    return hotSeat === room.hotSeat
       ? room
-      : finishIfOver({ ...room, timeTrial }, atMs);
+      : finishIfOver({ ...room, hotSeat }, atMs);
   }
   if (!room.race) {
     return room;
@@ -454,7 +454,7 @@ export function backToLobby(room: Room, byId: string): Room {
     phase: "lobby",
     text: null,
     race: null,
-    timeTrial: null,
+    hotSeat: null,
     darts: null,
     players: room.players.map((player) => ({ ...player, spectator: false })),
   };
@@ -464,8 +464,8 @@ export function backToLobby(room: Room, byId: string): Room {
 function finishIfOver(room: Room, nowMs: number): Room {
   const over = room.darts
     ? room.darts.winner !== null
-    : room.timeTrial
-      ? room.timeTrial.trial.winner !== null
+    : room.hotSeat
+      ? room.hotSeat.seat.winner !== null
       : room.race !== null && isRaceOver(room.race, nowMs);
   if (room.phase !== "racing" || !over) {
     return room;
@@ -485,20 +485,20 @@ export function roomTextSource(room: Room): TextSource {
 }
 
 /**
- * The best Times of a finished Online Time Trial, for the Leaderboard. Only
+ * The best Times of a finished Online Hot Seat Match, for the Leaderboard. Only
  * Players still in the Room are on it: the Room no longer knows who left.
  */
 export function roomLeaderboardRecords(
   room: Room,
 ): { textSource: TextSource; records: LeaderboardRecord[] } | null {
-  if (room.phase !== "results" || !room.timeTrial) {
+  if (room.phase !== "results" || !room.hotSeat) {
     return null;
   }
 
   return {
-    textSource: room.timeTrial.textSource,
-    records: timeTrialRecords(
-      room.timeTrial.trial,
+    textSource: room.hotSeat.textSource,
+    records: hotSeatRecords(
+      room.hotSeat.seat,
       (id) => room.players.find((player) => player.id === id)?.nickname,
     ),
   };

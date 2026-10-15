@@ -32,7 +32,7 @@ export async function fetchLeaderboard(
   return ((await response.json()) as LeaderboardResponse).entries;
 }
 
-/** Sends a Shared Keyboard's finished Time Trial; Rooms record their own. */
+/** Sends a Shared Keyboard's finished Hot Seat Match; Rooms record their own. */
 export async function submitToLeaderboard(
   host: string,
   submission: LeaderboardSubmission,

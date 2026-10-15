@@ -20,7 +20,7 @@ import {
   Spectating,
 } from "./match-screens";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
-import { OnlineTimeTrial } from "./time-trial-screens";
+import { OnlineHotSeat } from "./hot-seat-screens";
 import { useDisplayPreferences } from "@/components/finger-guide/use-display-preferences";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 import { useRoom } from "./use-room";
@@ -140,10 +140,10 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         />
       );
     }
-    if (view.phase === "racing" && view.timeTrial) {
+    if (view.phase === "racing" && view.hotSeat) {
       return (
-        <OnlineTimeTrial
-          timeTrial={view.timeTrial}
+        <OnlineHotSeat
+          hotSeat={view.hotSeat}
           you={you}
           nicknames={room.nicknames}
           clockOffsetMs={room.clockOffsetMs}

@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/card";
 import type { RoomState } from "./use-room";
 
-const MODES: Mode[] = ["classicRace", "crazyDarts", "timeTrial"];
+const MODES: Mode[] = ["classicRace", "crazyDarts", "hotSeat"];
 const TEXT_LENGTHS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
 const STARTING_HP = [50, 100, 150, 200];
@@ -245,7 +245,7 @@ function SettingsForm({
           onChange={(textLength) => onChange({ textLength })}
         />
       )}
-      {settings.mode === "timeTrial" && (
+      {settings.mode === "hotSeat" && (
         <ChoiceGroup
           {...shared}
           legend={t("timeBank")}

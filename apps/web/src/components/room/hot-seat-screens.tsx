@@ -6,50 +6,50 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
-import { TimeTrialStandings } from "@/components/shared-keyboard/time-trial-standings";
+import { HotSeatStandings } from "@/components/shared-keyboard/hot-seat-standings";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useNow } from "@/components/typing/use-now";
 import { useTyping } from "@/components/typing/use-typing";
 import { cn } from "@/lib/utils";
 
-type TimeTrialView = NonNullable<RoomView["timeTrial"]>;
-type Turn = NonNullable<TimeTrialView["turn"]>;
+type HotSeatView = NonNullable<RoomView["hotSeat"]>;
+type Turn = NonNullable<HotSeatView["turn"]>;
 
-/** An Online Time Trial: type on your Turn, watch the others on theirs. */
-export function OnlineTimeTrial({
-  timeTrial,
+/** An Online Hot Seat: type on your Turn, watch the others on theirs. */
+export function OnlineHotSeat({
+  hotSeat,
   you,
   nicknames,
   clockOffsetMs,
   display,
   onKey,
 }: {
-  timeTrial: TimeTrialView;
+  hotSeat: HotSeatView;
   you: string;
   nicknames: Record<string, string>;
   clockOffsetMs: number;
   display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
-  const { trial, turn } = timeTrial;
+  const { seat, turn } = hotSeat;
   const nameOf = (id: string) => nicknames[id] ?? "?";
   // A new key per Turn gives every Turn a fresh typing session.
-  const turnKey = `${trial.turnsTaken}-${trial.eliminated.length}`;
+  const turnKey = `${seat.turnsTaken}-${seat.eliminated.length}`;
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
       {turn &&
-        (trial.currentPlayer === you ? (
+        (seat.currentPlayer === you ? (
           <MyTurn key={turnKey} turn={turn} display={display} onKey={onKey} />
         ) : (
           <WatchTurn
             turn={turn}
-            player={nameOf(trial.currentPlayer ?? "")}
+            player={nameOf(seat.currentPlayer ?? "")}
             clockOffsetMs={clockOffsetMs}
           />
         ))}
-      <TimeTrialStandings trial={trial} nameOf={nameOf} />
+      <HotSeatStandings seat={seat} nameOf={nameOf} />
     </div>
   );
 }

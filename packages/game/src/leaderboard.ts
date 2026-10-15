@@ -1,25 +1,26 @@
 /**
- * The Leaderboard: the fastest Time Trial Turns ever, one board per Text
- * Source. Times only compare fairly on the same kind of text: Gibberish has a
- * board per Key Set (the resolved keys plus Capitals, however the Key Set was
- * chosen), and Words and Sentences one per Language.
+ * The Leaderboard: the fastest Hot Seat Turns and solo Classic Races ever,
+ * one board per Text Source. Times only compare fairly on the same kind of
+ * text: Gibberish has a board per Key Set (the resolved keys plus Capitals,
+ * however the Key Set was chosen), and Words and Sentences one per Language.
  */
+import type { ClassicRace } from "./classic-race";
 import { normalizeKeys } from "./key-sets";
-import { TIME_TRIAL_TURN_LENGTH } from "./online-time-trial";
+import { HOT_SEAT_TURN_LENGTH } from "./online-hot-seat";
 import type { TextSource } from "./text-source";
-import type { TimeTrial } from "./time-trial";
+import type { HotSeat } from "./hot-seat";
 
 /** How many entries a board keeps and shows. */
 export const LEADERBOARD_SIZE = 20;
 
-/** A Player's best Time from one finished Time Trial. */
+/** A Player's best Time from one finished Hot Seat Match. */
 export interface LeaderboardRecord {
   nickname: string;
   timeMs: number;
 }
 
 export interface LeaderboardEntry extends LeaderboardRecord {
-  /** When the Time Trial ended, so equal times rank first come, first served. */
+  /** When the Hot Seat Match ended, so equal times rank first come, first served. */
   recordedAtMs: number;
 }
 
@@ -30,33 +31,56 @@ export interface LeaderboardEntry extends LeaderboardRecord {
  */
 export function leaderboardBoard(source: TextSource): string {
   if (source.kind !== "gibberish") {
-    return `${TIME_TRIAL_TURN_LENGTH}:${source.kind}:${source.language}`;
+    return `${HOT_SEAT_TURN_LENGTH}:${source.kind}:${source.language}`;
   }
   const { keys, capitals } = source.keySet;
 
-  return `${TIME_TRIAL_TURN_LENGTH}:${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
+  return `${HOT_SEAT_TURN_LENGTH}:${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
 }
 
 /**
- * Each Player's best Time once the Time Trial has a winner. Players who never
- * finished a Turn have no Time. `nicknameOf` maps the Time Trial's names to
+ * Each Player's best Time once the Hot Seat Match has a winner. Players who never
+ * finished a Turn have no Time. `nicknameOf` maps the Hot Seat Match's names to
  * nicknames (Online they are Player ids); a name it doesn't know is left out.
  */
-export function timeTrialRecords(
-  trial: TimeTrial,
+export function hotSeatRecords(
+  seat: HotSeat,
   nicknameOf: (name: string) => string | undefined = (name) => name,
 ): LeaderboardRecord[] {
-  if (trial.winner === null) {
+  if (seat.winner === null) {
     return [];
   }
 
-  return trial.players.flatMap(({ name, bestTimeMs }) => {
+  return seat.players.flatMap(({ name, bestTimeMs }) => {
     const nickname = nicknameOf(name);
 
     return bestTimeMs === null || nickname === undefined
       ? []
       : [{ nickname, timeMs: bestTimeMs }];
   });
+}
+
+/**
+ * The Time of a solo Classic Race on a Shared Keyboard. It only counts when
+ * its text was a Hot Seat Turn's length, so it shares a board fairly with
+ * Turns. `textLength` is the number of characters the text was made with.
+ */
+export function soloRaceRecords(
+  race: ClassicRace,
+  textLength: number,
+): LeaderboardRecord[] {
+  const [nickname] = race.players;
+  const [stats] = race.turns;
+  if (
+    race.players.length !== 1 ||
+    textLength !== HOT_SEAT_TURN_LENGTH ||
+    nickname === undefined ||
+    stats === undefined
+  ) {
+    return [];
+  }
+
+  return [{ nickname, timeMs: stats.timeMs }];
 }
 
 /** Adds new records to a board, fastest first, and keeps the top entries. */

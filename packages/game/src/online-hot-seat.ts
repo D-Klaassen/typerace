@@ -3,27 +3,27 @@ import {
   completeTurn,
   eliminatePlayer,
   runOutOfTime,
-  startTimeTrial,
-  type TimeTrial,
-} from "./time-trial";
+  startHotSeat,
+  type HotSeat,
+} from "./hot-seat";
 import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
 
-/** Characters per Time Trial Turn (see docs/spec.md). */
-export const TIME_TRIAL_TURN_LENGTH = 100;
+/** Characters per Hot Seat Turn (see docs/spec.md). */
+export const HOT_SEAT_TURN_LENGTH = 100;
 
 /**
- * A Time Trial played Online: the Player whose Turn it is types on their own
+ * A Hot Seat played Online: the Player whose Turn it is types on their own
  * device while the others watch. Players are identified by id.
  */
-export interface OnlineTimeTrial {
-  readonly trial: TimeTrial;
+export interface OnlineHotSeat {
+  readonly seat: HotSeat;
   readonly textSource: TextSource;
   readonly seed: number;
   /** The current Turn's typing; null once there is a winner. */
   readonly turn: TypingSession | null;
 }
 
-export function startOnlineTimeTrial({
+export function startOnlineHotSeat({
   players,
   timeBankMs,
   textSource,
@@ -33,22 +33,22 @@ export function startOnlineTimeTrial({
   timeBankMs: number;
   textSource: TextSource;
   seed: number;
-}): OnlineTimeTrial {
+}): OnlineHotSeat {
   return withTurn({
-    trial: startTimeTrial({ players, timeBankMs }),
+    seat: startHotSeat({ players, timeBankMs }),
     textSource,
     seed,
     turn: null,
   });
 }
 
-export function typeInTimeTrial(
-  match: OnlineTimeTrial,
+export function typeInHotSeat(
+  match: OnlineHotSeat,
   playerId: string,
   key: string,
   atMs: number,
-): OnlineTimeTrial {
-  if (!match.turn || playerId !== match.trial.currentPlayer) {
+): OnlineHotSeat {
+  if (!match.turn || playerId !== match.seat.currentPlayer) {
     return match;
   }
 
@@ -62,15 +62,15 @@ export function typeInTimeTrial(
 
   return withTurn({
     ...match,
-    trial: completeTurn(match.trial, getStats(turn)),
+    seat: completeTurn(match.seat, getStats(turn)),
   });
 }
 
 /** Eliminates the current Player once their Time Bank has run dry. */
-export function advanceTimeTrial(
-  match: OnlineTimeTrial,
+export function advanceHotSeat(
+  match: OnlineHotSeat,
   nowMs: number,
-): OnlineTimeTrial {
+): OnlineHotSeat {
   const startedAt = match.turn?.firstKeyAtMs ?? null;
   const bankMs = currentTimeBankMs(match);
   if (!match.turn || startedAt === null || bankMs === null) {
@@ -82,7 +82,7 @@ export function advanceTimeTrial(
 
   return withTurn({
     ...match,
-    trial: runOutOfTime(match.trial, {
+    seat: runOutOfTime(match.seat, {
       ...getStats(match.turn),
       timeMs: bankMs,
     }),
@@ -90,31 +90,31 @@ export function advanceTimeTrial(
 }
 
 /** Leaving the Room eliminates a Player, whether it's their Turn or not. */
-export function dropFromTimeTrial(
-  match: OnlineTimeTrial,
+export function dropFromHotSeat(
+  match: OnlineHotSeat,
   playerId: string,
-): OnlineTimeTrial {
-  const wasCurrent = playerId === match.trial.currentPlayer;
-  const trial = eliminatePlayer(match.trial, playerId);
-  if (trial === match.trial) {
+): OnlineHotSeat {
+  const wasCurrent = playerId === match.seat.currentPlayer;
+  const seat = eliminatePlayer(match.seat, playerId);
+  if (seat === match.seat) {
     return match;
   }
 
-  return wasCurrent ? withTurn({ ...match, trial }) : { ...match, trial };
+  return wasCurrent ? withTurn({ ...match, seat }) : { ...match, seat };
 }
 
 /** What was left of the current Player's Time Bank when their Turn began. */
-export function currentTimeBankMs(match: OnlineTimeTrial): number | null {
-  const current = match.trial.players.find(
-    (player) => player.name === match.trial.currentPlayer,
+export function currentTimeBankMs(match: OnlineHotSeat): number | null {
+  const current = match.seat.players.find(
+    (player) => player.name === match.seat.currentPlayer,
   );
 
   return current?.timeBankMs ?? null;
 }
 
 /** Sets up fresh text for whoever goes next, or nothing once there's a winner. */
-function withTurn(match: OnlineTimeTrial): OnlineTimeTrial {
-  if (match.trial.currentPlayer === null) {
+function withTurn(match: OnlineHotSeat): OnlineHotSeat {
+  if (match.seat.currentPlayer === null) {
     return { ...match, turn: null };
   }
 
@@ -125,9 +125,9 @@ function withTurn(match: OnlineTimeTrial): OnlineTimeTrial {
         // An elimination without a Turn (someone left) still needs new text.
         seed:
           match.seed +
-          match.trial.turnsTaken +
-          match.trial.eliminated.length * 1_000,
-        minLength: TIME_TRIAL_TURN_LENGTH,
+          match.seat.turnsTaken +
+          match.seat.eliminated.length * 1_000,
+        minLength: HOT_SEAT_TURN_LENGTH,
       }),
     ),
   };

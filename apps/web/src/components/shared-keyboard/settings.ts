@@ -10,7 +10,7 @@ import {
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
 
-export type SharedKeyboardMode = "classicRace" | "timeTrial";
+export type SharedKeyboardMode = "classicRace" | "hotSeat";
 
 export interface SharedKeyboardPlayer {
   name: string;
@@ -29,11 +29,13 @@ export interface SharedKeyboardSettings {
   capitals: boolean;
   /** Classic Race only. */
   textLength: TextLength;
-  /** Time Trial only. */
+  /** Hot Seat only. */
   timeBankMs: number;
 }
 
-export const MIN_PLAYERS = 2;
+/** A Classic Race can be played alone; Hot Seat needs `MIN_HOT_SEAT_PLAYERS`. */
+export const MIN_PLAYERS = 1;
+export const MIN_HOT_SEAT_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
 
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {

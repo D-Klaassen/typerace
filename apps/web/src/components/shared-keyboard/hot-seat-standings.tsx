@@ -1,4 +1,4 @@
-import type { TimeTrial } from "@typerace/game";
+import type { HotSeat } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import {
   Table,
@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-/** Best times and remaining Time Banks during a Time Trial. */
-export function TimeTrialStandings({
-  trial,
+/** Best times and remaining Time Banks during a Hot Seat Match. */
+export function HotSeatStandings({
+  seat,
   nameOf = (name) => name,
 }: {
-  trial: TimeTrial;
+  seat: HotSeat;
   /** Online, Players are named by id; this turns that into a nickname. */
   nameOf?: (name: string) => string;
 }) {
@@ -32,11 +32,11 @@ export function TimeTrialStandings({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {trial.players.map((player) => (
+        {seat.players.map((player) => (
           <TableRow
             key={player.name}
             className={cn(
-              player.name === trial.currentPlayer && "font-semibold",
+              player.name === seat.currentPlayer && "font-semibold",
               player.eliminated && "text-muted-foreground line-through",
             )}
           >

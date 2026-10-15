@@ -4,11 +4,11 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { leaderboardHref } from "@/lib/leaderboard";
 
-/** How sending a finished Time Trial to the Leaderboard went. */
+/** How sending a finished Hot Seat Match to the Leaderboard went. */
 export type LeaderboardStatus = "saving" | "saved" | "failed";
 
 /**
- * Under Time Trial results: whether the best Times made it, and a link to
+ * Under Hot Seat results: whether the best Times made it, and a link to
  * the board of the text they were typed on.
  */
 export function LeaderboardNote({

@@ -49,8 +49,8 @@ const CORS_HEADERS = {
 };
 
 /**
- * GET a Text Source's board, or POST a Shared Keyboard's finished Time Trial.
- * Online Time Trials are recorded by their Room, which timed them itself.
+ * GET a Text Source's board, or POST a Shared Keyboard's finished Hot Seat Match.
+ * Online Hot Seat Matches are recorded by their Room, which timed them itself.
  */
 export async function leaderboardResponse(
   request: Request,

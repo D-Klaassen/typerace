@@ -16,7 +16,7 @@ async function currentText(page: Page): Promise<string> {
   return (await text.textContent()) ?? "";
 }
 
-test("an Online Time Trial until the slowest Player runs out of time", async ({
+test("an Online Hot Seat Match until the slowest Player runs out of time", async ({
   browser,
 }) => {
   // Bob's second Turn has to drain almost a full minute of Time Bank.
@@ -27,7 +27,7 @@ test("an Online Time Trial until the slowest Player runs out of time", async ({
   await anna.goto("/online");
   await anna.getByRole("button", { name: "Create Room" }).click();
   await expect(anna.getByLabel("Your nickname")).toHaveAccessibleDescription(
-    "Your nickname is shown on the leaderboard when you finish a Time Trial.",
+    "Your nickname is shown on the leaderboard when you finish a Hot Seat Match.",
   );
   await enterRoom(anna, "Anna");
   await expect(anna).toHaveURL(/\/room\/[A-Z]{6}$/);
@@ -37,7 +37,7 @@ test("an Online Time Trial until the slowest Player runs out of time", async ({
     "Bob",
   );
 
-  await anna.getByText("Time Trial", { exact: true }).first().click();
+  await anna.getByText("Hot Seat", { exact: true }).first().click();
   await anna.getByText("1", { exact: true }).click(); // 1-minute Time Bank
   await anna.getByRole("button", { name: "Start Match" }).click();
 

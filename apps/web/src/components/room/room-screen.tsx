@@ -20,7 +20,8 @@ import {
 import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
 import { useDisplayPreferences } from "@/components/finger-guide/use-display-preferences";
-import { ROOMS_HOST, useRoom } from "./use-room";
+import { ROOMS_HOST } from "@/lib/rooms-host";
+import { useRoom } from "./use-room";
 
 export function RoomScreen() {
   const { code } = useParams<{ code: string }>();
@@ -177,8 +178,12 @@ function NicknameForm({
             maxLength={MAX_NICKNAME_LENGTH}
             autoComplete="off"
             autoFocus
+            aria-describedby="nickname-hint"
             onChange={(event) => setNickname(event.target.value)}
           />
+          <p id="nickname-hint" className="text-sm text-muted-foreground">
+            {t("nicknameHint")}
+          </p>
           {error && (
             <p role="alert" className="text-sm text-destructive">
               {t(`errors.${error}`)}

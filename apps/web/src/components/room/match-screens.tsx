@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AidsLabel } from "@/components/finger-guide/aids-label";
+import { LeaderboardNote } from "@/components/leaderboard/leaderboard-note";
 import { RaceProgress } from "./race-progress";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
@@ -208,6 +209,14 @@ export function OnlineResults({
           ))}
         </TableBody>
       </Table>
+      {room.results?.mode === "timeTrial" && (
+        // The Room puts the best Times on the Leaderboard itself.
+        <LeaderboardNote
+          status="saved"
+          keySet={room.settings.keySet}
+          capitals={room.settings.capitals}
+        />
+      )}
       {isHost ? (
         <Button size="lg" onClick={onBackToLobby}>
           {t("backToLobby")}

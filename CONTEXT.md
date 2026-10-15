@@ -15,7 +15,7 @@ Playing on a single device that the Players pass between them, with no Room and 
 _Avoid_: Local, hot-seat, offline, couch play
 
 **Player**:
-A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account and nothing about them persists after they leave.
+A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and best Time on the Leaderboard.
 _Avoid_: User, account, participant
 
 **Room**:
@@ -105,6 +105,10 @@ Words per minute, counting every five correct characters as one word.
 
 **Accuracy**:
 The share of all keystrokes that were correct, so Typos lower it.
+
+**Leaderboard**:
+The fastest Time Trial Turns of everyone who ever finished a Time Trial, Online or on a Shared Keyboard, with one board per Key Set (its keys plus Capitals). Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
+_Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids
 

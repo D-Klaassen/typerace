@@ -251,3 +251,14 @@ export function parseServerMessage(raw: string): ServerMessage | null {
     return null;
   }
 }
+
+export {
+  LEADERBOARD_PATH,
+  leaderboardSearch,
+  MAX_LEADERBOARD_TIME_MS,
+  MIN_LEADERBOARD_TIME_MS,
+  parseLeaderboardSearch,
+  parseLeaderboardSubmission,
+  type LeaderboardResponse,
+  type LeaderboardSubmission,
+} from "./leaderboard";

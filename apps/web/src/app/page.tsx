@@ -32,6 +32,9 @@ export default function Home() {
           </p>
         </div>
       </div>
+      <Link href="/leaderboard" className={buttonVariants({ variant: "link" })}>
+        {t("leaderboard")}
+      </Link>
     </main>
   );
 }

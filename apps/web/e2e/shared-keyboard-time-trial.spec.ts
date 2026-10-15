@@ -13,6 +13,9 @@ test("two Players play a Time Trial until one runs out of time", async ({
   await page.clock.install();
   await page.goto("/play");
 
+  await expect(page.getByPlaceholder("Player 1")).toHaveAccessibleDescription(
+    "Nicknames are shown on the leaderboard after a Time Trial.",
+  );
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByPlaceholder("Player 2").fill("Bob");
   await page.getByText("Time Trial", { exact: true }).click();
@@ -41,6 +44,16 @@ test("two Players play a Time Trial until one runs out of time", async ({
   const rows = page.getByRole("row");
   await expect(rows.nth(1)).toContainText("Anna");
   await expect(rows.nth(2)).toContainText("Bob");
+
+  // Both best times go on the Medium board.
+  await expect(page.getByRole("status")).toHaveText(
+    "The best times are on the leaderboard.",
+  );
+  await page.getByRole("link", { name: "See the leaderboard" }).click();
+  await expect(page).toHaveURL(/\/leaderboard\?preset=classic-medium$/);
+  const board = page.getByRole("table", { name: "Leaderboard" });
+  await expect(board).toContainText("Anna");
+  await expect(board).toContainText("Bob");
 });
 
 test("rejects duplicate nicknames", async ({ page }) => {

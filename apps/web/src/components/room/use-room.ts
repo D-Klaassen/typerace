@@ -11,14 +11,6 @@ import {
 import usePartySocket from "partysocket/react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
-/**
- * Where the Rooms server lives. Only development falls back to the local
- * `wrangler dev`; a production build without it can't play Online.
- */
-export const ROOMS_HOST =
-  process.env.NEXT_PUBLIC_ROOMS_HOST ??
-  (process.env.NODE_ENV === "development" ? "localhost:8787" : null);
-
 export type RoomState = Extract<ServerMessage, { type: "state" }>;
 
 /**

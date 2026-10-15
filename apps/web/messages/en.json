@@ -9,7 +9,8 @@
     "sharedKeyboard": "Play on a Shared Keyboard",
     "sharedKeyboardDescription": "One device, pass the keyboard around.",
     "online": "Play Online",
-    "onlineDescription": "Everyone on their own device, in a Room."
+    "onlineDescription": "Everyone on their own device, in a Room.",
+    "leaderboard": "Leaderboard"
   },
   "Common": {
     "seconds": "{value, number, ::.0}s",
@@ -40,7 +41,8 @@
         "medium": "Medium",
         "long": "Long"
       },
-      "previewFor": "Preview for {name}"
+      "previewFor": "Preview for {name}",
+      "nicknameHint": "Nicknames are shown on the leaderboard after a Time Trial."
     },
     "Handover": {
       "turnOf": "{name}'s turn",
@@ -155,7 +157,8 @@
     "hpLeft": "HP left",
     "damageDealt": "Damage dealt",
     "notConfigured": "Online play isn’t set up on this site yet: the Rooms server address is missing.",
-    "aids": "Aids"
+    "aids": "Aids",
+    "nicknameHint": "Your nickname is shown on the leaderboard when you finish a Time Trial."
   },
   "Display": {
     "title": "Your display",
@@ -223,5 +226,24 @@
       "classic-medium": "Medium",
       "classic-hard": "Hard"
     }
+  },
+  "Leaderboard": {
+    "metadataTitle": "Leaderboard · Typerace",
+    "title": "Leaderboard",
+    "description": "The fastest Time Trial Turns, Online and on a Shared Keyboard. Pick the keys to see their board.",
+    "rank": "#",
+    "player": "Player",
+    "time": "Time",
+    "date": "Date",
+    "loading": "Loading…",
+    "empty": "No times for these keys yet. Finish a Time Trial to be the first!",
+    "failed": "Couldn’t load the leaderboard.",
+    "notConfigured": "The leaderboard isn’t set up on this site yet: the Rooms server address is missing.",
+    "status": {
+      "saving": "Saving the best times to the leaderboard…",
+      "saved": "The best times are on the leaderboard.",
+      "failed": "Couldn’t save the best times to the leaderboard."
+    },
+    "view": "See the leaderboard"
   }
 }

@@ -3,13 +3,16 @@
 import {
   completeTurn,
   finishRaceTurn,
-  generateGibberish,
+  generateText,
   resolveKeySet,
+  resolveTextSource,
   getClassicRaceResults,
   getTimeTrialResults,
   runOutOfTime,
   startClassicRace,
   startTimeTrial,
+  TEXT_LENGTH_CHARACTERS,
+  TIME_TRIAL_TURN_LENGTH,
   timeTrialRecords,
   type ClassicRace,
   type TimeTrial,
@@ -26,12 +29,7 @@ import { ROOMS_HOST } from "@/lib/rooms-host";
 import { HandoverScreen } from "./handover-screen";
 import { RaceStandings } from "./race-standings";
 import { ResultsScreen } from "./results-screen";
-import {
-  DEFAULT_SETTINGS,
-  TEXT_LENGTHS,
-  TIME_TRIAL_TURN_LENGTH,
-  type SharedKeyboardSettings,
-} from "./settings";
+import { DEFAULT_SETTINGS, type SharedKeyboardSettings } from "./settings";
 import { SetupForm } from "./setup-form";
 import { TimeTrialStandings } from "./time-trial-standings";
 import { TurnScreen } from "./turn-screen";
@@ -57,7 +55,12 @@ export function SharedKeyboardGame() {
 
   function saveToLeaderboard(trial: TimeTrial) {
     const records = timeTrialRecords(trial);
-    if (ROOMS_HOST === null || records.length === 0) {
+    // Boards are per Key Set, so only Gibberish goes on them.
+    if (
+      ROOMS_HOST === null ||
+      records.length === 0 ||
+      settings.textSource !== "gibberish"
+    ) {
       return;
     }
 
@@ -122,14 +125,13 @@ export function SharedKeyboardGame() {
     case "turn": {
       const player = currentPlayer(match);
       const turnNumber = turnsTaken(match);
-      // Every Turn gets fresh Gibberish of the same length and Key Set.
-      const text = generateGibberish({
+      // Every Turn gets fresh text of the same length and Text Source.
+      const text = generateText(resolveTextSource(settings), {
         seed: seed + turnNumber,
-        keySet: resolveKeySet(settings.keySet, settings.capitals),
         minLength:
           match.mode === "timeTrial"
             ? TIME_TRIAL_TURN_LENGTH
-            : TEXT_LENGTHS[settings.textLength],
+            : TEXT_LENGTH_CHARACTERS[settings.textLength],
       });
       const display =
         settings.players.find((p) => p.name === player)?.display ??
@@ -185,7 +187,13 @@ export function SharedKeyboardGame() {
           leaderboard={
             ROOMS_HOST !== null && (
               <LeaderboardNote
-                status={saved?.trial === match.trial ? saved.status : null}
+                status={
+                  settings.textSource !== "gibberish"
+                    ? "notCounted"
+                    : saved?.trial === match.trial
+                      ? saved.status
+                      : null
+                }
                 keySet={settings.keySet}
                 capitals={settings.capitals}
               />

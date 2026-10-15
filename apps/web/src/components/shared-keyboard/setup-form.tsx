@@ -4,6 +4,7 @@ import {
   MAX_NICKNAME_LENGTH,
   validateNicknames,
   type NicknameProblem,
+  type TextLength,
 } from "@typerace/game";
 import { XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChoiceGroup } from "@/components/choice-group";
 import { KeySetPicker } from "@/components/key-set/key-set-picker";
+import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
@@ -29,7 +31,6 @@ import {
   type SharedKeyboardMode,
   type SharedKeyboardPlayer,
   type SharedKeyboardSettings,
-  type TextLength,
 } from "./settings";
 
 const MODES: SharedKeyboardMode[] = ["classicRace", "timeTrial"];
@@ -46,6 +47,10 @@ export function SetupForm({
   const t = useTranslations("SharedKeyboard.Setup");
   const [mode, setMode] = useState(initial.mode);
   const [players, setPlayers] = useState(initial.players);
+  const [textSource, setTextSource] = useState({
+    textSource: initial.textSource,
+    language: initial.language,
+  });
   const [keySet, setKeySet] = useState({
     keySet: initial.keySet,
     capitals: initial.capitals,
@@ -70,6 +75,7 @@ export function SetupForm({
           ...player,
           name: player.name.trim(),
         })),
+        ...textSource,
         ...keySet,
         timeBankMs,
       });
@@ -185,7 +191,11 @@ export function SetupForm({
             onChange={setMode}
           />
 
-          <KeySetPicker value={keySet} onChange={setKeySet} />
+          <TextSourcePicker value={textSource} onChange={setTextSource} />
+
+          {textSource.textSource === "gibberish" && (
+            <KeySetPicker value={keySet} onChange={setKeySet} />
+          )}
 
           {mode === "classicRace" ? (
             <ChoiceGroup

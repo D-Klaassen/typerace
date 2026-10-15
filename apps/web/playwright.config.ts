@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const WEB_PORT = 3100;
-const ROOMS_PORT = 8788;
+// Overridable so e2e runs in parallel worktrees don't share servers.
+const WEB_PORT = Number(process.env.E2E_WEB_PORT ?? 3100);
+const ROOMS_PORT = Number(process.env.E2E_ROOMS_PORT ?? 8788);
 
 export default defineConfig({
   testDir: "./e2e",

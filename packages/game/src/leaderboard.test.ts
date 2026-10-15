@@ -15,6 +15,7 @@ import {
   typeInRoom,
   updateSettings,
   type Room,
+  type RoomSettings,
 } from "./room";
 import { completeTurn, runOutOfTime, startTimeTrial } from "./time-trial";
 import type { TypingStats } from "./typing";
@@ -38,6 +39,13 @@ describe("Leaderboard", () => {
 
     expect(leaderboardBoard(sameKeys)).toBe(leaderboardBoard(homeRow));
     expect(leaderboardBoard(withCapitals)).not.toBe(leaderboardBoard(homeRow));
+  });
+
+  it("keeps Times from the old 150-character Turns off today's boards", () => {
+    const homeRow = resolveKeySet({ preset: "row-home" }, false);
+
+    // How boards were named while Turns were 150 characters.
+    expect(leaderboardBoard(homeRow)).not.toBe("a:asdfghjkl;");
   });
 
   it("records each Player's best Time once the Time Trial has a winner", () => {
@@ -110,7 +118,7 @@ describe("Leaderboard", () => {
 });
 
 describe("Leaderboard records of a Room", () => {
-  function timeTrialRoom(): Room {
+  function timeTrialRoom(changes: Partial<RoomSettings> = {}): Room {
     let room = ["Anna", "Bob"].reduce(
       (next, nickname, index) =>
         joinRoom(next, { id: `p${index + 1}`, nickname }).room,
@@ -120,12 +128,23 @@ describe("Leaderboard records of a Room", () => {
       mode: "timeTrial",
       timeBankMs: 60_000,
       keySet: { preset: "row-home" },
+      ...changes,
     });
 
     return advanceClock(
       startCountdown(room, "p1", { text: "unused", seed: 1, nowMs: 0 }),
       3_000,
     );
+  }
+
+  function finish(room: Room): Room {
+    room = typeTurn(room, "p1", 4_000);
+    room = typeTurn(room, "p2", 30_000);
+    // Whoever is slowest starts a Turn and runs out of time.
+    const { trial, turn } = room.timeTrial!;
+    room = typeInRoom(room, trial.currentPlayer!, turn!.text[0]!, 60_000);
+
+    return advanceClock(room, 200_000);
   }
 
   function typeTurn(room: Room, playerId: string, startMs: number): Room {
@@ -139,13 +158,10 @@ describe("Leaderboard records of a Room", () => {
   }
 
   it("has the best Times and the Key Set once the Time Trial is over", () => {
-    let room = timeTrialRoom();
-    room = typeTurn(room, "p1", 4_000);
-    expect(roomLeaderboardRecords(room)).toBeNull();
+    const started = timeTrialRoom();
+    expect(roomLeaderboardRecords(typeTurn(started, "p1", 4_000))).toBeNull();
 
-    room = typeTurn(room, "p2", 30_000);
-    room = typeInRoom(room, "p2", room.timeTrial!.turn!.text[0]!, 60_000);
-    room = advanceClock(room, 200_000);
+    const room = finish(started);
 
     expect(room.phase).toBe("results");
     const result = roomLeaderboardRecords(room);
@@ -156,5 +172,12 @@ describe("Leaderboard records of a Room", () => {
       "Anna",
       "Bob",
     ]);
+  });
+
+  it("has none when the text wasn't Gibberish, as boards are per Key Set", () => {
+    const room = finish(timeTrialRoom({ textSource: "sentences" }));
+
+    expect(room.phase).toBe("results");
+    expect(roomLeaderboardRecords(room)).toBeNull();
   });
 });

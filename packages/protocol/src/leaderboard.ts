@@ -14,7 +14,7 @@ import { z } from "zod";
 export const LEADERBOARD_PATH = "/leaderboard";
 
 /**
- * Bounds on a submitted Time. A Turn of about 150 characters can't take less
+ * Bounds on a submitted Time. A Turn of about 100 characters can't take less
  * than a few seconds, and no Time Bank is longer than 10 minutes.
  */
 export const MIN_LEADERBOARD_TIME_MS = 5_000;

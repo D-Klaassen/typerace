@@ -16,6 +16,7 @@ import {
   KeySetSummary,
 } from "@/components/key-set/key-set-picker";
 import { KeySetVote } from "@/components/key-set/key-set-vote";
+import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
 import type { DisplayPreferences } from "@/components/finger-guide/finger-guide";
@@ -215,7 +216,12 @@ function SettingsForm({
         value={settings.mode}
         onChange={(mode) => onChange({ mode })}
       />
-      {editable ? (
+      <TextSourcePicker
+        {...shared}
+        value={{ textSource: settings.textSource, language: settings.language }}
+        onChange={(value) => onChange(value)}
+      />
+      {settings.textSource !== "gibberish" ? null : editable ? (
         <KeySetPicker
           value={{ keySet: settings.keySet, capitals: settings.capitals }}
           presetBadges={voteCounts.keySet}

@@ -25,7 +25,7 @@ test("the fastest Player wins a Classic Race on a Shared Keyboard", async ({
   await page.keyboard.press("Space");
   expect(
     (await page.locator("[data-typing-text]").textContent())?.length,
-  ).toBeGreaterThanOrEqual(100);
+  ).toBeGreaterThanOrEqual(50);
   await typeTextTaking(page, 30_000);
 
   await expect(page.getByRole("heading", { name: "Bob's turn" })).toBeVisible();

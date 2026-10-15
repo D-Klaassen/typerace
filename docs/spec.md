@@ -15,7 +15,6 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 - Accounts, profiles and history. Nothing persists after a Room or game ends, except the Leaderboard.
 - Public matchmaking.
-- Real-word Text Sources (Gibberish only).
 - Visual Themes beyond one fixed look per Mode.
 - Keyboard layouts other than US QWERTY (ANSI).
 - Phones and tablets. A physical keyboard is required; small or touch-only screens get a "keyboard required" message.
@@ -54,10 +53,14 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ## Text
 
-- **Text Source:** Gibberish only.
-- **Gibberish:** "words" of 2–7 characters, separated by single spaces.
-- **Generation is seeded,** so the Room and every client produce identical text from the same seed.
-- **Key Set:** the keys the text may contain. Every key in the set is equally likely.
+- **Text Source:** Gibberish (the default), Words or Sentences.
+  - **Gibberish:** "words" of 2–7 characters from the Key Set, separated by single spaces.
+  - **Words:** common words in the chosen Language, lowercase, separated by single spaces, never the same word twice in a row.
+  - **Sentences:** everyday sentences in the chosen Language, with capitals and punctuation, never the same sentence twice in a row.
+  - **Language:** English (the default) or Dutch. Real text has no accents, so every character is on a US QWERTY keyboard. The interface stays English.
+  - Words and Sentences ignore the Key Set and Capitals; the picker hides them and shows a sample instead.
+- **Generation is seeded** for every Text Source, so the Room and every client produce identical text from the same seed.
+- **Key Set:** the keys Gibberish may contain. Every key in the set is equally likely.
   - **Lessons:** 76 numbered Lessons in 8 stages (home row, top row, top + home, bottom row, bottom + home, columns per finger, numbers, review), modelled on typelesonline.nl: a pair of keys (one per hand), then pairs combined, then everything so far.
   - **Rows:** home, top, bottom, numbers, home + top, home + bottom, all letter rows.
   - **Fingers:** index, middle, ring, pinkies, left hand, right hand.
@@ -67,7 +70,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - The picker shows a sample of the text. Non-Host Players see the Key Set read-only on a keyboard.
 - **Text per game:**
   - In an Online Classic Race, everyone types the same text at once.
-  - Every Turn gets fresh Gibberish of the same length and Key Set.
+  - Every Turn gets fresh text of the same length from the same Text Source.
   - Crazy Darts text is endless in practice: 5,000 characters (about 15 minutes at 70 WPM), generated from a seed by both the Room and the browser so the text never has to be sent along with every update.
 
 ## Typing engine (shared by every Mode)
@@ -95,10 +98,11 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Classic Race
 
-| Setting     | Options                                         | Default |
-| ----------- | ----------------------------------------------- | ------- |
-| Key Set     | Lesson, row, fingers, classic or custom         | Medium  |
-| Text length | Short ~100 / Medium ~250 / Long ~500 characters | Medium  |
+| Setting     | Options                                             | Default   |
+| ----------- | --------------------------------------------------- | --------- |
+| Key Set     | Lesson, row, fingers, classic or custom (Gibberish) | Medium    |
+| Text Source | Gibberish, Words or Sentences (with a Language)     | Gibberish |
+| Text length | Short ~50 / Medium ~100 / Long ~200 characters      | Medium    |
 
 - **Online:**
   - Everyone types the same text at once.
@@ -130,11 +134,11 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Time Trial (Online and Shared Keyboard)
 
-| Setting              | Default                            |
-| -------------------- | ---------------------------------- |
-| Key Set              | Medium                             |
-| Turn text length     | ~150 characters **(spec default)** |
-| Time Bank per Player | 2:00                               |
+| Setting              | Default         |
+| -------------------- | --------------- |
+| Key Set              | Medium          |
+| Turn text length     | ~100 characters |
+| Time Bank per Player | 2:00            |
 
 1. **Opening round:** every Player takes one Turn, in join or setup order.
 2. **Who goes next:** the slowest Player (highest best Time) takes the next Turn.
@@ -159,7 +163,9 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Leaderboard
 
 - **What goes on it:** when a Time Trial ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it.
+- **Gibberish only:** boards are per Key Set, so Time Trials with Words or Sentences don't go on it; their results say so.
 - **One board per Key Set:** the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset. Each board keeps its fastest 20; equal Times rank in the order they were set.
+- **Per Turn length:** boards are stored under the Turn length too. Times from when Turns were 150 characters stay in storage but aren't on today's boards, so every Time on a board was set on a Turn of the same length.
 - **Online:** the Room records the Time Trial itself, using the Times it measured on its own clock.
 - **Shared Keyboard:** the browser sends the best Times to the Rooms server. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames and keys).
 - **The page** `/leaderboard`, linked from the home page and from Time Trial results, has a Key Set picker and shows that board. Its URL names the Key Set, so it can be shared.

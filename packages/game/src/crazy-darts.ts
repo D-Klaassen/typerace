@@ -1,5 +1,4 @@
-import { generateGibberish } from "./gibberish";
-import type { KeySet } from "./key-sets";
+import { generateText, type TextSource } from "./text-source";
 import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
 
 /**
@@ -8,12 +7,8 @@ import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
  */
 export const CRAZY_DARTS_TEXT_LENGTH = 5_000;
 
-export function crazyDartsText(seed: number, keySet: KeySet): string {
-  return generateGibberish({
-    seed,
-    keySet,
-    minLength: CRAZY_DARTS_TEXT_LENGTH,
-  });
+export function crazyDartsText(seed: number, source: TextSource): string {
+  return generateText(source, { seed, minLength: CRAZY_DARTS_TEXT_LENGTH });
 }
 
 export interface DartsPlayer {

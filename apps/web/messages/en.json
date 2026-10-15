@@ -71,7 +71,8 @@
       "typos": "Typos",
       "playAgain": "Play again",
       "backToSetup": "Back to setup",
-      "time": "Time"
+      "time": "Time",
+      "aids": "Aids"
     }
   },
   "Online": {
@@ -153,7 +154,8 @@
     "dartLine": "{from} 🎯 {to} −{damage}",
     "hpLeft": "HP left",
     "damageDealt": "Damage dealt",
-    "notConfigured": "Online play isn’t set up on this site yet: the Rooms server address is missing."
+    "notConfigured": "Online play isn’t set up on this site yet: the Rooms server address is missing.",
+    "aids": "Aids"
   },
   "Display": {
     "title": "Your display",
@@ -163,7 +165,8 @@
     "fingerGuide": "Finger Guide",
     "fingerGuideFor": "Finger Guide for {name}",
     "preview": "Preview",
-    "nothingExtra": "Just the text: no keyboard or hands while you type."
+    "nothingExtra": "Just the text: no keyboard or hands while you type.",
+    "noAids": "None"
   },
   "KeySet": {
     "title": "Keys",

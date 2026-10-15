@@ -40,7 +40,7 @@ describe("parseClientMessage", () => {
     });
   });
 
-  it("accepts a Key Set preset or custom keys, Capitals, and preset Votes", () => {
+  it("accepts Key Sets, Capitals, preset Votes and a Player's display", () => {
     for (const message of [
       { type: "updateSettings", changes: { keySet: { preset: "lesson-14" } } },
       {
@@ -48,6 +48,7 @@ describe("parseClientMessage", () => {
         changes: { keySet: { custom: "fjdk" }, capitals: true },
       },
       { type: "vote", vote: { keySet: "row-top" } },
+      { type: "display", display: { fingerGuide: false, keyboard: true } },
     ]) {
       expect(parseClientMessage(JSON.stringify(message))).toEqual(message);
     }

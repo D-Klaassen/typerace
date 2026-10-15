@@ -78,12 +78,23 @@ export const DEFAULT_ROOM_SETTINGS: RoomSettings = {
   typoHp: 2,
 };
 
+/** Which typing aids a Player sees (see CONTEXT.md: Display). */
+export interface Display {
+  fingerGuide: boolean;
+  keyboard: boolean;
+}
+
+/** Until a Player says otherwise: the Finger Guide on, the keyboard off. */
+export const DEFAULT_DISPLAY: Display = { fingerGuide: true, keyboard: false };
+
 export interface RoomPlayer {
   /** Stable for one connection; a reconnect is a new Player. */
   id: string;
   nickname: string;
   /** Joined during a Match; plays from the next one. */
   spectator: boolean;
+  /** The aids this Player currently has on. */
+  display: Display;
 }
 
 export type RoomPhase = "lobby" | "countdown" | "racing" | "results";
@@ -106,6 +117,8 @@ export interface Room {
   readonly timeTrial: OnlineTimeTrial | null;
   /** The current or last Crazy Darts; null in the lobby. */
   readonly darts: CrazyDarts | null;
+  /** Each Player's aids as they were when the Match started. */
+  readonly matchDisplays: Readonly<Record<string, Display>>;
   /** Seeds the Match's Gibberish where the Room generates it (Time Trial). */
   readonly seed: number;
 }
@@ -144,6 +157,7 @@ export function createRoom(): Room {
     race: null,
     timeTrial: null,
     darts: null,
+    matchDisplays: {},
     seed: 0,
   };
 }
@@ -173,6 +187,7 @@ export function joinRoom(
           ...player,
           nickname: player.nickname.trim(),
           spectator: room.phase !== "lobby",
+          display: DEFAULT_DISPLAY,
         },
       ],
       hostId: room.hostId ?? player.id,
@@ -307,6 +322,11 @@ export function advanceClock(room: Room, nowMs: number): Room {
       ...room,
       phase: "racing",
       countdownEndsAtMs: null,
+      matchDisplays: Object.fromEntries(
+        room.players
+          .filter((player) => !player.spectator)
+          .map((player) => [player.id, player.display]),
+      ),
     } as const;
 
     if (room.settings.mode === "crazyDarts") {
@@ -390,6 +410,24 @@ export function typeInRoom(
   }
 
   return finishIfOver({ ...room, race }, atMs);
+}
+
+/** A Player switches their aids; they count from the next Match. */
+export function setDisplay(
+  room: Room,
+  playerId: string,
+  display: Display,
+): Room {
+  if (!room.players.some((player) => player.id === playerId)) {
+    return room;
+  }
+
+  return {
+    ...room,
+    players: room.players.map((player) =>
+      player.id === playerId ? { ...player, display } : player,
+    ),
+  };
 }
 
 /** After the results, the Host takes everyone back; Spectators become Players. */

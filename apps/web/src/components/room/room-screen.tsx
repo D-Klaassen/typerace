@@ -40,8 +40,8 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const intent = searchParams.has("create") ? "create" : "join";
-  const room = useRoom(host, code, intent);
   const [display, setDisplay] = useDisplayPreferences();
+  const room = useRoom(host, code, intent, display);
   const joined = room.state !== null;
 
   // Once the Room exists, the address bar should hold a plain join link.
@@ -81,6 +81,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
         room={view}
         isHost={isHost}
         nicknames={room.nicknames}
+        displays={view.matchDisplays}
         onBackToLobby={room.backToLobby}
       />
     );

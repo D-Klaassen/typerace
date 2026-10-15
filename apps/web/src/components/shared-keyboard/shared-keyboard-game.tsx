@@ -147,6 +147,9 @@ export function SharedKeyboardGame() {
         <ResultsScreen
           results={getTimeTrialResults(match.trial)}
           columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
+          aidsOf={(name) =>
+            settings.players.find((player) => player.name === name)?.display
+          }
           onPlayAgain={() => start(settings)}
           onBackToSetup={() => setGame({ phase: "setup" })}
         />
@@ -154,6 +157,9 @@ export function SharedKeyboardGame() {
         <ResultsScreen
           results={getClassicRaceResults(match.race)}
           columns={["time", "wpm", "accuracy", "typos"]}
+          aidsOf={(name) =>
+            settings.players.find((player) => player.name === name)?.display
+          }
           onPlayAgain={() => start(settings)}
           onBackToSetup={() => setGame({ phase: "setup" })}
         />

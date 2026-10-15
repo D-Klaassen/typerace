@@ -49,7 +49,23 @@ test("each Shared Keyboard Player gets their own aids", async ({ page }) => {
   await page.keyboard.press("Space");
   await expect(page.getByTestId("finger-guide")).toBeVisible();
   await expect(page.getByTestId("on-screen-keyboard")).toHaveCount(0);
+  await page.keyboard.type(
+    (await page.locator("[data-typing-text]").textContent()) ?? "",
+  );
+
+  // The results show which aids each Player had on.
+  await expect(aidsOf(page, "Anna")).toHaveText("On-screen Keyboard");
+  await expect(aidsOf(page, "Bob")).toHaveText("Finger Guide");
 });
+
+/** The Aids cell (the last one) of a Player's results row. */
+function aidsOf(page: Page, nickname: string) {
+  return page
+    .getByRole("row")
+    .filter({ hasText: nickname })
+    .getByRole("cell")
+    .last();
+}
 
 async function newPlayer(browser: Browser): Promise<Page> {
   return (await browser.newContext()).newPage();
@@ -95,4 +111,18 @@ test("Online, your display is set in the lobby and used in the Match", async ({
   await expect(bob.getByRole("list", { name: "Race progress" })).toBeVisible();
   await expect(bob.getByTestId("finger-guide")).toBeVisible();
   await expect(bob.getByTestId("on-screen-keyboard")).toHaveCount(0);
+
+  for (const page of [anna, bob]) {
+    await page.keyboard.type(
+      (await page.locator("[data-typing-text]").textContent()) ?? "",
+    );
+  }
+
+  // Everyone sees everyone's aids in the results.
+  for (const page of [anna, bob]) {
+    await expect(aidsOf(page, "Anna")).toHaveText(
+      "On-screen KeyboardFinger Guide",
+    );
+    await expect(aidsOf(page, "Bob")).toHaveText("Finger Guide");
+  }
 });

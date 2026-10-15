@@ -1,6 +1,6 @@
 "use client";
 
-import type { RoomSettings, Vote } from "@typerace/game";
+import type { Display, RoomSettings, Vote } from "@typerace/game";
 import {
   parseServerMessage,
   ROOMS_PARTY,
@@ -9,7 +9,7 @@ import {
   type ServerMessage,
 } from "@typerace/protocol";
 import usePartySocket from "partysocket/react";
-import { useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 /**
  * Where the Rooms server lives. Only development falls back to the local
@@ -21,12 +21,22 @@ export const ROOMS_HOST =
 
 export type RoomState = Extract<ServerMessage, { type: "state" }>;
 
-/** Connects to a Room and exposes its state and the actions a Player can take. */
-export function useRoom(host: string, code: string, intent: "create" | "join") {
+/**
+ * Connects to a Room and exposes its state and the actions a Player can take.
+ * Keeps the Room informed of this Player's `display`, so others can see it.
+ */
+export function useRoom(
+  host: string,
+  code: string,
+  intent: "create" | "join",
+  display: Display,
+) {
   const [state, setState] = useState<RoomState | null>(null);
   const [error, setError] = useState<RoomError | null>(null);
   /** The nickname we joined with, to rejoin after a reconnect. */
   const nicknameRef = useRef<string | null>(null);
+  /** The display to send with every (re)join. */
+  const displayRef = useRef(display);
   /** Room clock minus our clock, to show the countdown. */
   const [clockOffsetMs, setClockOffsetMs] = useState(0);
   /** Every nickname seen, so results can name Players who already left. */
@@ -39,6 +49,7 @@ export function useRoom(host: string, code: string, intent: "create" | "join") {
     onOpen() {
       if (nicknameRef.current !== null) {
         send({ type: "join", nickname: nicknameRef.current, intent: "join" });
+        send({ type: "display", display: displayRef.current });
       }
     },
     onMessage(event: MessageEvent<string>) {
@@ -64,6 +75,18 @@ export function useRoom(host: string, code: string, intent: "create" | "join") {
     socket.send(JSON.stringify(message));
   }
 
+  const syncDisplay = useEffectEvent((next: Display) => {
+    displayRef.current = next;
+    if (nicknameRef.current !== null) {
+      send({ type: "display", display: next });
+    }
+  });
+
+  const { fingerGuide, keyboard } = display;
+  useEffect(() => {
+    syncDisplay({ fingerGuide, keyboard });
+  }, [fingerGuide, keyboard]);
+
   return {
     state,
     error,
@@ -72,6 +95,7 @@ export function useRoom(host: string, code: string, intent: "create" | "join") {
     join(nickname: string) {
       nicknameRef.current = nickname;
       send({ type: "join", nickname, intent });
+      send({ type: "display", display: displayRef.current });
     },
     updateSettings(changes: Partial<RoomSettings>) {
       send({ type: "updateSettings", changes });

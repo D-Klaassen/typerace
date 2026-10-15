@@ -5,7 +5,9 @@ import {
   leaderboardBoard,
   timeTrialRecords,
 } from "./leaderboard";
-import { resolveKeySet } from "./key-sets";
+import { resolveKeySet, type KeySetChoice } from "./key-sets";
+import { TIME_TRIAL_TURN_LENGTH } from "./online-time-trial";
+import { LANGUAGES, REAL_TEXT_KINDS, resolveTextSource } from "./text-source";
 import {
   advanceClock,
   createRoom,
@@ -32,20 +34,53 @@ function turnTaking(timeMs: number): TypingStats {
 }
 
 describe("Leaderboard", () => {
-  it("has one board per set of keys and Capitals, however they were chosen", () => {
-    const homeRow = resolveKeySet({ preset: "row-home" }, false);
-    const sameKeys = resolveKeySet({ custom: ";lkjhgfdsa" }, false);
-    const withCapitals = resolveKeySet({ preset: "row-home" }, true);
+  it("has one Gibberish board per set of keys and Capitals, however they were chosen", () => {
+    const board = (keySet: KeySetChoice, capitals: boolean) =>
+      leaderboardBoard({
+        kind: "gibberish",
+        keySet: resolveKeySet(keySet, capitals),
+      });
+    const homeRow = board({ preset: "row-home" }, false);
 
-    expect(leaderboardBoard(sameKeys)).toBe(leaderboardBoard(homeRow));
-    expect(leaderboardBoard(withCapitals)).not.toBe(leaderboardBoard(homeRow));
+    expect(board({ custom: ";lkjhgfdsa" }, false)).toBe(homeRow);
+    expect(board({ preset: "row-home" }, true)).not.toBe(homeRow);
+  });
+
+  it("has one board per Text Source and Language for real text", () => {
+    const boards = [
+      ...REAL_TEXT_KINDS.flatMap((kind) =>
+        LANGUAGES.map((language) => leaderboardBoard({ kind, language })),
+      ),
+      leaderboardBoard({
+        kind: "gibberish",
+        keySet: resolveKeySet({ preset: "row-home" }, false),
+      }),
+    ];
+
+    expect(new Set(boards).size).toBe(boards.length);
+    expect(leaderboardBoard({ kind: "words", language: "nl" })).toBe(
+      leaderboardBoard(
+        resolveTextSource({
+          textSource: "words",
+          language: "nl",
+          keySet: { preset: "row-home" },
+          capitals: true,
+        }),
+      ),
+    );
   });
 
   it("keeps Times from the old 150-character Turns off today's boards", () => {
     const homeRow = resolveKeySet({ preset: "row-home" }, false);
 
     // How boards were named while Turns were 150 characters.
-    expect(leaderboardBoard(homeRow)).not.toBe("a:asdfghjkl;");
+    expect(leaderboardBoard({ kind: "gibberish", keySet: homeRow })).not.toBe(
+      "a:asdfghjkl;",
+    );
+    // Real text came later, but its boards carry the Turn length too.
+    expect(leaderboardBoard({ kind: "words", language: "en" })).toBe(
+      `${TIME_TRIAL_TURN_LENGTH}:words:en`,
+    );
   });
 
   it("records each Player's best Time once the Time Trial has a winner", () => {
@@ -157,7 +192,7 @@ describe("Leaderboard records of a Room", () => {
     );
   }
 
-  it("has the best Times and the Key Set once the Time Trial is over", () => {
+  it("has the best Times and the Text Source once the Time Trial is over", () => {
     const started = timeTrialRoom();
     expect(roomLeaderboardRecords(typeTurn(started, "p1", 4_000))).toBeNull();
 
@@ -165,19 +200,27 @@ describe("Leaderboard records of a Room", () => {
 
     expect(room.phase).toBe("results");
     const result = roomLeaderboardRecords(room);
-    expect(result?.keySet).toEqual(
-      resolveKeySet({ preset: "row-home" }, false),
-    );
+    expect(result?.textSource).toEqual({
+      kind: "gibberish",
+      keySet: resolveKeySet({ preset: "row-home" }, false),
+    });
     expect(result?.records.map((record) => record.nickname)).toEqual([
       "Anna",
       "Bob",
     ]);
   });
 
-  it("has none when the text wasn't Gibberish, as boards are per Key Set", () => {
-    const room = finish(timeTrialRoom({ textSource: "sentences" }));
+  it("has the Text Source and Language when the text was real", () => {
+    const room = finish(
+      timeTrialRoom({ textSource: "sentences", language: "nl" }),
+    );
 
     expect(room.phase).toBe("results");
-    expect(roomLeaderboardRecords(room)).toBeNull();
+    const result = roomLeaderboardRecords(room);
+    expect(result?.textSource).toEqual({ kind: "sentences", language: "nl" });
+    expect(result?.records.map((record) => record.nickname)).toEqual([
+      "Anna",
+      "Bob",
+    ]);
   });
 });

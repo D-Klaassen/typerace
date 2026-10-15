@@ -1,10 +1,12 @@
 /**
- * The Leaderboard: the fastest Time Trial Turns ever, one board per Key Set.
- * Times only compare fairly on the same keys, so a board is the resolved keys
- * plus Capitals, however the Key Set was chosen.
+ * The Leaderboard: the fastest Time Trial Turns ever, one board per Text
+ * Source. Times only compare fairly on the same kind of text: Gibberish has a
+ * board per Key Set (the resolved keys plus Capitals, however the Key Set was
+ * chosen), and Words and Sentences one per Language.
  */
-import { normalizeKeys, type KeySet } from "./key-sets";
+import { normalizeKeys } from "./key-sets";
 import { TIME_TRIAL_TURN_LENGTH } from "./online-time-trial";
+import type { TextSource } from "./text-source";
 import type { TimeTrial } from "./time-trial";
 
 /** How many entries a board keeps and shows. */
@@ -22,11 +24,16 @@ export interface LeaderboardEntry extends LeaderboardRecord {
 }
 
 /**
- * A stable name for the board of a Key Set, to store it under. It includes
- * the Turn length, so Times from Turns of another length (150 characters
- * before) stay in storage but never share a board with today's.
+ * A stable name for the board of a Text Source, to store it under. It
+ * includes the Turn length, so Times from Turns of another length (150
+ * characters before) stay in storage but never share a board with today's.
  */
-export function leaderboardBoard({ keys, capitals }: KeySet): string {
+export function leaderboardBoard(source: TextSource): string {
+  if (source.kind !== "gibberish") {
+    return `${TIME_TRIAL_TURN_LENGTH}:${source.kind}:${source.language}`;
+  }
+  const { keys, capitals } = source.keySet;
+
   return `${TIME_TRIAL_TURN_LENGTH}:${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
 }
 

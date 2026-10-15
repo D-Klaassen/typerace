@@ -2,9 +2,11 @@ export { generateGibberish, type GibberishOptions } from "./gibberish";
 export {
   generateText,
   LANGUAGES,
+  REAL_TEXT_KINDS,
   resolveTextSource,
   TEXT_SOURCE_KINDS,
   type Language,
+  type RealTextKind,
   type TextChoice,
   type TextSource,
   type TextSourceKind,

@@ -1,13 +1,16 @@
 import {
   DEFAULT_KEY_SET_CHOICE,
   findPreset,
-  type KeySet,
-  type KeySetChoice,
+  LANGUAGES,
+  REAL_TEXT_KINDS,
   type LeaderboardEntry,
+  type TextChoice,
+  type TextSource,
 } from "@typerace/game";
 import {
   LEADERBOARD_PATH,
   leaderboardSearch,
+  leaderboardSubmissionBody,
   type LeaderboardResponse,
   type LeaderboardSubmission,
 } from "@typerace/protocol";
@@ -15,11 +18,11 @@ import { roomsOrigin } from "./rooms-host";
 
 export async function fetchLeaderboard(
   host: string,
-  keySet: KeySet,
+  textSource: TextSource,
   signal?: AbortSignal,
 ): Promise<LeaderboardEntry[]> {
   const response = await fetch(
-    `${roomsOrigin(host)}${LEADERBOARD_PATH}?${leaderboardSearch(keySet)}`,
+    `${roomsOrigin(host)}${LEADERBOARD_PATH}?${leaderboardSearch(textSource)}`,
     { signal },
   );
   if (!response.ok) {
@@ -37,18 +40,26 @@ export async function submitToLeaderboard(
   const response = await fetch(`${roomsOrigin(host)}${LEADERBOARD_PATH}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(submission),
+    body: JSON.stringify(leaderboardSubmissionBody(submission)),
   });
   if (!response.ok) {
     throw new Error(`Leaderboard: ${response.status}`);
   }
 }
 
-/** The Leaderboard page, opened on the board of a Key Set. */
-export function leaderboardHref(
-  keySet: KeySetChoice,
-  capitals: boolean,
-): string {
+/**
+ * The Leaderboard page, opened on the board of the chosen text: a Key Set's
+ * for Gibberish, else the Text Source and Language.
+ */
+export function leaderboardHref({
+  textSource,
+  language,
+  keySet,
+  capitals,
+}: TextChoice): string {
+  if (textSource !== "gibberish") {
+    return `/leaderboard?${new URLSearchParams({ source: textSource, language })}`;
+  }
   const params = new URLSearchParams(
     "preset" in keySet ? { preset: keySet.preset } : { custom: keySet.custom },
   );
@@ -59,15 +70,21 @@ export function leaderboardHref(
   return `/leaderboard?${params}`;
 }
 
-/** The Key Set a Leaderboard page link stands for; Medium without a valid one. */
-export function keySetOfLeaderboardHref(params: URLSearchParams): {
-  keySet: KeySetChoice;
-  capitals: boolean;
-} {
+/**
+ * The text a Leaderboard page link stands for: Gibberish with Medium keys
+ * without a valid one, and English for a Text Source without a Language.
+ */
+export function textChoiceOfLeaderboardHref(
+  params: URLSearchParams,
+): TextChoice {
+  const source = params.get("source");
+  const language = params.get("language");
   const preset = params.get("preset");
   const custom = params.get("custom");
 
   return {
+    textSource: REAL_TEXT_KINDS.find((kind) => kind === source) ?? "gibberish",
+    language: LANGUAGES.find((known) => known === language) ?? "en",
     keySet:
       preset !== null && findPreset(preset)
         ? { preset }

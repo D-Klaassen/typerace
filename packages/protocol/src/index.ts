@@ -259,10 +259,12 @@ export function parseServerMessage(raw: string): ServerMessage | null {
 export {
   LEADERBOARD_PATH,
   leaderboardSearch,
+  leaderboardSubmissionBody,
   MAX_LEADERBOARD_TIME_MS,
   MIN_LEADERBOARD_TIME_MS,
   parseLeaderboardSearch,
   parseLeaderboardSubmission,
   type LeaderboardResponse,
   type LeaderboardSubmission,
+  type LeaderboardSubmissionBody,
 } from "./leaderboard";

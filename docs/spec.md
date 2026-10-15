@@ -166,12 +166,13 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Leaderboard
 
 - **What goes on it:** when a Time Trial ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it.
-- **Gibberish only:** boards are per Key Set, so Time Trials with Words or Sentences don't go on it; their results say so.
-- **One board per Key Set:** the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset. Each board keeps its fastest 20; equal Times rank in the order they were set.
+- **One board per kind of text,** as Times only compare on the same text. Each board keeps its fastest 20; equal Times rank in the order they were set.
+  - **Gibberish:** a board per Key Set: the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset.
+  - **Words and Sentences:** a board per Text Source and Language: English Words, Dutch Words, English Sentences and Dutch Sentences.
 - **Per Turn length:** boards are stored under the Turn length too. Times from when Turns were 150 characters stay in storage but aren't on today's boards, so every Time on a board was set on a Turn of the same length.
 - **Online:** the Room records the Time Trial itself, using the Times it measured on its own clock.
-- **Shared Keyboard:** the browser sends the best Times to the Rooms server. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames and keys).
-- **The page** `/leaderboard`, linked from the home page and from Time Trial results, has a Key Set picker and shows that board. Its URL names the Key Set, so it can be shared.
+- **Shared Keyboard:** the browser sends the best Times to the Rooms server, with the Key Set or the Text Source and Language. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames, and valid keys or a known Text Source and Language).
+- **The page** `/leaderboard`, linked from the home page and from Time Trial results, has a Text Source picker (with a Language for Words and Sentences, or a Key Set picker for Gibberish) and shows that board. Its URL names the board, so it can be shared, and the link from Time Trial results opens the board the Time Trial went on.
 - **Nickname fields** say the nickname is shown on the Leaderboard after a Time Trial.
 
 ## On-screen Keyboard and Finger Guide

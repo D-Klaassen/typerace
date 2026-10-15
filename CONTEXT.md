@@ -117,5 +117,5 @@ An optional keyboard that highlights the next key, and the Shift key to hold wit
 _Avoid_: Keyboard hint, virtual keyboard
 
 **Display**:
-A Player's own choice of whether they see the On-screen Keyboard and the Finger Guide while typing. It never affects the other Players.
+A Player's own choice of whether they see the On-screen Keyboard and the Finger Guide while typing. The Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
 _Avoid_: Settings (those are the Host's)

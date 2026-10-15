@@ -28,7 +28,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 2–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (off by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Time Trial) and its settings.
+1. **Setup screen:** enter 2–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Time Trial) and its settings.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 
@@ -49,7 +49,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - Time Trial: they're eliminated.
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
-- **Display:** in the lobby, each Player switches the On-screen Keyboard and the Finger Guide on or off for themselves, with a live preview. There are no switches during a Match. Both are off by default, and the browser remembers the choice.
+- **Display:** in the lobby, each Player switches the On-screen Keyboard and the Finger Guide on or off for themselves, with a live preview. There are no switches during a Match. The Finger Guide is on and the keyboard off by default, and the browser remembers the choice. The Room records each Player's aids when a Match starts, and the results show them to everyone.
 - **After a Match:** Results, then a "Rematch" button for the Host. Everyone goes back to the lobby with the same settings.
 
 ## Text
@@ -152,7 +152,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ## Results screen
 
-- **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time.
+- **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide) they had on.
 - **Time Trial:** also each Player's best Time and number of Turns.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 

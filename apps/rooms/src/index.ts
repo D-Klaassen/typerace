@@ -8,6 +8,7 @@ import {
   joinRoom,
   leaveRoom,
   roomKeySet,
+  setDisplay,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
   typeInRoom,
@@ -101,6 +102,10 @@ export class Rooms extends Server<Env> {
         this.setRoom(
           typeInRoom(this.room, connection.id, message.key, Date.now()),
         );
+        return;
+
+      case "display":
+        this.setRoom(setDisplay(this.room, connection.id, message.display));
         return;
 
       case "backToLobby":

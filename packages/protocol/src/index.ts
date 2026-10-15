@@ -73,6 +73,12 @@ const clientMessage = z.discriminatedUnion("type", [
   }),
   z.object({ type: z.literal("updateSettings"), changes: settingsChanges }),
   z.object({ type: z.literal("start") }),
+  z.object({
+    type: z.literal("display"),
+    display: z
+      .object({ fingerGuide: z.boolean(), keyboard: z.boolean() })
+      .strict(),
+  }),
   z.object({ type: z.literal("key"), key: z.string().length(1) }),
   z.object({ type: z.literal("backToLobby") }),
   z.object({

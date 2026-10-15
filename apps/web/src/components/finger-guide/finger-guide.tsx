@@ -2,7 +2,7 @@ import { getKeyGuide } from "@typerace/game";
 import { Hands } from "./hands";
 import { OnScreenKeyboard } from "./on-screen-keyboard";
 
-/** What a Player wants to see while typing. Both are off by default. */
+/** What a Player wants to see while typing. */
 export interface DisplayPreferences {
   /** The hands, with the finger (and Shift pinky) to use lit up. */
   fingerGuide: boolean;
@@ -10,6 +10,13 @@ export interface DisplayPreferences {
   keyboard: boolean;
 }
 
+/** A Player's starting point: the Finger Guide on, the keyboard off. */
+export const DEFAULT_DISPLAY: DisplayPreferences = {
+  fingerGuide: true,
+  keyboard: false,
+};
+
+/** For people who watch rather than type, such as Spectators. */
 export const NO_DISPLAY_AIDS: DisplayPreferences = {
   fingerGuide: false,
   keyboard: false,

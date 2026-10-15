@@ -1,4 +1,6 @@
+import type { Display } from "@typerace/game";
 import { useTranslations } from "next-intl";
+import { AidsLabel } from "@/components/finger-guide/aids-label";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -28,11 +30,14 @@ type Column = "time" | "bestTime" | "turns" | "wpm" | "accuracy" | "typos";
 export function ResultsScreen({
   results,
   columns,
+  aidsOf,
   onPlayAgain,
   onBackToSetup,
 }: {
   results: ResultRow[];
   columns: Column[];
+  /** The aids a Player had on, by nickname. */
+  aidsOf: (name: string) => Display | undefined;
   onPlayAgain: () => void;
   onBackToSetup: () => void;
 }) {
@@ -67,6 +72,7 @@ export function ResultsScreen({
                 {t(column)}
               </TableHead>
             ))}
+            <TableHead>{t("aids")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -79,6 +85,9 @@ export function ResultsScreen({
                   {cell[column](result)}
                 </TableCell>
               ))}
+              <TableCell>
+                <AidsLabel display={aidsOf(result.name)} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

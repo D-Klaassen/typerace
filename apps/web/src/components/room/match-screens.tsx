@@ -1,5 +1,6 @@
 "use client";
 
+import type { Display } from "@typerace/game";
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AidsLabel } from "@/components/finger-guide/aids-label";
 import { RaceProgress } from "./race-progress";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
 import { OnlineTimeTrial } from "./time-trial-screens";
@@ -150,11 +152,14 @@ export function OnlineResults({
   room,
   isHost,
   nicknames,
+  displays,
   onBackToLobby,
 }: {
   room: RoomView;
   isHost: boolean;
   nicknames: Record<string, string>;
+  /** The aids each Player had on during the Match. */
+  displays: Readonly<Record<string, Display>>;
   onBackToLobby: () => void;
 }) {
   const t = useTranslations("Room");
@@ -181,6 +186,7 @@ export function OnlineResults({
                 {header}
               </TableHead>
             ))}
+            <TableHead>{t("aids")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -195,6 +201,9 @@ export function OnlineResults({
                   {cell}
                 </TableCell>
               ))}
+              <TableCell>
+                <AidsLabel display={displays[row.playerId]} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

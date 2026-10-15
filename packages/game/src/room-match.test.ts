@@ -7,6 +7,7 @@ import {
   getVoteCounts,
   joinRoom,
   leaveRoom,
+  setDisplay,
   startCountdown,
   typeInRoom,
   updateSettings,
@@ -235,5 +236,30 @@ describe("Room Matches", () => {
 
     expect(room.phase).toBe("results");
     expect(room.darts?.outOrder).toEqual(["p2", "p3"]);
+  });
+
+  it("records which aids every Player has on when the Match starts", () => {
+    let room = roomWith("Anna", "Bob");
+    expect(room.players[0]?.display).toEqual({
+      fingerGuide: true,
+      keyboard: false,
+    });
+
+    room = setDisplay(room, "p2", { fingerGuide: false, keyboard: true });
+    room = advanceClock(
+      startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 }),
+      3_000,
+    );
+    expect(room.matchDisplays).toEqual({
+      p1: { fingerGuide: true, keyboard: false },
+      p2: { fingerGuide: false, keyboard: true },
+    });
+
+    // The aids are fixed for the Match; changes wait for the lobby.
+    room = setDisplay(room, "p1", { fingerGuide: false, keyboard: false });
+    expect(room.matchDisplays.p1).toEqual({
+      fingerGuide: true,
+      keyboard: false,
+    });
   });
 });

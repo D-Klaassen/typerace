@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { NO_DISPLAY_AIDS, type DisplayPreferences } from "./finger-guide";
+import { DEFAULT_DISPLAY, type DisplayPreferences } from "./finger-guide";
 
 const STORAGE_KEY = "typerace.display";
 const listeners = new Set<() => void>();
@@ -18,17 +18,23 @@ function read(): string | null {
 
 function parse(raw: string | null): DisplayPreferences {
   if (raw === null) {
-    return NO_DISPLAY_AIDS;
+    return DEFAULT_DISPLAY;
   }
   try {
     const value = JSON.parse(raw) as Partial<DisplayPreferences>;
 
     return {
-      fingerGuide: value.fingerGuide === true,
-      keyboard: value.keyboard === true,
+      fingerGuide:
+        typeof value.fingerGuide === "boolean"
+          ? value.fingerGuide
+          : DEFAULT_DISPLAY.fingerGuide,
+      keyboard:
+        typeof value.keyboard === "boolean"
+          ? value.keyboard
+          : DEFAULT_DISPLAY.keyboard,
     };
   } catch {
-    return NO_DISPLAY_AIDS;
+    return DEFAULT_DISPLAY;
   }
 }
 
@@ -44,7 +50,7 @@ function subscribe(onChange: () => void) {
 
 /**
  * This browser's display choice for Online play, remembered between Rooms.
- * Falls back to "both off" when storage isn't available.
+ * Starts from DEFAULT_DISPLAY until the Player changes it.
  */
 export function useDisplayPreferences(): [
   DisplayPreferences,

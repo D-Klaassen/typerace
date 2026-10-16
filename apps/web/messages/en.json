@@ -17,6 +17,9 @@
     "percent": "{value, number, ::percent}",
     "wpm": "{value, number, ::.} WPM"
   },
+  "DarkMode": {
+    "label": "Dark mode"
+  },
   "Navigation": {
     "label": "Menu",
     "backToMenu": "Back to menu",

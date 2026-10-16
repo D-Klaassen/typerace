@@ -185,7 +185,7 @@ export class Rooms extends Server<Env> {
     const finished = roomLeaderboardRecords(this.room);
     if (finished && finished.records.length > 0) {
       this.ctx.waitUntil(
-        leaderboardOf(this.env).record(finished.textSource, finished.records),
+        leaderboardOf(this.env).record(finished.board, finished.records),
       );
     }
   }

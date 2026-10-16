@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-test("the Leaderboard has a board per Text Source and Language, linked from home", async ({
+test("the Leaderboard has a board per Text Source, Language and Text Length, linked from home", async ({
   page,
 }) => {
   await page.goto("/");
@@ -14,11 +14,24 @@ test("the Leaderboard has a board per Text Source and Language, linked from home
   await expect(page.getByRole("radio", { name: "English" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "Gibberish" })).toHaveCount(0);
   await expect(page.getByRole("group", { name: "Keys" })).toBeHidden();
+  await expect(page.getByRole("radio", { name: "Medium" })).toBeChecked();
 
   // A board nobody plays on: Dutch Sentences.
   await page.getByText("Sentences", { exact: true }).click();
   await page.getByText("Dutch", { exact: true }).click();
-  await expect(page).toHaveURL(/\/leaderboard\?source=sentences&language=nl$/);
+  await expect(page).toHaveURL(
+    /\/leaderboard\?source=sentences&language=nl&length=medium$/,
+  );
+  await expect(
+    page.getByText("No times on this board yet.", { exact: false }),
+  ).toBeVisible();
+
+  // Each Text Length has a board of its own.
+  await page.getByText("Long", { exact: true }).click();
+  await expect(page).toHaveURL(
+    /\/leaderboard\?source=sentences&language=nl&length=long$/,
+  );
+  await expect(page.getByRole("radio", { name: "Dutch" })).toBeChecked();
   await expect(
     page.getByText("No times on this board yet.", { exact: false }),
   ).toBeVisible();
@@ -31,6 +44,16 @@ test("an old link to a Gibberish board opens English Words", async ({
 
   await expect(page.getByRole("radio", { name: "Words" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "English" })).toBeChecked();
+});
+
+test("a link from before boards had a Text Length opens the Medium board", async ({
+  page,
+}) => {
+  await page.goto("/leaderboard?source=sentences&language=nl");
+
+  await expect(page.getByRole("radio", { name: "Sentences" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Dutch" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Medium" })).toBeChecked();
 });
 
 async function typeTurnTaking(page: Page, ms: number) {
@@ -70,9 +93,13 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   );
   await page.getByRole("link", { name: "See the leaderboard" }).click();
 
-  await expect(page).toHaveURL(/\/leaderboard\?source=words&language=nl$/);
+  // Hot Seat Turns are Medium texts, whatever a Classic Race's length is.
+  await expect(page).toHaveURL(
+    /\/leaderboard\?source=words&language=nl&length=medium$/,
+  );
   await expect(page.getByRole("radio", { name: "Words" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "Dutch" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Medium" })).toBeChecked();
   const board = page.getByRole("table", { name: "Leaderboard" });
   await expect(board).toContainText("Anke");
   await expect(board).toContainText("Bram");
@@ -83,7 +110,7 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
     .getByText("Sentences", { exact: true })
     .filter({ visible: true })
     .click();
-  await expect(page).toHaveURL(/source=sentences&language=nl$/);
+  await expect(page).toHaveURL(/source=sentences&language=nl&length=medium$/);
   await expect(
     page.getByText("No times on this board yet.", { exact: false }),
   ).toBeVisible();

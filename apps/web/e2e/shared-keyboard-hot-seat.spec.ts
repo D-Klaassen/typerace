@@ -14,7 +14,7 @@ test("two Players play a Hot Seat Match until one runs out of time", async ({
   await page.goto("/play");
 
   await expect(page.getByPlaceholder("Player 1")).toHaveAccessibleDescription(
-    "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences.",
+    "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo race with Words or Sentences.",
   );
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByRole("button", { name: "Add player" }).click();

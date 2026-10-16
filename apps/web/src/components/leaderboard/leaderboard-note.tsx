@@ -1,23 +1,23 @@
-import type { RealTextSource } from "@typerace/game";
+import type { LeaderboardBoard } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { leaderboardHref } from "@/lib/leaderboard";
 
-/** How sending a finished Hot Seat Match to the Leaderboard went. */
+/** How sending a finished Hot Seat Match or solo race to the Leaderboard went. */
 export type LeaderboardStatus = "saving" | "saved" | "failed";
 
 /**
- * Under Hot Seat results: whether the best Times made it, and a link to
- * the board of the text they were typed on.
+ * Under Hot Seat or solo race results: whether the Times made it, and a
+ * link to the board of the text they were typed on.
  */
 export function LeaderboardNote({
   status,
-  textSource,
+  board,
 }: {
   /** Null when there was nothing to save. */
   status: LeaderboardStatus | null;
-  textSource: RealTextSource;
+  board: LeaderboardBoard;
 }) {
   const t = useTranslations("Leaderboard");
 
@@ -34,7 +34,7 @@ export function LeaderboardNote({
         </p>
       )}
       <Link
-        href={leaderboardHref(textSource)}
+        href={leaderboardHref(board)}
         className={buttonVariants({ variant: "link" })}
       >
         {t("view")}

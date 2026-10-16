@@ -1,8 +1,9 @@
 import {
   LANGUAGES,
   REAL_TEXT_KINDS,
+  TEXT_LENGTHS,
+  type LeaderboardBoard,
   type LeaderboardEntry,
-  type RealTextSource,
 } from "@typerace/game";
 import {
   LEADERBOARD_PATH,
@@ -15,11 +16,11 @@ import { roomsOrigin } from "./rooms-host";
 
 export async function fetchLeaderboard(
   host: string,
-  textSource: RealTextSource,
+  board: LeaderboardBoard,
   signal?: AbortSignal,
 ): Promise<LeaderboardEntry[]> {
   const response = await fetch(
-    `${roomsOrigin(host)}${LEADERBOARD_PATH}?${leaderboardSearch(textSource)}`,
+    `${roomsOrigin(host)}${LEADERBOARD_PATH}?${leaderboardSearch(board)}`,
     { signal },
   );
   if (!response.ok) {
@@ -29,7 +30,10 @@ export async function fetchLeaderboard(
   return ((await response.json()) as LeaderboardResponse).entries;
 }
 
-/** Sends a Shared Keyboard's finished Hot Seat Match; Rooms record their own. */
+/**
+ * Sends a Shared Keyboard's finished Hot Seat Match or solo race; Rooms
+ * record their own.
+ */
 export async function submitToLeaderboard(
   host: string,
   submission: LeaderboardSubmission,
@@ -44,24 +48,31 @@ export async function submitToLeaderboard(
   }
 }
 
-/** The Leaderboard page, opened on the board of a Text Source and Language. */
-export function leaderboardHref({ kind, language }: RealTextSource): string {
-  return `/leaderboard?${new URLSearchParams({ source: kind, language })}`;
+/** The Leaderboard page, opened on a board. */
+export function leaderboardHref({
+  kind,
+  language,
+  textLength,
+}: LeaderboardBoard): string {
+  return `/leaderboard?${new URLSearchParams({ source: kind, language, length: textLength })}`;
 }
 
 /**
  * The board a Leaderboard page link stands for: English for a link without
- * a valid Language, and Words without a valid Text Source, like the old
- * links to Gibberish boards.
+ * a valid Language, Words without a valid Text Source, like the old links to
+ * Gibberish boards, and Medium without a valid Text Length, like the links
+ * from before boards had one.
  */
-export function textSourceOfLeaderboardHref(
+export function boardOfLeaderboardHref(
   params: URLSearchParams,
-): RealTextSource {
+): LeaderboardBoard {
   const source = params.get("source");
   const language = params.get("language");
+  const length = params.get("length");
 
   return {
     kind: REAL_TEXT_KINDS.find((kind) => kind === source) ?? "words",
     language: LANGUAGES.find((known) => known === language) ?? "en",
+    textLength: TEXT_LENGTHS.find((known) => known === length) ?? "medium",
   };
 }

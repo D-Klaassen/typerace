@@ -5,13 +5,14 @@ import {
 } from "./key-sets";
 import {
   hotSeatRecords,
-  leaderboardTextSource,
+  leaderboardBoard,
+  type LeaderboardBoard,
   type LeaderboardRecord,
 } from "./leaderboard";
+import type { TextLength } from "./text-length";
 import {
   resolveTextSource,
   type Language,
-  type RealTextSource,
   type TextSource,
   type TextSourceKind,
 } from "./text-source";
@@ -26,6 +27,7 @@ import {
 import {
   advanceHotSeat,
   dropFromHotSeat,
+  HOT_SEAT_TEXT_LENGTH,
   startOnlineHotSeat,
   typeInHotSeat,
   type OnlineHotSeat,
@@ -52,8 +54,6 @@ export const ONLINE_MODES: readonly Mode[] = [
 
 export type Mode = "classicRace" | "crazyDarts" | "hotSeat";
 
-export type TextLength = "short" | "medium" | "long";
-
 export interface RoomSettings {
   mode: Mode;
   /** Gibberish, Words or Sentences. */
@@ -75,13 +75,6 @@ export interface RoomSettings {
   /** Crazy Darts: HP a Player loses per Typo. */
   typoHp: number;
 }
-
-/** Characters per Classic Race text (see docs/spec.md). */
-export const TEXT_LENGTH_CHARACTERS: Record<TextLength, number> = {
-  short: 50,
-  medium: 100,
-  long: 200,
-};
 
 export const DEFAULT_ROOM_SETTINGS: RoomSettings = {
   mode: "classicRace",
@@ -501,15 +494,16 @@ export function roomTextSource(room: Room): TextSource {
  */
 export function roomLeaderboardRecords(
   room: Room,
-): { textSource: RealTextSource; records: LeaderboardRecord[] } | null {
-  const textSource =
-    room.hotSeat && leaderboardTextSource(room.hotSeat.textSource);
-  if (room.phase !== "results" || !room.hotSeat || !textSource) {
+): { board: LeaderboardBoard; records: LeaderboardRecord[] } | null {
+  const board =
+    room.hotSeat &&
+    leaderboardBoard(room.hotSeat.textSource, HOT_SEAT_TEXT_LENGTH);
+  if (room.phase !== "results" || !room.hotSeat || !board) {
     return null;
   }
 
   return {
-    textSource,
+    board,
     records: hotSeatRecords(
       room.hotSeat.seat,
       (id) => room.players.find((player) => player.id === id)?.nickname,

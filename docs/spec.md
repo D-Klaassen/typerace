@@ -15,7 +15,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 - Accounts, profiles and history. Nothing persists after a Room or game ends, except the Leaderboard.
 - Public matchmaking.
-- Visual Themes beyond one fixed look per Mode.
+- Visual Themes beyond one fixed look per Mode and the [Racing Theme](#racing-theme).
 - Keyboard layouts other than US QWERTY (ANSI).
 - Phones and tablets. A physical keyboard is required; small or touch-only screens get a "keyboard required" message.
 - Any interface language other than English.
@@ -28,7 +28,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 1–6 nicknames, each with its own On-screen Keyboard and Finger Guide switches (Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
+1. **Setup screen:** enter 1–6 nicknames, each with its own On-screen Keyboard, Finger Guide and Racing Theme switches (only the Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 4. **Quitting:** "Quit game" on the handover and Turn screens ends the game for everyone after a confirmation and goes to the home page. Nothing from the game is saved, so it never reaches the Leaderboard.
@@ -51,7 +51,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
 - **Leave Room:** every screen inside a Room has a "Leave Room" control that closes the connection, which the Room treats as leaving (see above), and goes to the home page. A Player in a countdown or a running Match confirms first, with a message saying what leaving costs in that Mode. In the lobby, as a Spectator and on the results it leaves at once. Before joining (the nickname form, "Room not found") there is "Back to menu" instead.
-- **Display:** in the lobby, each Player switches the On-screen Keyboard and the Finger Guide on or off for themselves, with a live preview. There are no switches during a Match. The Finger Guide is on and the keyboard off by default, and the browser remembers the choice. The Room records each Player's aids when a Match starts, and the results show them to everyone.
+- **Display:** in the lobby, each Player switches the On-screen Keyboard, the Finger Guide and the Racing Theme on or off for themselves, with a live preview. There are no switches during a Match. Only the Finger Guide is on by default, and the browser remembers the choice. The Room records each Player's aids (the keyboard and the Finger Guide, not the Racing Theme) when a Match starts, and the results show them to everyone.
 - **After a Match:** Results, then a "Rematch" button for the Host. Everyone goes back to the lobby with the same settings.
 
 ## Text
@@ -84,6 +84,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - It does not advance the text.
   - It shows a red error state until the correct key is pressed.
   - Every wrong keystroke counts as one Typo.
+  - The engine also counts the Typos in a row since the last correct key, for the [Racing Theme](#racing-theme)'s crash.
 - **Ignored keys:** Backspace, Escape, Tab and modifier keys on their own. They are not keystrokes.
 - **Stats per Player per Match** (in Hot Seat, per Turn and summed over the Match):
   - **Time:** from the first keystroke until the last character is typed.
@@ -92,7 +93,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - **Typos:** the count.
 - **During a Match** the screen shows:
   - The text.
-  - Each Player's progress.
+  - Each Player's progress: as bars, or as cars on a circuit in the [Racing Theme](#racing-theme).
   - In Crazy Darts, each Player's HP.
   - In Hot Seat, the active Player's remaining Time Bank and the table of times.
   - WPM is **not** shown while typing.
@@ -164,6 +165,31 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Hot Seat:** also each Player's best Time and number of Turns, and for Words and Sentences whether the best Times reached the Leaderboard, and a link to it.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 
+## Racing Theme
+
+A Theme for Classic Race and Hot Seat, Online and on a Shared Keyboard (not Crazy Darts). It changes no rules, and nothing about it is in the results.
+
+- **Switching it on:** each Player's own Display switch, off by default. It changes nobody else's screen.
+  - **Spectators** see the normal look, unless their browser remembers the Racing Theme being on.
+  - **Online Hot Seat:** the Player whose Turn it is and everyone watching each see it if they switched it on.
+- **The circuit:** a looping race track seen from above, drawn in plain SVG with no 3D library.
+  - One lap for every ~100 characters, rounded, at least one: a Medium text or a Hot Seat Turn is one lap.
+  - Every car is exactly as far along as its Player's typing. It glides to each new letter in 90 ms and is never drawn ahead of it.
+  - Up to six cars, one lane each, with a name tag. Your own car says "You". A Player's place in the Room or the setup gives their car its colour and lane, the same on every screen and every Turn. A Player who left is faded where they stopped.
+- **Layout:**
+  - The track view zooms in on your car (or the leader's, for a Spectator) and follows it round, always north up.
+  - A small map of the whole circuit in its corner shows everyone as dots, with a box for what the track view shows. The lap count is in the other corner.
+  - With more than one car, a race order beside the track shows each car's place and how many letters it is behind the leader (or that it finished, crashed or left). Those who finished come first, in the order the Room timed them, then everyone still typing, furthest first, then those who left. Without a car of its own to follow, the camera follows whoever leads the cars still racing.
+  - The text, the On-screen Keyboard and the Finger Guide sit below, as without the Theme.
+- **No speed is shown.** The cars' movement is the only sign of pace, so WPM stays hidden while typing.
+- **A Typo** makes the car skid for 600 ms, even if the right key comes sooner: it wobbles (three swings of up to about 26°, fading out), drifts a little sideways and leaves tyre marks.
+- **Three Typos in a row** crash it:
+  - It spins one and a quarter turns over 0.9 s, ending sideways, and slides towards the nearer kerb and the grass beyond it.
+  - It stays there until the right key is pressed, with "Crashed! Press the right key to drive on" on your own screen and "Crashed" in the race order.
+  - Online, the Room sends every Player's Typos in a row (and when they finished), so others see their cars skid and crash too.
+- **Reduced motion** (the computer's setting): no wobble, spin, slide or tyre marks. A crashed car just stops, with a still "⚠ Stop" tag, and the crash notice doesn't pulse.
+- **Later:** Ghosts (see `CONTEXT.md`), first from earlier Turns in a Match, then from the Leaderboard.
+
 ## Leaderboard
 
 - **What goes on it:** when a Hot Seat Match on Words or Sentences ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it. A solo Classic Race on a Shared Keyboard counts too when its text is Medium, the same length as a Turn, and Words or Sentences.
@@ -232,7 +258,7 @@ packages/game Pure TypeScript game rules — no React, no network, no timers of 
 - **Web app:** Next.js (App Router), Tailwind CSS and shadcn/ui
 - **Rooms:** PartyServer with Wrangler
 - **Translations:** next-intl
-- **Tests:** Vitest for `packages/game` (full rule coverage) and the Room logic; Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Hot Seat, one Online Classic Race with two browser contexts, one Online Crazy Darts, quitting a Shared Keyboard game, and leaving a Room.
+- **Tests:** Vitest for `packages/game` (full rule coverage), the Room logic and the web app's pure modules (such as the Racing Theme's circuit and car maths); Playwright for a few end-to-end flows. The flows are: one Shared Keyboard Hot Seat, one Online Classic Race with two browser contexts, one Online Crazy Darts, the Racing Theme on a Shared Keyboard and Online, quitting a Shared Keyboard game, and leaving a Room.
 - **Lint and format:** ESLint and Prettier
 - **Root scripts:** `lint`, `typecheck`, `test`, `test:e2e`, `format:check`, and `check`, which runs them all.
 - **Rule:** every commit and push requires a green `check`.

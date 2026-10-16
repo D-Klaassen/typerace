@@ -5,6 +5,8 @@ export interface TypingSession {
   /** True after a Typo, until the expected key is pressed. */
   readonly inError: boolean;
   readonly typos: number;
+  /** Typos since the last correct key; three in a row crash the Racing Theme's car. */
+  readonly typosInARow: number;
   /** True once every character has been typed; later keys are ignored. */
   readonly finished: boolean;
   /** All counted keystrokes, correct ones and Typos. */
@@ -36,6 +38,7 @@ export function startTyping(text: string): TypingSession {
     position: 0,
     inError: false,
     typos: 0,
+    typosInARow: 0,
     finished: false,
     keystrokes: 0,
     firstKeyAtMs: null,
@@ -60,7 +63,12 @@ export function typeKey(
   };
 
   if (key !== session.text[session.position]) {
-    return { ...counted, inError: true, typos: session.typos + 1 };
+    return {
+      ...counted,
+      inError: true,
+      typos: session.typos + 1,
+      typosInARow: session.typosInARow + 1,
+    };
   }
 
   const position = session.position + 1;
@@ -69,6 +77,7 @@ export function typeKey(
     ...counted,
     position,
     inError: false,
+    typosInARow: 0,
     finished: position === session.text.length,
     lastCorrectAtMs: atMs,
   };

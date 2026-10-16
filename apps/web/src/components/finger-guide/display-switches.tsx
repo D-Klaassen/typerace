@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { DisplayPreferences } from "./finger-guide";
 
-/** The two switches; `forName` labels them per Player on a Shared Keyboard. */
+/** The Display switches; `forName` labels them per Player on a Shared Keyboard. */
 export function DisplaySwitches({
   display,
   onChange,
@@ -16,12 +16,12 @@ export function DisplaySwitches({
   forName?: string;
 }) {
   const t = useTranslations("Display");
-  const label = (key: "fingerGuide" | "keyboard") =>
+  const label = (key: keyof DisplayPreferences) =>
     forName ? t(`${key}For`, { name: forName }) : t(key);
 
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-2">
-      {(["keyboard", "fingerGuide"] as const).map((key) => (
+      {(["keyboard", "fingerGuide", "racingTheme"] as const).map((key) => (
         <Label
           key={key}
           className="gap-2 text-sm font-normal whitespace-nowrap"

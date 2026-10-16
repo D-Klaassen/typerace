@@ -190,6 +190,8 @@
     "keyboardFor": "On-screen Keyboard for {name}",
     "fingerGuide": "Finger Guide",
     "fingerGuideFor": "Finger Guide for {name}",
+    "racingTheme": "Racing Theme",
+    "racingThemeFor": "Racing Theme for {name}",
     "preview": "Preview",
     "nothingExtra": "Just the text: no keyboard or hands while you type.",
     "noAids": "None"
@@ -282,5 +284,20 @@
       "en": "English",
       "nl": "Dutch"
     }
+  },
+  "RacingTheme": {
+    "track": "Race track",
+    "wholeCircuit": "The whole circuit",
+    "you": "You",
+    "raceOrder": "Race order",
+    "lap": "Lap {lap}/{laps}",
+    "leader": "–",
+    "gap": "+{letters}",
+    "gapNote": "Letters behind the leader",
+    "finished": "Finished",
+    "crashed": "Crashed",
+    "left": "Left",
+    "crashNotice": "Crashed! Press the right key to drive on",
+    "stop": "⚠ Stop"
   }
 }

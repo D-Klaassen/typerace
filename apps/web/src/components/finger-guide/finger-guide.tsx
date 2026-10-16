@@ -8,18 +8,22 @@ export interface DisplayPreferences {
   fingerGuide: boolean;
   /** The keyboard, with the next key (and Shift) lit up. */
   keyboard: boolean;
+  /** Classic Race and Hot Seat as cars on a circuit (see CONTEXT.md: Racing Theme). */
+  racingTheme: boolean;
 }
 
-/** A Player's starting point: the Finger Guide on, the keyboard off. */
+/** A Player's starting point: the Finger Guide on, the rest off. */
 export const DEFAULT_DISPLAY: DisplayPreferences = {
   fingerGuide: true,
   keyboard: false,
+  racingTheme: false,
 };
 
 /** For people who watch rather than type, such as Spectators. */
 export const NO_DISPLAY_AIDS: DisplayPreferences = {
   fingerGuide: false,
   keyboard: false,
+  racingTheme: false,
 };
 
 /** The On-screen Keyboard and/or Finger Guide for typing `nextChar`. */

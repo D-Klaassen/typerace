@@ -6,6 +6,7 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
+import { RacingTrack, typingCar } from "@/components/racing-theme/racing-track";
 import { HotSeatStandings } from "@/components/shared-keyboard/hot-seat-standings";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
@@ -36,17 +37,33 @@ export function OnlineHotSeat({
   const nameOf = (id: string) => nicknames[id] ?? "?";
   // A new key per Turn gives every Turn a fresh typing session.
   const turnKey = `${seat.turnsTaken}-${seat.eliminated.length}`;
+  // The Player's place in the Room gives their car its colour and lane.
+  const carSeat = Math.max(
+    0,
+    seat.players.findIndex((player) => player.name === seat.currentPlayer),
+  );
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
       {turn &&
         (seat.currentPlayer === you ? (
-          <MyTurn key={turnKey} turn={turn} display={display} onKey={onKey} />
+          <MyTurn
+            key={turnKey}
+            turn={turn}
+            you={you}
+            seat={carSeat}
+            display={display}
+            onKey={onKey}
+          />
         ) : (
           <WatchTurn
+            key={turnKey}
             turn={turn}
+            playerId={seat.currentPlayer ?? ""}
             player={nameOf(seat.currentPlayer ?? "")}
+            seat={carSeat}
             clockOffsetMs={clockOffsetMs}
+            racingTheme={display.racingTheme}
           />
         ))}
       <HotSeatStandings seat={seat} nameOf={nameOf} />
@@ -56,10 +73,14 @@ export function OnlineHotSeat({
 
 function MyTurn({
   turn,
+  you,
+  seat,
   display,
   onKey,
 }: {
   turn: Turn;
+  you: string;
+  seat: number;
   display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
@@ -77,6 +98,12 @@ function MyTurn({
         title={t("yourTurn")}
         remainingMs={turn.timeBankMs - elapsedMs}
       />
+      {display.racingTheme && (
+        <RacingTrack
+          cars={[typingCar(session, { id: you, name: "", isYou: true, seat })]}
+          textLength={turn.text.length}
+        />
+      )}
       {session.finished ? (
         <p className="text-center text-lg font-medium" role="status">
           {t("turnDone")}
@@ -93,12 +120,18 @@ function MyTurn({
 
 function WatchTurn({
   turn,
+  playerId,
   player,
+  seat,
   clockOffsetMs,
+  racingTheme,
 }: {
   turn: Turn;
+  playerId: string;
   player: string;
+  seat: number;
   clockOffsetMs: number;
+  racingTheme: boolean;
 }) {
   const t = useTranslations("Room");
   const roomNow = useNow(() => Date.now() + clockOffsetMs);
@@ -113,6 +146,17 @@ function WatchTurn({
         title={t("theirTurn", { name: player })}
         remainingMs={turn.timeBankMs - elapsedMs}
       />
+      {racingTheme && (
+        <RacingTrack
+          cars={[
+            typingCar(
+              { ...turn, finished: turn.position === turn.text.length },
+              { id: playerId, name: player, seat },
+            ),
+          ]}
+          textLength={turn.text.length}
+        />
+      )}
       <TypingText session={turn} />
     </>
   );

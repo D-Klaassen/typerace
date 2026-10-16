@@ -28,7 +28,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 1–6 nicknames, then switch the On-screen Keyboard, the Finger Guide, Coloured Text and the Racing Theme on or off for every Player at once (only the Finger Guide on by default), with a live preview shown from the start. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
+1. **Setup screen:** enter 1–6 nicknames (one Player to start with, add more as needed), then switch the On-screen Keyboard, the Finger Guide, Coloured Text and the Racing Theme on or off for every Player at once (only the Finger Guide on by default), with a live preview shown from the start in a panel beside the form. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players, so it's only offered once there are two.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 4. **Quitting:** "Quit game" on the handover and Turn screens ends the game for everyone after a confirmation and goes to the home page. Nothing from the game is saved, so it never reaches the Leaderboard.

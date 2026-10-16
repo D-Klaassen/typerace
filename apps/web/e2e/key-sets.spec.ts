@@ -5,6 +5,7 @@ test("a custom Key Set only uses the keys clicked on the keyboard", async ({
 }) => {
   await page.goto("/play");
   await page.getByPlaceholder("Player 1").fill("Anna");
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
 
   const keySetGroups = page.getByRole("group", { name: "Keys" });
@@ -32,6 +33,7 @@ test("a custom Key Set only uses the keys clicked on the keyboard", async ({
 test("a Lesson preset with Capitals", async ({ page }) => {
   await page.goto("/play");
   await page.getByPlaceholder("Player 1").fill("Anna");
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
 
   await page

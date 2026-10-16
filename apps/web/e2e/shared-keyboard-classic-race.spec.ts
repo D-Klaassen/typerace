@@ -14,6 +14,8 @@ test("the fastest Player wins a Classic Race on a Shared Keyboard", async ({
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anna");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
   await page.getByText("Classic Race", { exact: true }).click();
   await page.getByText("Short", { exact: true }).click();
@@ -48,7 +50,6 @@ test("a single Player races alone, and a Medium race goes on the Leaderboard", a
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Solveig");
-  await page.getByRole("button", { name: "Remove Player 2" }).click();
   await expect(page.getByPlaceholder("Player 2")).toBeHidden();
   await expect(
     page.getByText(
@@ -80,17 +81,25 @@ test("a single Player races alone, and a Medium race goes on the Leaderboard", a
   );
 });
 
-test("Hot Seat can't be played alone", async ({ page }) => {
+test("Hot Seat is only offered with two or more Players", async ({ page }) => {
   await page.goto("/play");
 
-  await page.getByPlaceholder("Player 1").fill("Solveig");
-  await page.getByRole("button", { name: "Remove Player 2" }).click();
-  await page.getByText("Hot Seat", { exact: true }).click();
-  await page.getByRole("button", { name: "Start" }).click();
+  // One Player to start with, so only a Classic Race.
+  const hotSeat = page.getByText("Hot Seat", { exact: true });
+  await expect(page.getByPlaceholder("Player 2")).toBeHidden();
+  await expect(hotSeat).toBeHidden();
 
+  await page.getByRole("button", { name: "Add player" }).click();
+  await hotSeat.click();
   await expect(
-    page.getByRole("alert").filter({ hasText: "Hot Seat needs" }),
-  ).toHaveText("Hot Seat needs at least two Players.");
-  // Still on the setup screen.
-  await expect(page.getByRole("button", { name: "Start" })).toBeVisible();
+    page.getByRole("group", { name: "Time Bank (minutes)" }),
+  ).toBeVisible();
+
+  // Back to one Player: Hot Seat goes, and so does its Time Bank.
+  await page.getByRole("button", { name: "Remove Player 2" }).click();
+  await expect(hotSeat).toBeHidden();
+  await expect(page.getByRole("radio", { name: "Classic Race" })).toBeChecked();
+  await expect(
+    page.getByRole("group", { name: "Time Bank (minutes)" }),
+  ).toBeHidden();
 });

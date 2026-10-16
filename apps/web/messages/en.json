@@ -40,8 +40,7 @@
       "errors": {
         "nicknameRequired": "Every Player needs a nickname.",
         "nicknameTooLong": "Nicknames can be at most 16 characters.",
-        "nicknameTaken": "Two Players can't share a nickname.",
-        "hotSeatNeedsTwo": "Hot Seat needs at least two Players."
+        "nicknameTaken": "Two Players can't share a nickname."
       },
       "classicRace": "Classic Race",
       "textLength": "Text length",

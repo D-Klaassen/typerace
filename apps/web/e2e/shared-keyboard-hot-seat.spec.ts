@@ -17,6 +17,7 @@ test("two Players play a Hot Seat Match until one runs out of time", async ({
     "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences.",
   );
   await page.getByPlaceholder("Player 1").fill("Anna");
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
   await page.getByText("Hot Seat", { exact: true }).click();
   await page.getByText("1", { exact: true }).click(); // 1-minute Time Bank
@@ -56,6 +57,8 @@ test("rejects duplicate nicknames", async ({ page }) => {
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Bob");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("bob");
   await page.getByRole("button", { name: "Start" }).click();
 

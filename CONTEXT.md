@@ -15,7 +15,7 @@ Playing on a single device that the Players pass between them, with no Room and 
 _Avoid_: Local, hot-seat, offline, couch play
 
 **Player**:
-A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and best Time on the Leaderboard.
+A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and Times on the Leaderboard.
 _Avoid_: User, account, participant
 
 **Room**:
@@ -45,8 +45,16 @@ A set of game rules that decides how Players interact and who wins: Classic Race
 _Avoid_: Theme (when talking about rules), game type
 
 **Theme**:
-The visual look of the game, separate from its rules. Each Mode has a single fixed look for now.
+The visual look of the game, separate from its rules. Each Mode has its own fixed look, and Classic Race and Time Trial can also be shown in the Racing Theme.
 _Avoid_: Mode, skin
+
+**Racing Theme**:
+A Theme for Classic Race and Time Trial in which each Player's typing drives a car down a 3D road. The car is exactly as far along as their typing and its speed shows their current pace; a Typo makes it skid, and three Typos in a row make it crash until the right key is pressed. It changes no rules.
+_Avoid_: Racing simulator, racing mode, car mode
+
+**Ghost**:
+A see-through car in the Racing Theme that replays how an earlier Turn progressed over time, so the Player can race against it.
+_Avoid_: Replay, shadow, ghost rider
 
 **Classic Race**:
 A Mode where the fastest Player to finish the text wins. Online, everyone types the same text at once. On a Shared Keyboard, Players take Turns.
@@ -107,7 +115,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Time Trial Turns of everyone who ever finished a Time Trial, Online or on a Shared Keyboard, with one board per Key Set (its keys plus Capitals). Each Player's best Time from a finished Time Trial goes on the board under their nickname, and a board keeps its top 20.
+The fastest Times ever typed in Time Trial and Classic Race, Online or on a Shared Keyboard. There is one board per Mode and Key Set (its keys plus Capitals), and Classic Race has one per text length too; Crazy Darts has none. A Time Trial puts each Player's best Time on the board, a Classic Race each Player's Time if they finished the text, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids
@@ -121,5 +129,5 @@ An optional keyboard that highlights the next key, and the Shift key to hold wit
 _Avoid_: Keyboard hint, virtual keyboard
 
 **Display**:
-A Player's own choice of whether they see the On-screen Keyboard and the Finger Guide while typing. The Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
+A Player's own choice of whether they see the On-screen Keyboard, the Finger Guide, the Racing Theme and the Leaderboard's Ghost while typing. Only the Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
 _Avoid_: Settings (those are the Host's)

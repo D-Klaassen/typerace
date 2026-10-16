@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RoomPage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center p-8">
+    <main className="relative flex flex-1 flex-col items-center justify-center p-8 pt-16">
       {/* The Room is entirely client-side; it reads its code from the URL. */}
       <Suspense>
         <RoomScreen />

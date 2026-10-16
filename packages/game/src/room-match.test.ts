@@ -84,7 +84,7 @@ describe("Room Matches", () => {
   });
 
   it("shows results once everyone has finished, and resets the Votes", () => {
-    let room = castVote(roomWith("Anna", "Bob"), "p2", { mode: "timeTrial" });
+    let room = castVote(roomWith("Anna", "Bob"), "p2", { mode: "hotSeat" });
     room = advanceClock(
       startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 }),
       3_000,
@@ -101,7 +101,7 @@ describe("Room Matches", () => {
 
     room = typeInRoom(room, "p2", "b", 6_000);
     expect(room.phase).toBe("results");
-    expect(getVoteCounts(room).mode.timeTrial).toBe(0);
+    expect(getVoteCounts(room).mode.hotSeat).toBe(0);
   });
 
   it("shows results when the grace period after the first finish runs out", () => {
@@ -153,9 +153,9 @@ describe("Room Matches", () => {
     expect(updateSettings(room, "p1", { capitals: true })).toBe(room);
   });
 
-  it("plays a Time Trial: the current Player types, leaving eliminates", () => {
+  it("plays a Hot Seat Match: the current Player types, leaving eliminates", () => {
     let room = updateSettings(roomWith("Anna", "Bob", "Cas"), "p1", {
-      mode: "timeTrial",
+      mode: "hotSeat",
     });
     room = advanceClock(
       startCountdown(room, "p1", { text: "unused", seed: 1, nowMs: 0 }),
@@ -164,38 +164,38 @@ describe("Room Matches", () => {
 
     expect(room.phase).toBe("racing");
     expect(room.race).toBeNull();
-    expect(room.timeTrial?.trial.currentPlayer).toBe("p1");
+    expect(room.hotSeat?.seat.currentPlayer).toBe("p1");
 
-    const firstKey = room.timeTrial!.turn!.text[0]!;
+    const firstKey = room.hotSeat!.turn!.text[0]!;
     room = typeInRoom(room, "p1", firstKey, 4_000);
-    expect(room.timeTrial?.turn?.position).toBe(1);
+    expect(room.hotSeat?.turn?.position).toBe(1);
 
     room = leaveRoom(room, "p1");
-    expect(room.timeTrial?.trial.currentPlayer).toBe("p2");
+    expect(room.hotSeat?.seat.currentPlayer).toBe("p2");
 
     room = leaveRoom(room, "p3");
     expect(room.phase).toBe("results");
-    expect(room.timeTrial?.trial.winner).toBe("p2");
+    expect(room.hotSeat?.seat.winner).toBe("p2");
 
     room = backToLobby(room, "p2");
-    expect(room.timeTrial).toBeNull();
+    expect(room.hotSeat).toBeNull();
   });
 
-  it("eliminates a Time Trial Player whose Time Bank runs out", () => {
+  it("eliminates a Hot Seat Player whose Time Bank runs out", () => {
     let room = updateSettings(roomWith("Anna", "Bob"), "p1", {
-      mode: "timeTrial",
+      mode: "hotSeat",
       timeBankMs: 60_000,
     });
     room = advanceClock(
       startCountdown(room, "p1", { text: "unused", seed: 1, nowMs: 0 }),
       3_000,
     );
-    room = typeInRoom(room, "p1", room.timeTrial!.turn!.text[0]!, 4_000);
+    room = typeInRoom(room, "p1", room.hotSeat!.turn!.text[0]!, 4_000);
 
     room = advanceClock(room, 64_000);
 
     expect(room.phase).toBe("results");
-    expect(room.timeTrial?.trial.winner).toBe("p2");
+    expect(room.hotSeat?.seat.winner).toBe("p2");
   });
 
   it("plays Crazy Darts until one Player has HP left", () => {

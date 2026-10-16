@@ -190,7 +190,7 @@ ENV_FILE=".env"
 
 wrangler() { pnpm --filter rooms exec wrangler "$@"; }
 
-TOTAL_STAGES=4
+TOTAL_STAGES=5
 
 banner "Deploy Typerace"
 
@@ -206,7 +206,7 @@ if wrangler whoami 2>&1 | grep -qi "not authenticated"; then
   step "Next to ${BOLD}Edit Cloudflare Workers${RESET}, click ${BOLD}Use template${RESET}."
   step "Account Resources: Include → your account. Zone Resources: Include → All zones."
   step "Click Continue to summary → Create Token, then copy the token."
-  note "The token is only used for this run; it isn't saved anywhere."
+  note "It isn't saved on this computer. The next stage can give it to GitHub."
   ask_secret CLOUDFLARE_API_TOKEN "Paste the API token (hidden):"
   export CLOUDFLARE_API_TOKEN
 else
@@ -251,7 +251,34 @@ fi
 write_env ROOMS_HOST "$ROOMS_HOST"
 pause
 
-# ── 3. Vercel project ─────────────────────────────────────────────────────
+# ── 3. Deploy on every merge ──────────────────────────────────────────────
+stage "GitHub: deploy the Rooms server on every merge"
+say "Vercel redeploys the web app on every push to main. GitHub Actions does"
+say "the same for the Rooms server (.github/workflows/rooms.yml), so the two"
+say "never drift apart. It needs a Cloudflare API token and your account ID."
+if confirm "Let GitHub deploy the Rooms server on every push to main?"; then
+  if [[ -n "${CLOUDFLARE_API_TOKEN:-}" ]] && confirm "Use the token you pasted in stage 1?"; then
+    ACTIONS_CF_TOKEN="$CLOUDFLARE_API_TOKEN"
+  else
+    open_url "https://dash.cloudflare.com/profile/api-tokens"
+    step "Click ${BOLD}Create Token${RESET}, then ${BOLD}Use template${RESET} next to ${BOLD}Edit Cloudflare Workers${RESET}."
+    step "Account Resources: Include → your account. Zone Resources: Include → All zones."
+    step "Click Continue to summary → Create Token, then copy the token."
+    ask_secret ACTIONS_CF_TOKEN "Paste the API token (hidden):"
+  fi
+  set_secret CLOUDFLARE_API_TOKEN "$ACTIONS_CF_TOKEN"
+  ACCOUNT_ID=$(wrangler whoami 2>&1 | grep -Eo '\b[0-9a-f]{32}\b' | head -n 1 || true)
+  if [[ -z "$ACCOUNT_ID" ]]; then
+    step "Find your Account ID in the Cloudflare dashboard: Workers & Pages, right-hand side."
+    ask ACCOUNT_ID "Paste the Account ID:"
+  fi
+  set_var CLOUDFLARE_ACCOUNT_ID "$ACCOUNT_ID"
+else
+  SKIPPED+=("Automatic Rooms deploys: see README, Deploy")
+fi
+pause
+
+# ── 4. Vercel project ─────────────────────────────────────────────────────
 stage "Vercel: create the web app"
 say "The web app deploys from GitHub, so every push to main goes live."
 open_url "https://vercel.com/new"
@@ -270,7 +297,7 @@ WEB_URL="${WEB_URL%/}"
 write_env WEB_URL "$WEB_URL"
 pause
 
-# ── 4. Smoke test ─────────────────────────────────────────────────────────
+# ── 5. Smoke test ─────────────────────────────────────────────────────────
 stage "Try it live"
 open_url "$WEB_URL/online"
 step "Click Create Room and enter a nickname."
@@ -287,5 +314,5 @@ pause
 finish
 note "Web app:      $WEB_URL"
 note "Rooms server: wss://$ROOMS_HOST"
-note "Redeploy the Rooms server after changes with: pnpm deploy:rooms"
+note "Every push to main that changes it redeploys the Rooms server; by hand: pnpm deploy:rooms"
 printf '\n'

@@ -1,22 +1,23 @@
-import type { KeySetChoice } from "@typerace/game";
+import type { TextChoice } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { leaderboardHref } from "@/lib/leaderboard";
 
-/** How sending a finished Time Trial to the Leaderboard went. */
+/** How sending a finished Hot Seat Match to the Leaderboard went. */
 export type LeaderboardStatus = "saving" | "saved" | "failed";
 
-/** Under Time Trial results: whether the best Times made it, and a link. */
+/**
+ * Under Hot Seat results: whether the best Times made it, and a link to
+ * the board of the text they were typed on.
+ */
 export function LeaderboardNote({
   status,
-  keySet,
-  capitals,
+  text,
 }: {
   /** Null when there was nothing to save. */
   status: LeaderboardStatus | null;
-  keySet: KeySetChoice;
-  capitals: boolean;
+  text: TextChoice;
 }) {
   const t = useTranslations("Leaderboard");
 
@@ -33,7 +34,7 @@ export function LeaderboardNote({
         </p>
       )}
       <Link
-        href={leaderboardHref(keySet, capitals)}
+        href={leaderboardHref(text)}
         className={buttonVariants({ variant: "link" })}
       >
         {t("view")}

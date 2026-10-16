@@ -3,12 +3,12 @@ import {
   backToLobby,
   castVote,
   createRoom,
-  generateGibberish,
+  generateText,
   getVoteCounts,
   joinRoom,
   leaveRoom,
-  roomKeySet,
   roomLeaderboardRecords,
+  roomTextSource,
   setDisplay,
   startCountdown,
   TEXT_LENGTH_CHARACTERS,
@@ -87,9 +87,8 @@ export class Rooms extends Server<Env> {
       case "start": {
         const { textLength } = this.room.settings;
         const seed = Math.floor(Math.random() * 2 ** 31);
-        const text = generateGibberish({
+        const text = generateText(roomTextSource(this.room), {
           seed,
-          keySet: roomKeySet(this.room),
           minLength: TEXT_LENGTH_CHARACTERS[textLength],
         });
         this.setRoom(
@@ -181,12 +180,12 @@ export class Rooms extends Server<Env> {
     }
   }
 
-  /** A finished Time Trial's best Times go on the Leaderboard. */
+  /** A finished Hot Seat Match's best Times go on the Leaderboard. */
   private recordOnLeaderboard() {
     const finished = roomLeaderboardRecords(this.room);
     if (finished && finished.records.length > 0) {
       this.ctx.waitUntil(
-        leaderboardOf(this.env).record(finished.keySet, finished.records),
+        leaderboardOf(this.env).record(finished.textSource, finished.records),
       );
     }
   }

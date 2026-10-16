@@ -1,6 +1,6 @@
 import type { TypingStats } from "./typing";
 
-export interface TimeTrialPlayer {
+export interface HotSeatPlayer {
   readonly name: string;
   /** What is left of this Player's Time Bank. */
   readonly timeBankMs: number;
@@ -21,24 +21,24 @@ interface TurnTotals {
   readonly typos: number;
 }
 
-export interface TimeTrial {
-  readonly players: readonly TimeTrialPlayer[];
-  /** Nickname of the Player whose Turn it is; null once the Time Trial is over. */
+export interface HotSeat {
+  readonly players: readonly HotSeatPlayer[];
+  /** Nickname of the Player whose Turn it is; null once the Hot Seat Match is over. */
   readonly currentPlayer: string | null;
-  /** The last Player left; null while the Time Trial is running. */
+  /** The last Player left; null while the Hot Seat Match is running. */
   readonly winner: string | null;
   readonly turnsTaken: number;
   /** Nicknames in the order they were eliminated. */
   readonly eliminated: readonly string[];
 }
 
-export interface TimeTrialOptions {
+export interface HotSeatOptions {
   /** Nicknames in Turn order for the opening round. */
   players: readonly string[];
   timeBankMs: number;
 }
 
-export interface TimeTrialResult {
+export interface HotSeatResult {
   name: string;
   bestTimeMs: number | null;
   turns: number;
@@ -51,10 +51,7 @@ export interface TimeTrialResult {
 const CHARACTERS_PER_WORD = 5;
 const MS_PER_MINUTE = 60_000;
 
-export function startTimeTrial({
-  players,
-  timeBankMs,
-}: TimeTrialOptions): TimeTrial {
+export function startHotSeat({ players, timeBankMs }: HotSeatOptions): HotSeat {
   return {
     players: players.map((name) => ({
       name,
@@ -73,36 +70,36 @@ export function startTimeTrial({
 }
 
 /** The current Player typed their whole text. */
-export function completeTurn(trial: TimeTrial, stats: TypingStats): TimeTrial {
-  const current = currentPlayerOf(trial);
+export function completeTurn(seat: HotSeat, stats: TypingStats): HotSeat {
+  const current = currentPlayerOf(seat);
   if (!current) {
-    return trial;
+    return seat;
   }
   if (stats.timeMs >= current.timeBankMs) {
-    return runOutOfTime(trial, stats);
+    return runOutOfTime(seat, stats);
   }
 
   const isNewBest =
     current.bestTimeMs === null || stats.timeMs < current.bestTimeMs;
 
-  return afterTurn(trial, {
+  return afterTurn(seat, {
     ...recordTurn(current, stats),
     timeBankMs: current.timeBankMs - stats.timeMs,
     ...(isNewBest && {
       bestTimeMs: stats.timeMs,
-      bestSetOnTurn: trial.turnsTaken,
+      bestSetOnTurn: seat.turnsTaken,
     }),
   });
 }
 
 /** The current Player's Time Bank hit zero before they finished their text. */
-export function runOutOfTime(trial: TimeTrial, stats: TypingStats): TimeTrial {
-  const current = currentPlayerOf(trial);
+export function runOutOfTime(seat: HotSeat, stats: TypingStats): HotSeat {
+  const current = currentPlayerOf(seat);
   if (!current) {
-    return trial;
+    return seat;
   }
 
-  return afterTurn(trial, {
+  return afterTurn(seat, {
     ...recordTurn(current, stats),
     timeBankMs: 0,
     eliminated: true,
@@ -110,22 +107,22 @@ export function runOutOfTime(trial: TimeTrial, stats: TypingStats): TimeTrial {
 }
 
 /** Takes a Player out without a Turn, e.g. because they left. */
-export function eliminatePlayer(trial: TimeTrial, name: string): TimeTrial {
-  const player = trial.players.find((p) => p.name === name);
-  if (!player || player.eliminated || trial.winner !== null) {
-    return trial;
+export function eliminatePlayer(seat: HotSeat, name: string): HotSeat {
+  const player = seat.players.find((p) => p.name === name);
+  if (!player || player.eliminated || seat.winner !== null) {
+    return seat;
   }
 
-  return settle(trial, { ...player, timeBankMs: 0, eliminated: true }, false);
+  return settle(seat, { ...player, timeBankMs: 0, eliminated: true }, false);
 }
 
 /** Ranking: the winner first, then everyone else in reverse order of elimination. */
-export function getTimeTrialResults(trial: TimeTrial): TimeTrialResult[] {
+export function getHotSeatResults(seat: HotSeat): HotSeatResult[] {
   const ranked = [
-    ...trial.players.filter((player) => !player.eliminated),
-    ...[...trial.eliminated]
+    ...seat.players.filter((player) => !player.eliminated),
+    ...[...seat.eliminated]
       .reverse()
-      .map((name) => trial.players.find((player) => player.name === name)!),
+      .map((name) => seat.players.find((player) => player.name === name)!),
   ];
 
   return ranked.map(({ name, bestTimeMs, turns, totals }) => ({
@@ -145,14 +142,11 @@ export function getTimeTrialResults(trial: TimeTrial): TimeTrialResult[] {
   }));
 }
 
-function currentPlayerOf(trial: TimeTrial): TimeTrialPlayer | undefined {
-  return trial.players.find((player) => player.name === trial.currentPlayer);
+function currentPlayerOf(seat: HotSeat): HotSeatPlayer | undefined {
+  return seat.players.find((player) => player.name === seat.currentPlayer);
 }
 
-function recordTurn(
-  player: TimeTrialPlayer,
-  stats: TypingStats,
-): TimeTrialPlayer {
+function recordTurn(player: HotSeatPlayer, stats: TypingStats): HotSeatPlayer {
   return {
     ...player,
     turns: player.turns + 1,
@@ -165,22 +159,22 @@ function recordTurn(
   };
 }
 
-function afterTurn(trial: TimeTrial, updated: TimeTrialPlayer): TimeTrial {
-  return settle(trial, updated, true);
+function afterTurn(seat: HotSeat, updated: HotSeatPlayer): HotSeat {
+  return settle(seat, updated, true);
 }
 
 /** Applies a changed Player and decides who goes next, or who won. */
 function settle(
-  trial: TimeTrial,
-  updated: TimeTrialPlayer,
+  seat: HotSeat,
+  updated: HotSeatPlayer,
   tookTurn: boolean,
-): TimeTrial {
-  const players = trial.players.map((player) =>
+): HotSeat {
+  const players = seat.players.map((player) =>
     player.name === updated.name ? updated : player,
   );
   const eliminated = updated.eliminated
-    ? [...trial.eliminated, updated.name]
-    : trial.eliminated;
+    ? [...seat.eliminated, updated.name]
+    : seat.eliminated;
   const remaining = players.filter((player) => !player.eliminated);
   const winner = remaining.length === 1 ? remaining[0]!.name : null;
 
@@ -188,12 +182,12 @@ function settle(
     players,
     eliminated,
     winner,
-    turnsTaken: trial.turnsTaken + (tookTurn ? 1 : 0),
+    turnsTaken: seat.turnsTaken + (tookTurn ? 1 : 0),
     currentPlayer: winner === null ? nextPlayer(remaining) : null,
   };
 }
 
-function nextPlayer(remaining: readonly TimeTrialPlayer[]): string | null {
+function nextPlayer(remaining: readonly HotSeatPlayer[]): string | null {
   const waitingForOpeningTurn = remaining.find(
     (player) => player.bestTimeMs === null,
   );
@@ -204,10 +198,8 @@ function nextPlayer(remaining: readonly TimeTrialPlayer[]): string | null {
   return slowest(remaining)?.name ?? null;
 }
 
-function slowest(
-  players: readonly TimeTrialPlayer[],
-): TimeTrialPlayer | undefined {
-  return players.reduce<TimeTrialPlayer | undefined>((slowestSoFar, player) => {
+function slowest(players: readonly HotSeatPlayer[]): HotSeatPlayer | undefined {
+  return players.reduce<HotSeatPlayer | undefined>((slowestSoFar, player) => {
     if (!slowestSoFar) {
       return player;
     }

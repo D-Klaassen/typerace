@@ -102,12 +102,12 @@ describe("Room", () => {
     let room = roomWith("Anna", "Bob", "Cas");
     room = castVote(room, "p2", { mode: "crazyDarts" });
     room = castVote(room, "p2", { keySet: "row-top" });
-    room = castVote(room, "p3", { mode: "timeTrial" });
+    room = castVote(room, "p3", { mode: "hotSeat" });
     room = castVote(room, "p3", { mode: "crazyDarts" }); // changed their mind
     room = castVote(room, "p1", { mode: "classicRace" }); // the Host can't vote
 
     expect(getVoteCounts(room)).toEqual({
-      mode: { classicRace: 0, crazyDarts: 2, timeTrial: 0 },
+      mode: { classicRace: 0, crazyDarts: 2, hotSeat: 0 },
       keySet: { "row-top": 1 },
     });
   });
@@ -115,16 +115,16 @@ describe("Room", () => {
   it("drops the Votes of Players who left or became Host", () => {
     let room = roomWith("Anna", "Bob", "Cas");
     room = castVote(room, "p2", { mode: "crazyDarts" });
-    room = castVote(room, "p3", { mode: "timeTrial" });
+    room = castVote(room, "p3", { mode: "hotSeat" });
 
     room = leaveRoom(room, "p1"); // Bob becomes Host
     expect(getVoteCounts(room).mode).toEqual({
       classicRace: 0,
       crazyDarts: 0,
-      timeTrial: 1,
+      hotSeat: 1,
     });
 
     room = leaveRoom(room, "p3");
-    expect(getVoteCounts(room).mode.timeTrial).toBe(0);
+    expect(getVoteCounts(room).mode.hotSeat).toBe(0);
   });
 });

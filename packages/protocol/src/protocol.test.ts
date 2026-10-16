@@ -54,6 +54,20 @@ describe("parseClientMessage", () => {
     }
   });
 
+  it("accepts a Text Source and Language, and rejects unknown ones", () => {
+    const message = {
+      type: "updateSettings",
+      changes: { textSource: "sentences", language: "nl" },
+    };
+    expect(parseClientMessage(JSON.stringify(message))).toEqual(message);
+
+    for (const changes of [{ textSource: "poems" }, { language: "de" }]) {
+      expect(
+        parseClientMessage(JSON.stringify({ type: "updateSettings", changes })),
+      ).toBeNull();
+    }
+  });
+
   it("rejects unknown Key Set presets", () => {
     for (const message of [
       { type: "updateSettings", changes: { keySet: { preset: "lesson-999" } } },

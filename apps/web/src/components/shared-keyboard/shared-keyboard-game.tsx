@@ -3,55 +3,60 @@
 import {
   completeTurn,
   finishRaceTurn,
-  generateGibberish,
-  resolveKeySet,
+  generateText,
+  resolveTextSource,
   getClassicRaceResults,
-  getTimeTrialResults,
+  getHotSeatResults,
   runOutOfTime,
   startClassicRace,
-  startTimeTrial,
-  timeTrialRecords,
+  startHotSeat,
+  TEXT_LENGTH_CHARACTERS,
+  HOT_SEAT_TURN_LENGTH,
+  hotSeatRecords,
+  soloRaceRecords,
   type ClassicRace,
-  type TimeTrial,
+  type LeaderboardRecord,
+  type HotSeat,
   type TypingStats,
 } from "@typerace/game";
-import { useLayoutEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import {
   LeaderboardNote,
   type LeaderboardStatus,
 } from "@/components/leaderboard/leaderboard-note";
+import { BackToMenu, MenuBar } from "@/components/navigation/menu-bar";
+import { QuitButton } from "@/components/navigation/quit-button";
 import { submitToLeaderboard } from "@/lib/leaderboard";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 import { HandoverScreen } from "./handover-screen";
 import { RaceStandings } from "./race-standings";
 import { ResultsScreen } from "./results-screen";
-import {
-  DEFAULT_SETTINGS,
-  TEXT_LENGTHS,
-  TIME_TRIAL_TURN_LENGTH,
-  type SharedKeyboardSettings,
-} from "./settings";
+import { DEFAULT_SETTINGS, type SharedKeyboardSettings } from "./settings";
 import { SetupForm } from "./setup-form";
-import { TimeTrialStandings } from "./time-trial-standings";
+import { HotSeatStandings } from "./hot-seat-standings";
 import { TurnScreen } from "./turn-screen";
 
 type Match =
-  | { mode: "timeTrial"; trial: TimeTrial }
+  | { mode: "hotSeat"; seat: HotSeat }
   | { mode: "classicRace"; race: ClassicRace };
 
 type Game =
   | { phase: "setup" }
   | { phase: "handover" | "turn" | "results"; match: Match; seed: number };
 
-/** Classic Race or Time Trial, played by passing one keyboard around. */
+/** Classic Race or Hot Seat, played by passing one keyboard around, or a Classic Race alone. */
 export function SharedKeyboardGame() {
+  const t = useTranslations("SharedKeyboard.Quit");
+  const router = useRouter();
   const [settings, setSettings] =
     useState<SharedKeyboardSettings>(DEFAULT_SETTINGS);
   const [game, setGame] = useState<Game>({ phase: "setup" });
-  /** Which finished Time Trial was sent to the Leaderboard, and how it went. */
+  /** Which finished Match was sent to the Leaderboard, and how it went. */
   const [saved, setSaved] = useState<{
-    trial: TimeTrial;
+    match: Match;
     status: LeaderboardStatus;
   } | null>(null);
 
@@ -59,19 +64,29 @@ export function SharedKeyboardGame() {
   // quits the game, so coming back starts at setup with the same settings.
   useLayoutEffect(() => () => setGame({ phase: "setup" }), []);
 
-  function saveToLeaderboard(trial: TimeTrial) {
-    const records = timeTrialRecords(trial);
+  /** A Hot Seat Match's best Times, or a solo Classic Race of a Turn's length. */
+  function leaderboardRecords(match: Match): LeaderboardRecord[] {
+    return match.mode === "hotSeat"
+      ? hotSeatRecords(match.seat)
+      : soloRaceRecords(
+          match.race,
+          TEXT_LENGTH_CHARACTERS[settings.textLength],
+        );
+  }
+
+  function saveToLeaderboard(match: Match) {
+    const records = leaderboardRecords(match);
     if (ROOMS_HOST === null || records.length === 0) {
       return;
     }
 
-    setSaved({ trial, status: "saving" });
+    setSaved({ match, status: "saving" });
     submitToLeaderboard(ROOMS_HOST, {
-      keySet: resolveKeySet(settings.keySet, settings.capitals),
+      textSource: resolveTextSource(settings),
       records,
     }).then(
-      () => setSaved({ trial, status: "saved" }),
-      () => setSaved({ trial, status: "failed" }),
+      () => setSaved({ match, status: "saved" }),
+      () => setSaved({ match, status: "failed" }),
     );
   }
 
@@ -81,10 +96,10 @@ export function SharedKeyboardGame() {
     setGame({
       phase: "handover",
       match:
-        chosen.mode === "timeTrial"
+        chosen.mode === "hotSeat"
           ? {
-              mode: "timeTrial",
-              trial: startTimeTrial({ players, timeBankMs: chosen.timeBankMs }),
+              mode: "hotSeat",
+              seat: startHotSeat({ players, timeBankMs: chosen.timeBankMs }),
             }
           : { mode: "classicRace", race: startClassicRace({ players }) },
       seed: Math.floor(Math.random() * 2 ** 31),
@@ -92,7 +107,14 @@ export function SharedKeyboardGame() {
   }
 
   if (game.phase === "setup") {
-    return <SetupForm initial={settings} onStart={start} />;
+    return (
+      <>
+        <MenuBar>
+          <BackToMenu />
+        </MenuBar>
+        <SetupForm initial={settings} onStart={start} />
+      </>
+    );
   }
 
   const { match, seed } = game;
@@ -102,19 +124,21 @@ export function SharedKeyboardGame() {
       match: next,
       seed,
     });
-    if (next.mode === "timeTrial" && isOver(next)) {
-      saveToLeaderboard(next.trial);
+    if (isOver(next)) {
+      saveToLeaderboard(next);
     }
   };
 
+  let screen: ReactNode;
   switch (game.phase) {
     case "handover":
-      return (
+      screen = (
         <HandoverScreen
           player={currentPlayer(match)}
+          solo={settings.players.length === 1}
           standings={
-            match.mode === "timeTrial" ? (
-              <TimeTrialStandings trial={match.trial} />
+            match.mode === "hotSeat" ? (
+              <HotSeatStandings seat={match.seat} />
             ) : (
               <RaceStandings race={match.race} />
             )
@@ -122,25 +146,25 @@ export function SharedKeyboardGame() {
           onReady={() => setGame({ ...game, phase: "turn" })}
         />
       );
+      break;
 
     case "turn": {
       const player = currentPlayer(match);
       const turnNumber = turnsTaken(match);
-      // Every Turn gets fresh Gibberish of the same length and Key Set.
-      const text = generateGibberish({
+      // Every Turn gets fresh text of the same length and Text Source.
+      const text = generateText(resolveTextSource(settings), {
         seed: seed + turnNumber,
-        keySet: resolveKeySet(settings.keySet, settings.capitals),
         minLength:
-          match.mode === "timeTrial"
-            ? TIME_TRIAL_TURN_LENGTH
-            : TEXT_LENGTHS[settings.textLength],
+          match.mode === "hotSeat"
+            ? HOT_SEAT_TURN_LENGTH
+            : TEXT_LENGTH_CHARACTERS[settings.textLength],
       });
       const display =
         settings.players.find((p) => p.name === player)?.display ??
         DEFAULT_DISPLAY;
 
       if (match.mode === "classicRace") {
-        return (
+        screen = (
           <TurnScreen
             key={turnNumber}
             player={player}
@@ -155,79 +179,108 @@ export function SharedKeyboardGame() {
             }
           />
         );
+        break;
       }
 
-      const { trial } = match;
-      const endTrialTurn =
-        (end: (trial: TimeTrial, stats: TypingStats) => TimeTrial) =>
+      const { seat } = match;
+      const endHotSeatTurn =
+        (end: (seat: HotSeat, stats: TypingStats) => HotSeat) =>
         (stats: TypingStats) =>
-          endTurn({ mode: "timeTrial", trial: end(trial, stats) });
+          endTurn({ mode: "hotSeat", seat: end(seat, stats) });
 
-      return (
+      screen = (
         <TurnScreen
           key={turnNumber}
           player={player}
           text={text}
           timeBankMs={
-            trial.players.find((p) => p.name === player)?.timeBankMs ?? 0
+            seat.players.find((p) => p.name === player)?.timeBankMs ?? 0
           }
           display={display}
-          onComplete={endTrialTurn(completeTurn)}
-          onRunOutOfTime={endTrialTurn(runOutOfTime)}
+          onComplete={endHotSeatTurn(completeTurn)}
+          onRunOutOfTime={endHotSeatTurn(runOutOfTime)}
         />
       );
+      break;
     }
 
     case "results":
-      return match.mode === "timeTrial" ? (
-        <ResultsScreen
-          results={getTimeTrialResults(match.trial)}
-          columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
-          aidsOf={(name) =>
-            settings.players.find((player) => player.name === name)?.display
-          }
-          leaderboard={
-            ROOMS_HOST !== null && (
-              <LeaderboardNote
-                status={saved?.trial === match.trial ? saved.status : null}
-                keySet={settings.keySet}
-                capitals={settings.capitals}
-              />
-            )
-          }
-          onPlayAgain={() => start(settings)}
-          onBackToSetup={() => setGame({ phase: "setup" })}
-        />
-      ) : (
-        <ResultsScreen
-          results={getClassicRaceResults(match.race)}
-          columns={["time", "wpm", "accuracy", "typos"]}
-          aidsOf={(name) =>
-            settings.players.find((player) => player.name === name)?.display
-          }
-          onPlayAgain={() => start(settings)}
-          onBackToSetup={() => setGame({ phase: "setup" })}
-        />
-      );
+      screen =
+        match.mode === "hotSeat" ? (
+          <ResultsScreen
+            results={getHotSeatResults(match.seat)}
+            columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
+            aidsOf={(name) =>
+              settings.players.find((player) => player.name === name)?.display
+            }
+            leaderboard={
+              ROOMS_HOST !== null && (
+                <LeaderboardNote
+                  status={saved?.match === match ? saved.status : null}
+                  text={settings}
+                />
+              )
+            }
+            onPlayAgain={() => start(settings)}
+            onBackToSetup={() => setGame({ phase: "setup" })}
+          />
+        ) : (
+          <ResultsScreen
+            results={getClassicRaceResults(match.race)}
+            columns={["time", "wpm", "accuracy", "typos"]}
+            aidsOf={(name) =>
+              settings.players.find((player) => player.name === name)?.display
+            }
+            leaderboard={
+              ROOMS_HOST !== null &&
+              leaderboardRecords(match).length > 0 && (
+                <LeaderboardNote
+                  status={saved?.match === match ? saved.status : null}
+                  text={settings}
+                />
+              )
+            }
+            onPlayAgain={() => start(settings)}
+            onBackToSetup={() => setGame({ phase: "setup" })}
+          />
+        );
   }
+
+  return (
+    <>
+      <MenuBar>
+        {game.phase === "results" ? (
+          <BackToMenu />
+        ) : (
+          // Nothing is saved from an unfinished game, so ask first.
+          <QuitButton
+            label={t("quit")}
+            confirmation={{ title: t("title"), description: t("description") }}
+            onQuit={() => router.push("/")}
+          />
+        )}
+      </MenuBar>
+      {screen}
+    </>
+  );
 }
 
 function currentPlayer(match: Match): string {
   return (
-    (match.mode === "timeTrial"
-      ? match.trial.currentPlayer
+    (match.mode === "hotSeat"
+      ? match.seat.currentPlayer
       : match.race.currentPlayer) ?? ""
   );
 }
 
 function turnsTaken(match: Match): number {
-  return match.mode === "timeTrial"
-    ? match.trial.turnsTaken
+  return match.mode === "hotSeat"
+    ? match.seat.turnsTaken
     : match.race.turns.length;
 }
 
 function isOver(match: Match): boolean {
-  return match.mode === "timeTrial"
-    ? match.trial.winner !== null
+  return match.mode === "hotSeat"
+    ? match.seat.winner !== null
     : match.race.finished;
 }

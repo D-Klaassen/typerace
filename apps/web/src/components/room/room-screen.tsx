@@ -5,7 +5,9 @@ import { isRoomCode } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { BackToMenu, MenuBar } from "@/components/navigation/menu-bar";
+import { QuitButton } from "@/components/navigation/quit-button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +20,7 @@ import {
   Spectating,
 } from "./match-screens";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
-import { OnlineTimeTrial } from "./time-trial-screens";
+import { OnlineHotSeat } from "./hot-seat-screens";
 import { useDisplayPreferences } from "@/components/finger-guide/use-display-preferences";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 import { useRoom } from "./use-room";
@@ -28,7 +30,14 @@ export function RoomScreen() {
   const t = useTranslations("Room");
 
   if (ROOMS_HOST === null) {
-    return <p role="alert">{t("notConfigured")}</p>;
+    return (
+      <>
+        <MenuBar>
+          <BackToMenu />
+        </MenuBar>
+        <p role="alert">{t("notConfigured")}</p>
+      </>
+    );
   }
   if (!isRoomCode(code)) {
     return <RoomNotFound />;
@@ -38,6 +47,7 @@ export function RoomScreen() {
 }
 
 function ValidRoom({ host, code }: { host: string; code: string }) {
+  const t = useTranslations("Room.Leave");
   const searchParams = useSearchParams();
   const router = useRouter();
   const intent = searchParams.has("create") ? "create" : "join";
@@ -56,93 +66,129 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
     return <RoomNotFound />;
   }
   if (!room.state) {
-    return <NicknameForm code={code} error={room.error} onJoin={room.join} />;
+    return (
+      <>
+        <MenuBar>
+          <BackToMenu />
+        </MenuBar>
+        <NicknameForm code={code} error={room.error} onJoin={room.join} />
+      </>
+    );
   }
 
-  const { room: view, you } = room.state;
+  const state = room.state;
+  const { room: view, you } = state;
   const me = view.players.find((player) => player.id === you);
   const isHost = view.hostId === you;
+  // Leaving a running Match costs the Player it, so they confirm first.
+  const inMatch =
+    (view.phase === "countdown" || view.phase === "racing") && !me?.spectator;
 
-  if (view.phase === "lobby") {
-    return (
-      <Lobby
-        code={code}
-        state={room.state}
-        onUpdateSettings={room.updateSettings}
-        onVote={room.vote}
-        onStart={room.start}
-        display={display}
-        onDisplayChange={setDisplay}
-      />
-    );
-  }
-  if (view.phase === "results") {
-    return (
-      <OnlineResults
-        room={view}
-        isHost={isHost}
-        nicknames={room.nicknames}
-        displays={view.matchDisplays}
-        onBackToLobby={room.backToLobby}
-      />
-    );
-  }
-  if (me?.spectator) {
-    return (
-      <Spectating
-        room={view}
-        you={you}
-        nicknames={room.nicknames}
-        clockOffsetMs={room.clockOffsetMs}
-      />
-    );
-  }
-  if (view.phase === "countdown" && view.countdownEndsAtMs !== null) {
-    return (
-      <Countdown
-        endsAtMs={view.countdownEndsAtMs}
-        clockOffsetMs={room.clockOffsetMs}
-      />
-    );
-  }
-  if (view.phase === "racing" && view.darts) {
-    return (
-      <CrazyDartsMatch
-        darts={view.darts}
-        startingHp={view.settings.startingHp}
-        you={you}
-        nicknames={room.nicknames}
-        clockOffsetMs={room.clockOffsetMs}
-        display={display}
-        onKey={room.key}
-      />
-    );
-  }
-  if (view.phase === "racing" && view.timeTrial) {
-    return (
-      <OnlineTimeTrial
-        timeTrial={view.timeTrial}
-        you={you}
-        nicknames={room.nicknames}
-        clockOffsetMs={room.clockOffsetMs}
-        display={display}
-        onKey={room.key}
-      />
-    );
-  }
-  if (view.phase === "racing" && view.race) {
-    return (
-      <RaceTyping
-        race={view.race}
-        you={you}
-        nicknames={room.nicknames}
-        display={display}
-        onKey={room.key}
-      />
-    );
-  }
+  const screen = (): ReactNode => {
+    if (view.phase === "lobby") {
+      return (
+        <Lobby
+          code={code}
+          state={state}
+          onUpdateSettings={room.updateSettings}
+          onVote={room.vote}
+          onStart={room.start}
+          display={display}
+          onDisplayChange={setDisplay}
+        />
+      );
+    }
+    if (view.phase === "results") {
+      return (
+        <OnlineResults
+          room={view}
+          isHost={isHost}
+          nicknames={room.nicknames}
+          displays={view.matchDisplays}
+          onBackToLobby={room.backToLobby}
+        />
+      );
+    }
+    if (me?.spectator) {
+      return (
+        <Spectating
+          room={view}
+          you={you}
+          nicknames={room.nicknames}
+          clockOffsetMs={room.clockOffsetMs}
+        />
+      );
+    }
+    if (view.phase === "countdown" && view.countdownEndsAtMs !== null) {
+      return (
+        <Countdown
+          endsAtMs={view.countdownEndsAtMs}
+          clockOffsetMs={room.clockOffsetMs}
+        />
+      );
+    }
+    if (view.phase === "racing" && view.darts) {
+      return (
+        <CrazyDartsMatch
+          darts={view.darts}
+          startingHp={view.settings.startingHp}
+          you={you}
+          nicknames={room.nicknames}
+          clockOffsetMs={room.clockOffsetMs}
+          display={display}
+          onKey={room.key}
+        />
+      );
+    }
+    if (view.phase === "racing" && view.hotSeat) {
+      return (
+        <OnlineHotSeat
+          hotSeat={view.hotSeat}
+          you={you}
+          nicknames={room.nicknames}
+          clockOffsetMs={room.clockOffsetMs}
+          display={display}
+          onKey={room.key}
+        />
+      );
+    }
+    if (view.phase === "racing" && view.race) {
+      return (
+        <RaceTyping
+          race={view.race}
+          you={you}
+          nicknames={room.nicknames}
+          display={display}
+          onKey={room.key}
+        />
+      );
+    }
 
-  return null;
+    return null;
+  };
+
+  return (
+    <>
+      <MenuBar>
+        <QuitButton
+          label={t("leave")}
+          confirmation={
+            inMatch
+              ? {
+                  title: t("title"),
+                  description: t(`description.${view.settings.mode}`),
+                }
+              : undefined
+          }
+          onQuit={() => {
+            room.leave();
+            router.push("/");
+          }}
+        />
+      </MenuBar>
+      {screen()}
+    </>
+  );
 }
 
 function NicknameForm({
@@ -203,6 +249,9 @@ function RoomNotFound() {
 
   return (
     <div className="flex flex-col items-center gap-4 text-center">
+      <MenuBar>
+        <BackToMenu />
+      </MenuBar>
       <h1 className="text-2xl font-bold">{t("errors.roomNotFound")}</h1>
       <Link href="/online" className={buttonVariants({ variant: "outline" })}>
         {t("backToOnline")}

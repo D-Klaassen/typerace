@@ -74,7 +74,7 @@ function DartsTyping({
   display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
-  const text = crazyDartsText(darts.textSeed, darts.keySet);
+  const text = crazyDartsText(darts.textSeed, darts.textSource);
   const { session } = useTyping(text, () => {}, onKey);
 
   // Show a window of the long text around the next character.

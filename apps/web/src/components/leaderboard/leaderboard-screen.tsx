@@ -2,16 +2,16 @@
 
 import {
   leaderboardBoard,
-  resolveKeySet,
+  resolveTextSource,
   type LeaderboardEntry,
+  type TextChoice,
+  type TextSource,
 } from "@typerace/game";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import {
-  KeySetPicker,
-  type KeySetValue,
-} from "@/components/key-set/key-set-picker";
+import { useEffect, useMemo, useState } from "react";
+import { KeySetPicker } from "@/components/key-set/key-set-picker";
+import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import {
   Card,
   CardContent,
@@ -29,19 +29,30 @@ import {
 } from "@/components/ui/table";
 import {
   fetchLeaderboard,
-  keySetOfLeaderboardHref,
   leaderboardHref,
+  textChoiceOfLeaderboardHref,
 } from "@/lib/leaderboard";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 
-/** The fastest Time Trial Turns for a Key Set picked on the page. */
+/**
+ * The fastest Hot Seat Turns for the text picked on the page: a Key Set for
+ * Gibberish, or a Text Source and Language.
+ */
 export function LeaderboardScreen() {
   const t = useTranslations("Leaderboard");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState<KeySetValue>(() =>
-    keySetOfLeaderboardHref(searchParams),
+  const [value, setValue] = useState<TextChoice>(() =>
+    textChoiceOfLeaderboardHref(searchParams),
   );
+  const textSource = useMemo(() => resolveTextSource(value), [value]);
+
+  function choose(changes: Partial<TextChoice>) {
+    const next = { ...value, ...changes };
+    setValue(next);
+    // Keep the link shareable without adding to the history.
+    router.replace(leaderboardHref(next), { scroll: false });
+  }
 
   if (ROOMS_HOST === null) {
     return <p role="alert">{t("notConfigured")}</p>;
@@ -56,47 +67,30 @@ export function LeaderboardScreen() {
           </CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <KeySetPicker
-            value={value}
-            onChange={(next) => {
-              setValue(next);
-              // Keep the link shareable without adding to the history.
-              router.replace(leaderboardHref(next.keySet, next.capitals), {
-                scroll: false,
-              });
-            }}
-          />
+        <CardContent className="flex flex-col gap-6">
+          <TextSourcePicker value={value} onChange={choose} />
+          {value.textSource === "gibberish" && (
+            <KeySetPicker value={value} onChange={choose} />
+          )}
         </CardContent>
       </Card>
-      <Board
-        host={ROOMS_HOST}
-        {...resolveKeySet(value.keySet, value.capitals)}
-      />
+      <Board host={ROOMS_HOST} textSource={textSource} />
     </div>
   );
 }
 
 type Loaded = { board: string; entries: LeaderboardEntry[] | "failed" };
 
-function Board({
-  host,
-  keys,
-  capitals,
-}: {
-  host: string;
-  keys: string;
-  capitals: boolean;
-}) {
+function Board({ host, textSource }: { host: string; textSource: TextSource }) {
   const t = useTranslations("Leaderboard");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const board = leaderboardBoard({ keys, capitals });
+  const board = leaderboardBoard(textSource);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchLeaderboard(host, { keys, capitals }, controller.signal).then(
+    fetchLeaderboard(host, textSource, controller.signal).then(
       (entries) => setLoaded({ board, entries }),
       () => {
         if (!controller.signal.aborted) {
@@ -106,7 +100,7 @@ function Board({
     );
 
     return () => controller.abort();
-  }, [host, board, keys, capitals]);
+  }, [host, board, textSource]);
 
   // Until this board arrives, an older one would be misleading.
   const entries = loaded?.board === board ? loaded.entries : null;

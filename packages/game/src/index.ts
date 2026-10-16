@@ -1,5 +1,17 @@
 export { generateGibberish, type GibberishOptions } from "./gibberish";
 export {
+  generateText,
+  LANGUAGES,
+  REAL_TEXT_KINDS,
+  resolveTextSource,
+  TEXT_SOURCE_KINDS,
+  type Language,
+  type RealTextKind,
+  type TextChoice,
+  type TextSource,
+  type TextSourceKind,
+} from "./text-source";
+export {
   DEFAULT_KEY_SET_CHOICE,
   findPreset,
   KEY_SET_PRESETS,
@@ -24,14 +36,14 @@ export {
 export {
   completeTurn,
   eliminatePlayer,
-  getTimeTrialResults,
+  getHotSeatResults,
   runOutOfTime,
-  startTimeTrial,
-  type TimeTrial,
-  type TimeTrialOptions,
-  type TimeTrialPlayer,
-  type TimeTrialResult,
-} from "./time-trial";
+  startHotSeat,
+  type HotSeat,
+  type HotSeatOptions,
+  type HotSeatPlayer,
+  type HotSeatResult,
+} from "./hot-seat";
 export {
   MAX_NICKNAME_LENGTH,
   validateNicknames,
@@ -63,6 +75,7 @@ export {
   leaveRoom,
   MAX_ROOM_PLAYERS,
   roomKeySet,
+  roomTextSource,
   roomLeaderboardRecords,
   ONLINE_MODES,
   setDisplay,
@@ -95,14 +108,14 @@ export {
   type RaceEntry,
 } from "./online-race";
 export {
-  advanceTimeTrial,
+  advanceHotSeat,
   currentTimeBankMs,
-  dropFromTimeTrial,
-  startOnlineTimeTrial,
-  TIME_TRIAL_TURN_LENGTH,
-  typeInTimeTrial,
-  type OnlineTimeTrial,
-} from "./online-time-trial";
+  dropFromHotSeat,
+  startOnlineHotSeat,
+  HOT_SEAT_TURN_LENGTH,
+  typeInHotSeat,
+  type OnlineHotSeat,
+} from "./online-hot-seat";
 export {
   CRAZY_DARTS_TEXT_LENGTH,
   crazyDartsText,
@@ -119,7 +132,8 @@ export {
   addToLeaderboard,
   LEADERBOARD_SIZE,
   leaderboardBoard,
-  timeTrialRecords,
+  hotSeatRecords,
+  soloRaceRecords,
   type LeaderboardEntry,
   type LeaderboardRecord,
 } from "./leaderboard";

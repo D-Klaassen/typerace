@@ -24,7 +24,7 @@ import { AidsLabel } from "@/components/finger-guide/aids-label";
 import { LeaderboardNote } from "@/components/leaderboard/leaderboard-note";
 import { RaceProgress } from "./race-progress";
 import { CrazyDartsMatch } from "./crazy-darts-screens";
-import { OnlineTimeTrial } from "./time-trial-screens";
+import { OnlineHotSeat } from "./hot-seat-screens";
 
 type Race = NonNullable<RoomView["race"]>;
 
@@ -135,9 +135,9 @@ export function Spectating({
           clockOffsetMs={clockOffsetMs}
         />
       )}
-      {room.timeTrial && (
-        <OnlineTimeTrial
-          timeTrial={room.timeTrial}
+      {room.hotSeat && (
+        <OnlineHotSeat
+          hotSeat={room.hotSeat}
           you={you}
           nicknames={nicknames}
           clockOffsetMs={clockOffsetMs}
@@ -209,13 +209,9 @@ export function OnlineResults({
           ))}
         </TableBody>
       </Table>
-      {room.results?.mode === "timeTrial" && (
+      {room.results?.mode === "hotSeat" && (
         // The Room puts the best Times on the Leaderboard itself.
-        <LeaderboardNote
-          status="saved"
-          keySet={room.settings.keySet}
-          capitals={room.settings.capitals}
-        />
+        <LeaderboardNote status="saved" text={room.settings} />
       )}
       {isHost ? (
         <Button size="lg" onClick={onBackToLobby}>
@@ -253,7 +249,7 @@ function resultTable(
   const statHeaders = [t("wpm"), t("accuracy"), t("typos")];
 
   switch (results?.mode) {
-    case "timeTrial":
+    case "hotSeat":
       return {
         headers: [t("bestTime"), t("turns"), ...statHeaders],
         rows: results.ranking.map((result) => ({

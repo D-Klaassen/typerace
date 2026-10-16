@@ -8,6 +8,7 @@ import {
   type TypingStats,
 } from "@typerace/game";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { isDialogOpen } from "./dialog-open";
 
 /**
  * Feeds the window's keystrokes into a typing session for `text`.
@@ -23,7 +24,13 @@ export function useTyping(
   const sessionRef = useRef(session);
 
   const handleKeyDown = useEffectEvent((event: KeyboardEvent) => {
-    if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) {
+    if (
+      event.repeat ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      isDialogOpen()
+    ) {
       return;
     }
     if (event.key.length === 1) {

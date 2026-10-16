@@ -16,6 +16,7 @@ import {
   KeySetSummary,
 } from "@/components/key-set/key-set-picker";
 import { KeySetVote } from "@/components/key-set/key-set-vote";
+import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
 import type { DisplayPreferences } from "@/components/finger-guide/finger-guide";
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/card";
 import type { RoomState } from "./use-room";
 
-const MODES: Mode[] = ["classicRace", "crazyDarts", "timeTrial"];
+const MODES: Mode[] = ["classicRace", "crazyDarts", "hotSeat"];
 const TEXT_LENGTHS: TextLength[] = ["short", "medium", "long"];
 const TIME_BANK_MINUTES = [1, 2, 3, 5];
 const STARTING_HP = [50, 100, 150, 200];
@@ -215,7 +216,12 @@ function SettingsForm({
         value={settings.mode}
         onChange={(mode) => onChange({ mode })}
       />
-      {editable ? (
+      <TextSourcePicker
+        {...shared}
+        value={{ textSource: settings.textSource, language: settings.language }}
+        onChange={(value) => onChange(value)}
+      />
+      {settings.textSource !== "gibberish" ? null : editable ? (
         <KeySetPicker
           value={{ keySet: settings.keySet, capitals: settings.capitals }}
           presetBadges={voteCounts.keySet}
@@ -239,7 +245,7 @@ function SettingsForm({
           onChange={(textLength) => onChange({ textLength })}
         />
       )}
-      {settings.mode === "timeTrial" && (
+      {settings.mode === "hotSeat" && (
         <ChoiceGroup
           {...shared}
           legend={t("timeBank")}

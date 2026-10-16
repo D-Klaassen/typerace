@@ -4,6 +4,8 @@ test("every Shared Keyboard Player gets the same aids", async ({ page }) => {
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anna");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
   // One set of switches for everyone: only the Finger Guide on at first, and
   // the preview shows it straight away.

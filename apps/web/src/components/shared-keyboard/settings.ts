@@ -33,14 +33,14 @@ export interface SharedKeyboardSettings {
   timeBankMs: number;
 }
 
-/** A Classic Race can be played alone; Hot Seat needs `MIN_HOT_SEAT_PLAYERS`. */
+/** A Classic Race can be played alone; Hot Seat is offered from `MIN_HOT_SEAT_PLAYERS`. */
 export const MIN_PLAYERS = 1;
 export const MIN_HOT_SEAT_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
 
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
   mode: "classicRace",
-  players: [{ name: "" }, { name: "" }],
+  players: [{ name: "" }],
   display: DEFAULT_DISPLAY,
   textSource: "gibberish",
   language: "en",

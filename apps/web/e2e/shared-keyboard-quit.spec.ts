@@ -5,6 +5,8 @@ async function startTurn(page: Page) {
   await page.getByRole("link", { name: "Play on a Shared Keyboard" }).click();
 
   await page.getByPlaceholder("Player 1").fill("Anna");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
   await page.getByRole("button", { name: "Start" }).click();
 

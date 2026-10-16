@@ -48,6 +48,8 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anke");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bram");
   await page.getByText("Hot Seat", { exact: true }).click();
   await page.getByText("1", { exact: true }).click(); // 1-minute Time Bank

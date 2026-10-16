@@ -6,6 +6,8 @@ test("a Classic Race can use Dutch sentences instead of Gibberish", async ({
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anna");
+
+  await page.getByRole("button", { name: "Add player" }).click();
   await page.getByPlaceholder("Player 2").fill("Bob");
   await expect(page.getByTestId("key-set-sample")).toBeVisible();
 

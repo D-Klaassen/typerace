@@ -18,7 +18,11 @@ async function startTurn(page: Page) {
 
 async function expectSetup(page: Page) {
   await expect(page.getByRole("button", { name: "Start" })).toBeVisible();
-  await expect(page.locator("[data-typing-text]")).toHaveCount(0);
+  // The only text on screen is the aids preview's sample, not a Turn's.
+  await expect(page.locator("[data-typing-text]")).toHaveCount(1);
+  await expect(
+    page.getByTestId("display-preview").locator("[data-typing-text]"),
+  ).toBeVisible();
 }
 
 test("quitting a Shared Keyboard game and coming back starts at setup", async ({

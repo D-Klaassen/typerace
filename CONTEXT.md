@@ -138,6 +138,10 @@ _Avoid_: Hand helper
 An optional keyboard that highlights the next key, and the Shift key to hold with it.
 _Avoid_: Keyboard hint, virtual keyboard
 
+**Coloured Text**:
+An optional colouring of the text still to type, each character in the colour of the finger that types it.
+_Avoid_: Finger colours (every finger's own colour, used by all the aids), rainbow text
+
 **Display**:
-A Player's own choice of whether they see the On-screen Keyboard, the Finger Guide, the Racing Theme and the Leaderboard's Ghost while typing. Only the Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
+A Player's own choice of whether they see the On-screen Keyboard, the Finger Guide, Coloured Text, the Racing Theme and the Leaderboard's Ghost while typing. On a Shared Keyboard, one Display applies to every Player. Only the Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
 _Avoid_: Settings (those are the Host's)

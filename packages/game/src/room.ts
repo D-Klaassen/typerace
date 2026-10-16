@@ -100,10 +100,15 @@ export const DEFAULT_ROOM_SETTINGS: RoomSettings = {
 export interface Display {
   fingerGuide: boolean;
   keyboard: boolean;
+  coloredText: boolean;
 }
 
-/** Until a Player says otherwise: the Finger Guide on, the keyboard off. */
-export const DEFAULT_DISPLAY: Display = { fingerGuide: true, keyboard: false };
+/** Until a Player says otherwise: only the Finger Guide on. */
+export const DEFAULT_DISPLAY: Display = {
+  fingerGuide: true,
+  keyboard: false,
+  coloredText: false,
+};
 
 export interface RoomPlayer {
   /** Stable for one connection; a reconnect is a new Player. */

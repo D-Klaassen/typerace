@@ -48,10 +48,24 @@ describe("parseClientMessage", () => {
         changes: { keySet: { custom: "fjdk" }, capitals: true },
       },
       { type: "vote", vote: { keySet: "row-top" } },
-      { type: "display", display: { fingerGuide: false, keyboard: true } },
+      {
+        type: "display",
+        display: { fingerGuide: false, keyboard: true, coloredText: true },
+      },
     ]) {
       expect(parseClientMessage(JSON.stringify(message))).toEqual(message);
     }
+  });
+
+  it("reads a display without Coloured Text, from an older browser, as off", () => {
+    const message = {
+      type: "display",
+      display: { fingerGuide: true, keyboard: false },
+    };
+    expect(parseClientMessage(JSON.stringify(message))).toEqual({
+      type: "display",
+      display: { fingerGuide: true, keyboard: false, coloredText: false },
+    });
   });
 
   it("accepts a Text Source and Language, and rejects unknown ones", () => {

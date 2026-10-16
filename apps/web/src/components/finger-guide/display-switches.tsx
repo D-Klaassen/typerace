@@ -1,39 +1,47 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { DisplayPreferences } from "./finger-guide";
 
-/** The Display switches; `forName` labels them per Player on a Shared Keyboard. */
+const SWITCHES = [
+  "keyboard",
+  "fingerGuide",
+  "coloredText",
+  "racingTheme",
+] as const;
+
+/** A switch per Display choice, each with a line saying what it changes. */
 export function DisplaySwitches({
   display,
   onChange,
-  forName,
 }: {
   display: DisplayPreferences;
   onChange: (next: DisplayPreferences) => void;
-  forName?: string;
 }) {
   const t = useTranslations("Display");
-  const label = (key: keyof DisplayPreferences) =>
-    forName ? t(`${key}For`, { name: forName }) : t(key);
+  const id = useId();
 
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-2">
-      {(["keyboard", "fingerGuide", "racingTheme"] as const).map((key) => (
-        <Label
-          key={key}
-          className="gap-2 text-sm font-normal whitespace-nowrap"
-        >
+    <div className="flex flex-col gap-3">
+      {SWITCHES.map((key) => (
+        <Label key={key} className="items-start gap-2 text-sm font-normal">
           <Checkbox
             checked={display[key]}
             onCheckedChange={(checked) =>
               onChange({ ...display, [key]: checked })
             }
-            aria-label={label(key)}
+            aria-label={t(key)}
+            aria-describedby={`${id}-${key}`}
           />
-          {t(key)}
+          <span className="flex flex-col gap-0.5">
+            <span className="font-medium">{t(key)}</span>
+            <span id={`${id}-${key}`} className="text-muted-foreground">
+              {t(`${key}Description`)}
+            </span>
+          </span>
         </Label>
       ))}
     </div>

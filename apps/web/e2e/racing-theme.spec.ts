@@ -17,9 +17,7 @@ test("a Shared Keyboard Player races a car round the circuit, and crashes on thr
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByRole("button", { name: "Remove Player 2" }).click();
   // Off by default; Anna switches it on, and the preview shows the circuit.
-  const racingTheme = page.getByRole("checkbox", {
-    name: "Racing Theme for Anna",
-  });
+  const racingTheme = page.getByRole("checkbox", { name: "Racing Theme" });
   await expect(racingTheme).not.toBeChecked();
   await racingTheme.click();
   await expect(

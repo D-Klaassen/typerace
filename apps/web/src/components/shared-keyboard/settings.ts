@@ -14,13 +14,13 @@ export type SharedKeyboardMode = "classicRace" | "hotSeat";
 
 export interface SharedKeyboardPlayer {
   name: string;
-  /** What this Player sees during their Turns. */
-  display: DisplayPreferences;
 }
 
 export interface SharedKeyboardSettings {
   mode: SharedKeyboardMode;
   players: SharedKeyboardPlayer[];
+  /** What every Player sees during their Turns. */
+  display: DisplayPreferences;
   textSource: TextSourceKind;
   /** Words and Sentences only. */
   language: Language;
@@ -40,10 +40,8 @@ export const MAX_PLAYERS = 6;
 
 export const DEFAULT_SETTINGS: SharedKeyboardSettings = {
   mode: "classicRace",
-  players: [
-    { name: "", display: DEFAULT_DISPLAY },
-    { name: "", display: DEFAULT_DISPLAY },
-  ],
+  players: [{ name: "" }, { name: "" }],
+  display: DEFAULT_DISPLAY,
   textSource: "gibberish",
   language: "en",
   keySet: DEFAULT_KEY_SET_CHOICE,

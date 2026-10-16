@@ -74,10 +74,10 @@ export function useRoom(
     }
   });
 
-  const { fingerGuide, keyboard } = display;
+  const { fingerGuide, keyboard, coloredText } = display;
   useEffect(() => {
-    syncDisplay({ fingerGuide, keyboard });
-  }, [fingerGuide, keyboard]);
+    syncDisplay({ fingerGuide, keyboard, coloredText });
+  }, [fingerGuide, keyboard, coloredText]);
 
   return {
     state,

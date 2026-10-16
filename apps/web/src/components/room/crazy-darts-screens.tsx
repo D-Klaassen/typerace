@@ -90,7 +90,7 @@ function DartsTyping({
 
   return (
     <>
-      <TypingText session={visible} />
+      <TypingText session={visible} coloredText={display.coloredText} />
       <TypingAids nextChar={text[session.position]} display={display} />
     </>
   );

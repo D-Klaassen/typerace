@@ -243,23 +243,33 @@ describe("Room Matches", () => {
     expect(room.players[0]?.display).toEqual({
       fingerGuide: true,
       keyboard: false,
+      coloredText: false,
     });
 
-    room = setDisplay(room, "p2", { fingerGuide: false, keyboard: true });
+    room = setDisplay(room, "p2", {
+      fingerGuide: false,
+      keyboard: true,
+      coloredText: true,
+    });
     room = advanceClock(
       startCountdown(room, "p1", { text: "ab", seed: 1, nowMs: 0 }),
       3_000,
     );
     expect(room.matchDisplays).toEqual({
-      p1: { fingerGuide: true, keyboard: false },
-      p2: { fingerGuide: false, keyboard: true },
+      p1: { fingerGuide: true, keyboard: false, coloredText: false },
+      p2: { fingerGuide: false, keyboard: true, coloredText: true },
     });
 
     // The aids are fixed for the Match; changes wait for the lobby.
-    room = setDisplay(room, "p1", { fingerGuide: false, keyboard: false });
+    room = setDisplay(room, "p1", {
+      fingerGuide: false,
+      keyboard: false,
+      coloredText: true,
+    });
     expect(room.matchDisplays.p1).toEqual({
       fingerGuide: true,
       keyboard: false,
+      coloredText: false,
     });
   });
 });

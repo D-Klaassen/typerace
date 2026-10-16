@@ -7,7 +7,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Goals
 
 - Friends and colleagues race each other in short, replayable Matches under three Modes.
-- An On-screen Keyboard and a Finger Guide teach correct finger placement while playing.
+- An On-screen Keyboard, a Finger Guide and Coloured Text teach correct finger placement while playing.
 - The same game rules run both in the browser (Shared Keyboard) and on the server (Online).
 - The interface is English in v1, and is built so more languages can be added without touching components.
 
@@ -28,7 +28,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ### Shared Keyboard
 
-1. **Setup screen:** enter 1–6 nicknames, each with its own On-screen Keyboard, Finger Guide and Racing Theme switches (only the Finger Guide on by default), and a preview of the last Player's choice. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
+1. **Setup screen:** enter 1–6 nicknames, then switch the On-screen Keyboard, the Finger Guide, Coloured Text and the Racing Theme on or off for every Player at once (only the Finger Guide on by default), with a live preview shown from the start. Choose the Mode (Classic Race or Hot Seat) and its settings. Hot Seat needs at least two Players; starting it with one shows an error.
 2. **Handover screen** before every Turn: "<Nickname>'s turn — press Space when ready". The Turn's clock starts on the first keystroke.
 3. **Results screen,** then "Play again" (same Players and settings) or "Back to setup".
 4. **Quitting:** "Quit game" on the handover and Turn screens ends the game for everyone after a confirmation and goes to the home page. Nothing from the game is saved, so it never reaches the Leaderboard.
@@ -51,7 +51,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
   - The Host leaving: the longest-present Player becomes Host.
   - The Room disappears when its last Player leaves.
 - **Leave Room:** every screen inside a Room has a "Leave Room" control that closes the connection, which the Room treats as leaving (see above), and goes to the home page. A Player in a countdown or a running Match confirms first, with a message saying what leaving costs in that Mode. In the lobby, as a Spectator and on the results it leaves at once. Before joining (the nickname form, "Room not found") there is "Back to menu" instead.
-- **Display:** in the lobby, each Player switches the On-screen Keyboard, the Finger Guide and the Racing Theme on or off for themselves, with a live preview. There are no switches during a Match. Only the Finger Guide is on by default, and the browser remembers the choice. The Room records each Player's aids (the keyboard and the Finger Guide, not the Racing Theme) when a Match starts, and the results show them to everyone.
+- **Display:** in the lobby, each Player switches the On-screen Keyboard, the Finger Guide, Coloured Text and the Racing Theme on or off for themselves, with a live preview. There are no switches during a Match. Only the Finger Guide is on by default, and the browser remembers the choice. The Room records each Player's aids (the keyboard, the Finger Guide and Coloured Text, not the Racing Theme) when a Match starts, and the results show them to everyone.
 - **After a Match:** Results, then a "Rematch" button for the Host. Everyone goes back to the lobby with the same settings.
 
 ## Text
@@ -161,7 +161,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 ## Results screen
 
-- **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide) they had on.
+- **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide, Coloured Text) they had on.
 - **Hot Seat:** also each Player's best Time and number of Turns, and for Words and Sentences whether the best Times reached the Leaderboard, and a link to it.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 
@@ -169,7 +169,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 
 A Theme for Classic Race and Hot Seat, Online and on a Shared Keyboard (not Crazy Darts). It changes no rules, and nothing about it is in the results.
 
-- **Switching it on:** each Player's own Display switch, off by default. It changes nobody else's screen.
+- **Switching it on:** a Display switch, off by default: Online each Player's own, on a Shared Keyboard one for every Player, like the aids. Online it changes nobody else's screen.
   - **Spectators** see the normal look, unless their browser remembers the Racing Theme being on.
   - **Online Hot Seat:** the Player whose Turn it is and everyone watching each see it if they switched it on.
 - **The circuit:** a looping race track seen from above, drawn in plain SVG with no 3D library.
@@ -201,9 +201,13 @@ A Theme for Classic Race and Hot Seat, Online and on a Shared Keyboard (not Craz
 - **The page** `/leaderboard`, linked from the home page and from Hot Seat results, has a picker for Words or Sentences and a Language, and shows that board. Its URL names the board, so it can be shared, and the link from Hot Seat results opens the board the Hot Seat Match went on.
 - **Nickname fields** say the nickname is shown on the Leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences.
 
-## On-screen Keyboard and Finger Guide
+## On-screen Keyboard, Finger Guide and Coloured Text
 
-- **Two separate aids,** each switched on or off per Player, shown below the text: an On-screen Keyboard (US QWERTY, ANSI) and a Finger Guide (a pair of hands).
+- **Three separate aids,** each switched on or off (per Player Online, for everyone at once on a Shared Keyboard):
+  - an On-screen Keyboard (US QWERTY, ANSI), shown below the text,
+  - a Finger Guide (a pair of hands), shown below the text,
+  - Coloured Text: every character still to type is in its finger's colour. Typed characters stay dimmed, and a Typo still shows red.
+- **Each switch** has a short line saying what the aid does.
 - **Finger colours:** every finger has its own colour, and each key is tinted in its finger's colour.
 - **The next key** is strongly highlighted, along with the finger that should press it.
 - **For capitals and shifted symbols,** the Shift key on the **opposite** hand is highlighted too, with that hand's pinky.

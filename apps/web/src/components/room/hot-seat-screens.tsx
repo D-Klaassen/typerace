@@ -109,7 +109,7 @@ function MyTurn({
           {t("turnDone")}
         </p>
       ) : (
-        <TypingText session={session} />
+        <TypingText session={session} coloredText={display.coloredText} />
       )}
       {!session.finished && (
         <TypingAids nextChar={turn.text[session.position]} display={display} />

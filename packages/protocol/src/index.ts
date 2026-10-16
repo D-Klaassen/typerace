@@ -80,7 +80,12 @@ const clientMessage = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("display"),
     display: z
-      .object({ fingerGuide: z.boolean(), keyboard: z.boolean() })
+      .object({
+        fingerGuide: z.boolean(),
+        keyboard: z.boolean(),
+        // Browsers from before Coloured Text existed don't send it.
+        coloredText: z.boolean().default(false),
+      })
       .strict(),
   }),
   z.object({ type: z.literal("key"), key: z.string().length(1) }),

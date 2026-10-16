@@ -23,7 +23,6 @@ import { KeySetPicker } from "@/components/key-set/key-set-picker";
 import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
-import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import { Label } from "@/components/ui/label";
 import {
   MAX_PLAYERS,
@@ -50,6 +49,7 @@ export function SetupForm({
   const t = useTranslations("SharedKeyboard.Setup");
   const [mode, setMode] = useState(initial.mode);
   const [players, setPlayers] = useState(initial.players);
+  const [display, setDisplay] = useState(initial.display);
   const [textSource, setTextSource] = useState({
     textSource: initial.textSource,
     language: initial.language,
@@ -61,10 +61,6 @@ export function SetupForm({
   const [textLength, setTextLength] = useState(initial.textLength);
   const [timeBankMs, setTimeBankMs] = useState(initial.timeBankMs);
   const [problem, setProblem] = useState<SetupProblem | null>(null);
-  /** Whose display choice the preview shows: the last one changed. */
-  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
-  const previewPlayer =
-    previewIndex === null ? undefined : players[previewIndex];
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,6 +77,7 @@ export function SetupForm({
           ...player,
           name: player.name.trim(),
         })),
+        display,
         ...textSource,
         ...keySet,
         timeBankMs,
@@ -113,44 +110,34 @@ export function SetupForm({
                 );
 
               return (
-                <div key={index} className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`player-${index}`} className="sr-only">
-                      {label}
-                    </Label>
-                    <Input
-                      id={`player-${index}`}
-                      value={player.name}
-                      maxLength={MAX_NICKNAME_LENGTH}
-                      placeholder={label}
-                      autoComplete="off"
-                      aria-describedby="nickname-hint"
-                      onChange={(event) => update({ name: event.target.value })}
-                    />
-                    {players.length > MIN_PLAYERS && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label={t("removePlayer", {
-                          name: player.name || label,
-                        })}
-                        onClick={() =>
-                          setPlayers(players.filter((_, i) => i !== index))
-                        }
-                      >
-                        <XIcon />
-                      </Button>
-                    )}
-                  </div>
-                  <DisplaySwitches
-                    display={player.display}
-                    forName={player.name || label}
-                    onChange={(display) => {
-                      update({ display });
-                      setPreviewIndex(index);
-                    }}
+                <div key={index} className="flex items-center gap-2">
+                  <Label htmlFor={`player-${index}`} className="sr-only">
+                    {label}
+                  </Label>
+                  <Input
+                    id={`player-${index}`}
+                    value={player.name}
+                    maxLength={MAX_NICKNAME_LENGTH}
+                    placeholder={label}
+                    autoComplete="off"
+                    aria-describedby="nickname-hint"
+                    onChange={(event) => update({ name: event.target.value })}
                   />
+                  {players.length > MIN_PLAYERS && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t("removePlayer", {
+                        name: player.name || label,
+                      })}
+                      onClick={() =>
+                        setPlayers(players.filter((_, i) => i !== index))
+                      }
+                    >
+                      <XIcon />
+                    </Button>
+                  )}
                 </div>
               );
             })}
@@ -159,12 +146,7 @@ export function SetupForm({
                 type="button"
                 variant="outline"
                 className="self-start"
-                onClick={() =>
-                  setPlayers([
-                    ...players,
-                    { name: "", display: DEFAULT_DISPLAY },
-                  ])
-                }
+                onClick={() => setPlayers([...players, { name: "" }])}
               >
                 {t("addPlayer")}
               </Button>
@@ -176,18 +158,12 @@ export function SetupForm({
             )}
           </fieldset>
 
-          {previewPlayer && (
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium">
-                {t("previewFor", {
-                  name:
-                    previewPlayer.name ||
-                    t("playerLabel", { number: (previewIndex ?? 0) + 1 }),
-                })}
-              </span>
-              <DisplayPreview display={previewPlayer.display} />
-            </div>
-          )}
+          <fieldset className="flex flex-col gap-3">
+            <legend className="text-sm font-medium">{t("aids")}</legend>
+            <p className="text-sm text-muted-foreground">{t("aidsHint")}</p>
+            <DisplaySwitches display={display} onChange={setDisplay} />
+            <DisplayPreview display={display} />
+          </fieldset>
 
           <ChoiceGroup
             legend={t("mode")}

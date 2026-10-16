@@ -113,7 +113,7 @@ export function TurnScreen({
           />
         </div>
       )}
-      <TypingText session={session} />
+      <TypingText session={session} coloredText={display.coloredText} />
       <p className="text-sm text-muted-foreground tabular-nums">
         {t("progress", { typed: session.position, total: text.length })}
       </p>

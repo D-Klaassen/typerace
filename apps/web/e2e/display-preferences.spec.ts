@@ -1,27 +1,42 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
-test("each Shared Keyboard Player gets their own aids", async ({ page }) => {
+test("every Shared Keyboard Player gets the same aids", async ({ page }) => {
   await page.goto("/play");
 
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByPlaceholder("Player 2").fill("Bob");
-  // Everyone starts with the Finger Guide on and the keyboard off.
-  await expect(
-    page.getByRole("checkbox", { name: "Finger Guide for Bob" }),
-  ).toBeChecked();
-  await expect(
-    page.getByRole("checkbox", { name: "On-screen Keyboard for Bob" }),
-  ).not.toBeChecked();
-
-  // Anna swaps the hands for the keyboard; the preview follows.
-  await page
-    .getByRole("checkbox", { name: "On-screen Keyboard for Anna" })
-    .click();
-  await page.getByRole("checkbox", { name: "Finger Guide for Anna" }).click();
+  // One set of switches for everyone: only the Finger Guide on at first, and
+  // the preview shows it straight away.
+  const keyboardSwitch = page.getByRole("checkbox", {
+    name: "On-screen Keyboard",
+  });
+  const fingerGuideSwitch = page.getByRole("checkbox", {
+    name: "Finger Guide",
+  });
+  const coloredTextSwitch = page.getByRole("checkbox", {
+    name: "Coloured Text",
+  });
+  await expect(fingerGuideSwitch).toBeChecked();
+  await expect(keyboardSwitch).not.toBeChecked();
+  await expect(coloredTextSwitch).not.toBeChecked();
+  await expect(coloredTextSwitch).toHaveAccessibleDescription(
+    "Every character still to type is in the colour of the finger that types it.",
+  );
   const preview = page.getByTestId("display-preview");
-  await expect(page.getByText("Preview for Anna")).toBeVisible();
+  await expect(preview.getByTestId("finger-guide")).toBeVisible();
+  await expect(preview.locator("[data-typing-text] [data-finger]")).toHaveCount(
+    0,
+  );
+
+  // Swap the hands for the keyboard and colour the text; the preview follows.
+  await keyboardSwitch.click();
+  await fingerGuideSwitch.click();
+  await coloredTextSwitch.click();
   await expect(preview.getByTestId("on-screen-keyboard")).toBeVisible();
   await expect(preview.getByTestId("finger-guide")).toHaveCount(0);
+  await expect(
+    preview.locator("[data-typing-text] [data-finger]").first(),
+  ).toBeVisible();
 
   await page
     .getByRole("group", { name: "Keys" })
@@ -30,7 +45,8 @@ test("each Shared Keyboard Player gets their own aids", async ({ page }) => {
   await page.getByText("Hard", { exact: true }).click();
   await page.getByRole("button", { name: "Start" }).click();
 
-  // Anna's Turn: only the keyboard, pointing at the first character's key.
+  // Anna's Turn: the keyboard, pointing at the first character's key, and
+  // the text in finger colours.
   await page.keyboard.press("Space");
   const keyboard = page.getByTestId("on-screen-keyboard");
   await expect(keyboard).toBeVisible();
@@ -42,20 +58,31 @@ test("each Shared Keyboard Player gets their own aids", async ({ page }) => {
     "data-active",
     "true",
   );
+  // A space is always typed with the thumbs.
+  await expect(
+    page.locator("[data-typing-text] [data-finger='thumbs']").first(),
+  ).toHaveText(/^ +$/);
   await page.keyboard.type(text);
 
-  // Bob's Turn: the default, only the hands.
+  // Bob's Turn: the same aids.
   await expect(page.getByRole("heading", { name: "Bob's turn" })).toBeVisible();
   await page.keyboard.press("Space");
-  await expect(page.getByTestId("finger-guide")).toBeVisible();
-  await expect(page.getByTestId("on-screen-keyboard")).toHaveCount(0);
+  await expect(page.getByTestId("on-screen-keyboard")).toBeVisible();
+  await expect(page.getByTestId("finger-guide")).toHaveCount(0);
+  await expect(
+    page.locator("[data-typing-text] [data-finger]").first(),
+  ).toBeVisible();
   await page.keyboard.type(
     (await page.locator("[data-typing-text]").textContent()) ?? "",
   );
 
   // The results show which aids each Player had on.
-  await expect(aidsOf(page, "Anna")).toHaveText("On-screen Keyboard");
-  await expect(aidsOf(page, "Bob")).toHaveText("Finger Guide");
+  await expect(aidsOf(page, "Anna")).toHaveText(
+    "On-screen KeyboardColoured Text",
+  );
+  await expect(aidsOf(page, "Bob")).toHaveText(
+    "On-screen KeyboardColoured Text",
+  );
 });
 
 /** The Aids cell (the last one) of a Player's results row. */

@@ -109,7 +109,7 @@ export function RaceTyping({
           {t("finishedWaiting")}
         </p>
       ) : (
-        <TypingText session={session} />
+        <TypingText session={session} coloredText={display.coloredText} />
       )}
       {!session.finished && (
         <TypingAids nextChar={race.text[session.position]} display={display} />

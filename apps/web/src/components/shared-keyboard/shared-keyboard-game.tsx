@@ -23,7 +23,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useState, type ReactNode } from "react";
-import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import {
   LeaderboardNote,
   type LeaderboardStatus,
@@ -164,9 +163,7 @@ export function SharedKeyboardGame() {
             ? HOT_SEAT_TURN_LENGTH
             : TEXT_LENGTH_CHARACTERS[settings.textLength],
       });
-      const display =
-        settings.players.find((p) => p.name === player)?.display ??
-        DEFAULT_DISPLAY;
+      const { display } = settings;
       // The Player's place in the setup gives their car its colour and lane.
       const carSeat = Math.max(
         0,
@@ -222,9 +219,7 @@ export function SharedKeyboardGame() {
           <ResultsScreen
             results={getHotSeatResults(match.seat)}
             columns={["bestTime", "turns", "wpm", "accuracy", "typos"]}
-            aidsOf={(name) =>
-              settings.players.find((player) => player.name === name)?.display
-            }
+            aidsOf={() => settings.display}
             leaderboard={
               ROOMS_HOST !== null &&
               board !== null && (
@@ -241,9 +236,7 @@ export function SharedKeyboardGame() {
           <ResultsScreen
             results={getClassicRaceResults(match.race)}
             columns={["time", "wpm", "accuracy", "typos"]}
-            aidsOf={(name) =>
-              settings.players.find((player) => player.name === name)?.display
-            }
+            aidsOf={() => settings.display}
             leaderboard={
               ROOMS_HOST !== null &&
               board !== null &&

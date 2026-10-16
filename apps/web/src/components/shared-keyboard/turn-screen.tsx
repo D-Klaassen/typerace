@@ -4,11 +4,10 @@ import type { TypingStats } from "@typerace/game";
 import { getStats } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
-import {
-  TypingAids,
-  type DisplayPreferences,
-} from "@/components/finger-guide/finger-guide";
-import { RacingTrack, typingCar } from "@/components/racing-theme/racing-track";
+import type { DisplayPreferences } from "@/components/finger-guide/display-preferences";
+import { TypingAids } from "@/components/finger-guide/finger-guide";
+import { RacingTrack } from "@/components/racing-theme/racing-track";
+import { typingCar } from "@/components/racing-theme/typing-car";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";

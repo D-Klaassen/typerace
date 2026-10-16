@@ -2,11 +2,10 @@
 
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
-import {
-  TypingAids,
-  type DisplayPreferences,
-} from "@/components/finger-guide/finger-guide";
-import { RacingTrack, typingCar } from "@/components/racing-theme/racing-track";
+import type { DisplayPreferences } from "@/components/finger-guide/display-preferences";
+import { TypingAids } from "@/components/finger-guide/finger-guide";
+import { RacingTrack } from "@/components/racing-theme/racing-track";
+import { typingCar } from "@/components/racing-theme/typing-car";
 import { HotSeatStandings } from "@/components/shared-keyboard/hot-seat-standings";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";

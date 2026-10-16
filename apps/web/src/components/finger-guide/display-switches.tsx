@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import type { DisplayPreferences } from "./finger-guide";
+import type { DisplayPreferences } from "./display-preferences";
 
 const SWITCHES = [
   "keyboard",

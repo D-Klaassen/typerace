@@ -5,9 +5,9 @@ import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
 import {
   NO_DISPLAY_AIDS,
-  TypingAids,
   type DisplayPreferences,
-} from "@/components/finger-guide/finger-guide";
+} from "@/components/finger-guide/display-preferences";
+import { TypingAids } from "@/components/finger-guide/finger-guide";
 import { TypingText } from "@/components/typing/typing-text";
 import { useNow } from "@/components/typing/use-now";
 import { useTyping } from "@/components/typing/use-typing";

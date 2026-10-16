@@ -10,10 +10,13 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
+/** On a Shared Keyboard, Players are named by their nickname already. */
+const ownName = (name: string) => name;
+
 /** Best times and remaining Time Banks during a Hot Seat Match. */
 export function HotSeatStandings({
   seat,
-  nameOf = (name) => name,
+  nameOf = ownName,
 }: {
   seat: HotSeat;
   /** Online, Players are named by id; this turns that into a nickname. */

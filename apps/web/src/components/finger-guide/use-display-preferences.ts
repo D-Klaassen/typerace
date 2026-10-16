@@ -1,7 +1,10 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { DEFAULT_DISPLAY, type DisplayPreferences } from "./finger-guide";
+import {
+  DEFAULT_DISPLAY,
+  type DisplayPreferences,
+} from "./display-preferences";
 
 const STORAGE_KEY = "typerace.display";
 const listeners = new Set<() => void>();

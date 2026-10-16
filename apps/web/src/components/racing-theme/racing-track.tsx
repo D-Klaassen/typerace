@@ -1,6 +1,5 @@
 "use client";
 
-import type { TypingSession } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { useId } from "react";
 import { cn } from "@/lib/utils";
@@ -36,19 +35,6 @@ export interface RacingCar extends CarTyping {
    * to the car's place in the list.
    */
   seat?: number;
-}
-
-/** The car of a single typist, such as the Player whose Turn it is. */
-export function typingCar(
-  session: Pick<TypingSession, "position" | "typosInARow" | "finished">,
-  car: Pick<RacingCar, "id" | "name" | "isYou" | "seat">,
-): RacingCar {
-  return {
-    ...car,
-    position: session.position,
-    typosInARow: session.typosInARow,
-    finished: session.finished,
-  };
 }
 
 const LANE = 16;

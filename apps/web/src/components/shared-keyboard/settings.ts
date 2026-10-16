@@ -8,7 +8,7 @@ import {
 import {
   DEFAULT_DISPLAY,
   type DisplayPreferences,
-} from "@/components/finger-guide/finger-guide";
+} from "@/components/finger-guide/display-preferences";
 
 export type SharedKeyboardMode = "classicRace" | "hotSeat";
 

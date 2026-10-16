@@ -20,12 +20,6 @@ export function KeySetVote({
 }) {
   const t = useTranslations("KeySet");
   const labelOf = usePresetLabel();
-  const option = (id: string, label: string) => (
-    <option key={id} value={id}>
-      {label}
-      {counts[id] ? ` (${t("votes", { count: counts[id]! })})` : ""}
-    </option>
-  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -42,18 +36,52 @@ export function KeySetVote({
         {OTHER_GROUPS.map((group) => (
           <optgroup key={group} label={t(`groups.${group}`)}>
             {KEY_SET_PRESETS.filter((preset) => preset.group === group).map(
-              (preset) => option(preset.id, labelOf(preset)),
+              (preset) => (
+                <VoteOption
+                  key={preset.id}
+                  id={preset.id}
+                  label={labelOf(preset)}
+                  count={counts[preset.id]}
+                />
+              ),
             )}
           </optgroup>
         ))}
         {STAGES.map((stage) => (
           <optgroup key={stage} label={t(`stages.${stage}`)}>
-            {LESSONS.filter((lesson) => lesson.stage === stage).map((lesson) =>
-              option(lesson.id, labelOf(lesson)),
+            {LESSONS.filter((lesson) => lesson.stage === stage).map(
+              (lesson) => (
+                <VoteOption
+                  key={lesson.id}
+                  id={lesson.id}
+                  label={labelOf(lesson)}
+                  count={counts[lesson.id]}
+                />
+              ),
             )}
           </optgroup>
         ))}
       </select>
     </div>
+  );
+}
+
+/** A preset to vote for, with its Votes so far. */
+function VoteOption({
+  id,
+  label,
+  count,
+}: {
+  id: string;
+  label: string;
+  count: number | undefined;
+}) {
+  const t = useTranslations("KeySet");
+
+  return (
+    <option value={id}>
+      {label}
+      {count ? ` (${t("votes", { count })})` : ""}
+    </option>
   );
 }

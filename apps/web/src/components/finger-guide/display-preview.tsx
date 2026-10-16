@@ -4,7 +4,8 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { RacingTrack } from "@/components/racing-theme/racing-track";
 import { TypingText } from "@/components/typing/typing-text";
-import { TypingAids, type DisplayPreferences } from "./finger-guide";
+import type { DisplayPreferences } from "./display-preferences";
+import { TypingAids } from "./finger-guide";
 
 /** A word with a capital, so the preview also shows Shift. */
 const SAMPLE = "TypeRace";

@@ -12,14 +12,14 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   NO_DISPLAY_AIDS,
-  TypingAids,
   type DisplayPreferences,
-} from "@/components/finger-guide/finger-guide";
+} from "@/components/finger-guide/display-preferences";
+import { TypingAids } from "@/components/finger-guide/finger-guide";
 import {
   RacingTrack,
-  typingCar,
   type RacingCar,
 } from "@/components/racing-theme/racing-track";
+import { typingCar } from "@/components/racing-theme/typing-car";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { Button } from "@/components/ui/button";

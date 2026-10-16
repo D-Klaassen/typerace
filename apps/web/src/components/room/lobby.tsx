@@ -19,7 +19,7 @@ import { KeySetVote } from "@/components/key-set/key-set-vote";
 import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import { DisplayPreview } from "@/components/finger-guide/display-preview";
 import { DisplaySwitches } from "@/components/finger-guide/display-switches";
-import type { DisplayPreferences } from "@/components/finger-guide/finger-guide";
+import type { DisplayPreferences } from "@/components/finger-guide/display-preferences";
 import { Button } from "@/components/ui/button";
 import {
   Card,

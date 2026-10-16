@@ -87,6 +87,10 @@ _Avoid_: Timer, time limit
 Where a Match's text comes from: Gibberish, Words or Sentences. Chosen by the Host, or per game on a Shared Keyboard.
 _Avoid_: Text type, content
 
+**Text Length**:
+How long a Classic Race's text is: Short (about 50 characters), Medium (about 100) or Long (about 200). A Hot Seat Turn is always Medium. Each has its own Leaderboard boards.
+_Avoid_: Race length, distance
+
 **Gibberish**:
 Randomly generated nonsense words of 2–7 characters from the Key Set, separated by spaces.
 _Avoid_: Random text, nonsense
@@ -125,7 +129,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per Text Source and Language for Words and Sentences. Gibberish is for practising keys, so it has no board and its Times never go on the Leaderboard. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
+The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard, with one board per Text Source, Language and Text Length for Words and Sentences. A Turn is a Medium text, so Hot Seat Times are on the Medium boards. Gibberish is for practising keys, so it has no board and its Times never go on the Leaderboard. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match, or a solo race's Time, goes on the board under their nickname, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids

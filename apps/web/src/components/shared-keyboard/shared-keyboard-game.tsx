@@ -11,9 +11,10 @@ import {
   startClassicRace,
   startHotSeat,
   TEXT_LENGTH_CHARACTERS,
+  HOT_SEAT_TEXT_LENGTH,
   HOT_SEAT_TURN_LENGTH,
   hotSeatRecords,
-  leaderboardTextSource,
+  leaderboardBoard,
   soloRaceRecords,
   type ClassicRace,
   type LeaderboardRecord,
@@ -64,31 +65,37 @@ export function SharedKeyboardGame() {
   // quits the game, so coming back starts at setup with the same settings.
   useLayoutEffect(() => () => setGame({ phase: "setup" }), []);
 
-  /** The board the Times go on; Gibberish has none. */
-  const board = leaderboardTextSource(resolveTextSource(settings));
+  /**
+   * The board a Match's Times go on: its Text Length's, or Medium for Hot
+   * Seat Turns. Gibberish has none.
+   */
+  function boardOf(match: Match) {
+    return leaderboardBoard(
+      resolveTextSource(settings),
+      match.mode === "hotSeat" ? HOT_SEAT_TEXT_LENGTH : settings.textLength,
+    );
+  }
 
-  /** A Hot Seat Match's best Times, or a solo Classic Race of a Turn's length. */
+  /** A Hot Seat Match's best Times, or a solo Classic Race's Time. */
   function leaderboardRecords(match: Match): LeaderboardRecord[] {
-    if (board === null) {
+    if (boardOf(match) === null) {
       return [];
     }
 
     return match.mode === "hotSeat"
       ? hotSeatRecords(match.seat)
-      : soloRaceRecords(
-          match.race,
-          TEXT_LENGTH_CHARACTERS[settings.textLength],
-        );
+      : soloRaceRecords(match.race);
   }
 
   function saveToLeaderboard(match: Match) {
+    const board = boardOf(match);
     const records = leaderboardRecords(match);
     if (ROOMS_HOST === null || board === null || records.length === 0) {
       return;
     }
 
     setSaved({ match, status: "saving" });
-    submitToLeaderboard(ROOMS_HOST, { textSource: board, records }).then(
+    submitToLeaderboard(ROOMS_HOST, { board, records }).then(
       () => setSaved({ match, status: "saved" }),
       () => setSaved({ match, status: "failed" }),
     );
@@ -213,7 +220,8 @@ export function SharedKeyboardGame() {
       break;
     }
 
-    case "results":
+    case "results": {
+      const board = boardOf(match);
       screen =
         match.mode === "hotSeat" ? (
           <ResultsScreen
@@ -225,7 +233,7 @@ export function SharedKeyboardGame() {
               board !== null && (
                 <LeaderboardNote
                   status={saved?.match === match ? saved.status : null}
-                  textSource={board}
+                  board={board}
                 />
               )
             }
@@ -243,7 +251,7 @@ export function SharedKeyboardGame() {
               leaderboardRecords(match).length > 0 && (
                 <LeaderboardNote
                   status={saved?.match === match ? saved.status : null}
-                  textSource={board}
+                  board={board}
                 />
               )
             }
@@ -251,6 +259,8 @@ export function SharedKeyboardGame() {
             onBackToSetup={() => setGame({ phase: "setup" })}
           />
         );
+      break;
+    }
   }
 
   return (

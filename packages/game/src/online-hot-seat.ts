@@ -7,9 +7,14 @@ import {
   type HotSeat,
 } from "./hot-seat";
 import { getStats, startTyping, typeKey, type TypingSession } from "./typing";
+import { TEXT_LENGTH_CHARACTERS, type TextLength } from "./text-length";
+
+/** A Hot Seat Turn is a Medium text, so its Times go on the Medium board. */
+export const HOT_SEAT_TEXT_LENGTH: TextLength = "medium";
 
 /** Characters per Hot Seat Turn (see docs/spec.md). */
-export const HOT_SEAT_TURN_LENGTH = 100;
+export const HOT_SEAT_TURN_LENGTH =
+  TEXT_LENGTH_CHARACTERS[HOT_SEAT_TEXT_LENGTH];
 
 /**
  * A Hot Seat played Online: the Player whose Turn it is types on their own

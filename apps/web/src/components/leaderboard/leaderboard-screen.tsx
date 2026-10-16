@@ -1,14 +1,16 @@
 "use client";
 
 import {
-  leaderboardBoard,
+  leaderboardKey,
   REAL_TEXT_KINDS,
+  TEXT_LENGTHS,
+  type LeaderboardBoard,
   type LeaderboardEntry,
-  type RealTextSource,
 } from "@typerace/game";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ChoiceGroup } from "@/components/choice-group";
 import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import {
   Card,
@@ -27,25 +29,26 @@ import {
 } from "@/components/ui/table";
 import {
   fetchLeaderboard,
+  boardOfLeaderboardHref,
   leaderboardHref,
-  textSourceOfLeaderboardHref,
 } from "@/lib/leaderboard";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 
 /**
- * The fastest Hot Seat Turns for the Text Source and Language picked on the
- * page. Gibberish has no board, so it can't be picked.
+ * The fastest Times for the Text Source, Language and Text Length picked on
+ * the page. Gibberish has no board, so it can't be picked.
  */
 export function LeaderboardScreen() {
   const t = useTranslations("Leaderboard");
+  const lengths = useTranslations("SharedKeyboard.Setup.textLengths");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [textSource, setTextSource] = useState<RealTextSource>(() =>
-    textSourceOfLeaderboardHref(searchParams),
+  const [board, setBoard] = useState<LeaderboardBoard>(() =>
+    boardOfLeaderboardHref(searchParams),
   );
 
-  function choose(next: RealTextSource) {
-    setTextSource(next);
+  function choose(next: LeaderboardBoard) {
+    setBoard(next);
     // Keep the link shareable without adding to the history.
     router.replace(leaderboardHref(next), { scroll: false });
   }
@@ -63,55 +66,56 @@ export function LeaderboardScreen() {
           </CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-6">
           <TextSourcePicker
             kinds={REAL_TEXT_KINDS}
-            value={{
-              textSource: textSource.kind,
-              language: textSource.language,
-            }}
+            value={{ textSource: board.kind, language: board.language }}
             onChange={({ textSource: kind, language }) =>
-              choose({ kind, language })
+              choose({ ...board, kind, language })
             }
+          />
+          <ChoiceGroup
+            legend={t("textLength")}
+            name="text-length"
+            options={TEXT_LENGTHS.map((value) => ({
+              value,
+              label: lengths(value),
+            }))}
+            value={board.textLength}
+            onChange={(textLength) => choose({ ...board, textLength })}
           />
         </CardContent>
       </Card>
-      <Board host={ROOMS_HOST} textSource={textSource} />
+      <Board host={ROOMS_HOST} board={board} />
     </div>
   );
 }
 
-type Loaded = { board: string; entries: LeaderboardEntry[] | "failed" };
+type Loaded = { key: string; entries: LeaderboardEntry[] | "failed" };
 
-function Board({
-  host,
-  textSource,
-}: {
-  host: string;
-  textSource: RealTextSource;
-}) {
+function Board({ host, board }: { host: string; board: LeaderboardBoard }) {
   const t = useTranslations("Leaderboard");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const board = leaderboardBoard(textSource);
+  const key = leaderboardKey(board);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchLeaderboard(host, textSource, controller.signal).then(
-      (entries) => setLoaded({ board, entries }),
+    fetchLeaderboard(host, board, controller.signal).then(
+      (entries) => setLoaded({ key, entries }),
       () => {
         if (!controller.signal.aborted) {
-          setLoaded({ board, entries: "failed" });
+          setLoaded({ key, entries: "failed" });
         }
       },
     );
 
     return () => controller.abort();
-  }, [host, board, textSource]);
+  }, [host, key, board]);
 
   // Until this board arrives, an older one would be misleading.
-  const entries = loaded?.board === board ? loaded.entries : null;
+  const entries = loaded?.key === key ? loaded.entries : null;
 
   if (entries === null) {
     return <p className="text-muted-foreground">{t("loading")}</p>;

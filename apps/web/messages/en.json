@@ -49,10 +49,10 @@
         "medium": "Medium",
         "long": "Long"
       },
-      "soloLeaderboardHint": "On your own, a Medium race with Words or Sentences goes on the leaderboard.",
+      "soloLeaderboardHint": "On your own, a race with Words or Sentences goes on the leaderboard for its length.",
       "aids": "Display",
       "aidsHint": "Every Player gets the same Display during their Turns.",
-      "nicknameHint": "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences."
+      "nicknameHint": "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo race with Words or Sentences."
     },
     "Handover": {
       "turnOf": "{name}'s turn",
@@ -260,13 +260,14 @@
   "Leaderboard": {
     "metadataTitle": "Leaderboard · Typerace",
     "title": "Leaderboard",
-    "description": "The fastest Hot Seat Turns, Online and on a Shared Keyboard, and solo Medium races, with a board for Words and for Sentences in each language.",
+    "description": "The fastest solo races and Hot Seat Turns, Online and on a Shared Keyboard, with a board for Words and for Sentences in each language and text length. Hot Seat Turns count as Medium.",
     "rank": "#",
     "player": "Player",
     "time": "Time",
     "date": "Date",
+    "textLength": "Text length",
     "loading": "Loading…",
-    "empty": "No times on this board yet. Finish a Hot Seat Match or a solo Medium race to be the first!",
+    "empty": "No times on this board yet. Finish a solo race of this length, or a Hot Seat Match for Medium, to be the first!",
     "failed": "Couldn’t load the leaderboard.",
     "notConfigured": "The leaderboard isn’t set up on this site yet: the Rooms server address is missing.",
     "status": {

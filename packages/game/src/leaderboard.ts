@@ -1,18 +1,23 @@
 /**
  * The Leaderboard: the fastest Hot Seat Turns and solo Classic Races ever on
- * Words and Sentences, one board per Text Source and Language, as Times only
- * compare fairly on the same kind of text. Gibberish is for practising keys,
- * so it has no board.
+ * Words and Sentences, one board per Text Source, Language and Text Length,
+ * as Times only compare fairly on the same kind and length of text.
+ * Gibberish is for practising keys, so it has no board.
  */
 import type { ClassicRace } from "./classic-race";
-import { HOT_SEAT_TURN_LENGTH } from "./online-hot-seat";
 import type { RealTextSource, TextSource } from "./text-source";
+import { TEXT_LENGTH_CHARACTERS, type TextLength } from "./text-length";
 import type { HotSeat } from "./hot-seat";
 
 /** How many entries a board keeps and shows. */
 export const LEADERBOARD_SIZE = 20;
 
-/** A Player's best Time from one finished Hot Seat Match. */
+/** Times on one board were all typed on the same kind and length of text. */
+export interface LeaderboardBoard extends RealTextSource {
+  textLength: TextLength;
+}
+
+/** A Player's best Time from a finished Hot Seat Match, or a solo race's Time. */
 export interface LeaderboardRecord {
   nickname: string;
   timeMs: number;
@@ -23,20 +28,30 @@ export interface LeaderboardEntry extends LeaderboardRecord {
   recordedAtMs: number;
 }
 
-/** The board a Match's Times go on; null for Gibberish, which has none. */
-export function leaderboardTextSource(
+/**
+ * The board a Match's Times go on; null for Gibberish, which has none. A Hot
+ * Seat Match's Turns are `HOT_SEAT_TEXT_LENGTH` long.
+ */
+export function leaderboardBoard(
   source: TextSource,
-): RealTextSource | null {
-  return source.kind === "gibberish" ? null : source;
+  textLength: TextLength,
+): LeaderboardBoard | null {
+  return source.kind === "gibberish"
+    ? null
+    : { kind: source.kind, language: source.language, textLength };
 }
 
 /**
- * A stable name for the board of a Text Source, to store it under. It
- * includes the Turn length, so Times from Turns of another length (150
- * characters before) stay in storage but never share a board with today's.
+ * A stable name for a board, to store it under. It starts with the text's
+ * characters, so Times from texts of another length (Turns of 150 characters
+ * before) stay in storage but never share a board with today's.
  */
-export function leaderboardBoard({ kind, language }: RealTextSource): string {
-  return `${HOT_SEAT_TURN_LENGTH}:${kind}:${language}`;
+export function leaderboardKey({
+  kind,
+  language,
+  textLength,
+}: LeaderboardBoard): string {
+  return `${TEXT_LENGTH_CHARACTERS[textLength]}:${kind}:${language}`;
 }
 
 /** Times go on the board in whole milliseconds; the browser's clock has fractions. */
@@ -67,19 +82,14 @@ export function hotSeatRecords(
 }
 
 /**
- * The Time of a solo Classic Race on a Shared Keyboard. It only counts when
- * its text was a Hot Seat Turn's length, so it shares a board fairly with
- * Turns. `textLength` is the number of characters the text was made with.
+ * The Time of a solo Classic Race on a Shared Keyboard, for the board of its
+ * Text Length. A race with more Players has none.
  */
-export function soloRaceRecords(
-  race: ClassicRace,
-  textLength: number,
-): LeaderboardRecord[] {
+export function soloRaceRecords(race: ClassicRace): LeaderboardRecord[] {
   const [nickname] = race.players;
   const [stats] = race.turns;
   if (
     race.players.length !== 1 ||
-    textLength !== HOT_SEAT_TURN_LENGTH ||
     nickname === undefined ||
     stats === undefined
   ) {

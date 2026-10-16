@@ -43,7 +43,7 @@ test("the fastest Player wins a Classic Race on a Shared Keyboard", async ({
   await expect(rows.nth(2)).toContainText(/30\.\ds/);
 });
 
-test("a single Player races alone, and a Medium race goes on the Leaderboard", async ({
+test("a single Player races alone, and the race goes on its Text Length's board", async ({
   page,
 }) => {
   await page.clock.install();
@@ -53,11 +53,12 @@ test("a single Player races alone, and a Medium race goes on the Leaderboard", a
   await expect(page.getByPlaceholder("Player 2")).toBeHidden();
   await expect(
     page.getByText(
-      "On your own, a Medium race with Words or Sentences goes on the leaderboard.",
+      "On your own, a race with Words or Sentences goes on the leaderboard for its length.",
     ),
   ).toBeVisible();
-  // English Sentences: a board no other test plays on.
+  // Short English Sentences: a board no other test plays on.
   await page.getByText("Sentences", { exact: true }).click();
+  await page.getByText("Short", { exact: true }).click();
   await page.getByRole("button", { name: "Start" }).click();
 
   await expect(
@@ -75,7 +76,10 @@ test("a single Player races alone, and a Medium race goes on the Leaderboard", a
   );
   await page.getByRole("link", { name: "See the leaderboard" }).click();
 
-  await expect(page).toHaveURL(/\/leaderboard\?source=sentences&language=en$/);
+  await expect(page).toHaveURL(
+    /\/leaderboard\?source=sentences&language=en&length=short$/,
+  );
+  await expect(page.getByRole("radio", { name: "Short" })).toBeChecked();
   await expect(page.getByRole("table", { name: "Leaderboard" })).toContainText(
     "Solveig",
   );

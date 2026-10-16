@@ -70,7 +70,9 @@ test("an Online Hot Seat Match until the slowest Player runs out of time", async
   await expect(rows.nth(2).getByRole("cell").nth(3)).toHaveText("2");
   // The Room put both best Times on the English Words board.
   await bob.getByRole("link", { name: "See the leaderboard" }).click();
-  await expect(bob).toHaveURL(/\/leaderboard\?source=words&language=en$/);
+  await expect(bob).toHaveURL(
+    /\/leaderboard\?source=words&language=en&length=medium$/,
+  );
   const board = bob.getByRole("table", { name: "Leaderboard" });
   await expect(board).toContainText("Anna");
   await expect(board).toContainText("Bob");

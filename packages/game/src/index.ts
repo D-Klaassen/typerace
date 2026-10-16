@@ -81,7 +81,6 @@ export {
   ONLINE_MODES,
   setDisplay,
   startCountdown,
-  TEXT_LENGTH_CHARACTERS,
   typeInRoom,
   updateSettings,
   type Display,
@@ -93,7 +92,6 @@ export {
   type RoomPhase,
   type RoomPlayer,
   type RoomSettings,
-  type TextLength,
   type Vote,
   type VoteCounts,
 } from "./room";
@@ -113,6 +111,7 @@ export {
   currentTimeBankMs,
   dropFromHotSeat,
   startOnlineHotSeat,
+  HOT_SEAT_TEXT_LENGTH,
   HOT_SEAT_TURN_LENGTH,
   typeInHotSeat,
   type OnlineHotSeat,
@@ -133,9 +132,15 @@ export {
   addToLeaderboard,
   LEADERBOARD_SIZE,
   leaderboardBoard,
-  leaderboardTextSource,
+  leaderboardKey,
   hotSeatRecords,
   soloRaceRecords,
+  type LeaderboardBoard,
   type LeaderboardEntry,
   type LeaderboardRecord,
 } from "./leaderboard";
+export {
+  TEXT_LENGTH_CHARACTERS,
+  TEXT_LENGTHS,
+  type TextLength,
+} from "./text-length";

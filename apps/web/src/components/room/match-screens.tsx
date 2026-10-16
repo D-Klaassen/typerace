@@ -1,7 +1,8 @@
 "use client";
 
 import {
-  leaderboardTextSource,
+  HOT_SEAT_TEXT_LENGTH,
+  leaderboardBoard,
   resolveTextSource,
   type Display,
   type TypingSession,
@@ -223,7 +224,10 @@ export function OnlineResults({
   const { headers, rows } = resultTable(room.results, { t, seconds, percent });
   const winner = rows[0];
   // Gibberish has no board, so a Hot Seat Match on it isn't recorded.
-  const board = leaderboardTextSource(resolveTextSource(room.settings));
+  const board = leaderboardBoard(
+    resolveTextSource(room.settings),
+    HOT_SEAT_TEXT_LENGTH,
+  );
 
   return (
     <div className="flex w-full max-w-3xl flex-col items-center gap-6">
@@ -266,7 +270,7 @@ export function OnlineResults({
       </Table>
       {room.results?.mode === "hotSeat" && board !== null && (
         // The Room puts the best Times on the Leaderboard itself.
-        <LeaderboardNote status="saved" textSource={board} />
+        <LeaderboardNote status="saved" board={board} />
       )}
       {isHost ? (
         <Button size="lg" onClick={onBackToLobby}>

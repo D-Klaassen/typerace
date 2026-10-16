@@ -1,9 +1,9 @@
 import {
   addToLeaderboard,
-  leaderboardBoard,
+  leaderboardKey,
+  type LeaderboardBoard,
   type LeaderboardEntry,
   type LeaderboardRecord,
-  type RealTextSource,
 } from "@typerace/game";
 import {
   parseLeaderboardSearch,
@@ -18,21 +18,20 @@ import { DurableObject } from "cloudflare:workers";
  * reading a board and writing it back can't lose a concurrent record.
  */
 export class Leaderboard extends DurableObject<Env> {
-  async top(textSource: RealTextSource): Promise<LeaderboardEntry[]> {
+  async top(board: LeaderboardBoard): Promise<LeaderboardEntry[]> {
     return (
-      (await this.ctx.storage.get<LeaderboardEntry[]>(
-        leaderboardBoard(textSource),
-      )) ?? []
+      (await this.ctx.storage.get<LeaderboardEntry[]>(leaderboardKey(board))) ??
+      []
     );
   }
 
   async record(
-    textSource: RealTextSource,
+    board: LeaderboardBoard,
     records: readonly LeaderboardRecord[],
   ): Promise<void> {
     await this.ctx.storage.put(
-      leaderboardBoard(textSource),
-      addToLeaderboard(await this.top(textSource), records, Date.now()),
+      leaderboardKey(board),
+      addToLeaderboard(await this.top(board), records, Date.now()),
     );
   }
 }
@@ -49,8 +48,9 @@ const CORS_HEADERS = {
 };
 
 /**
- * GET a Text Source's board, or POST a Shared Keyboard's finished Hot Seat Match.
- * Online Hot Seat Matches are recorded by their Room, which timed them itself.
+ * GET a board, or POST a Shared Keyboard's finished Hot Seat Match or solo
+ * race. Online Hot Seat Matches are recorded by their Room, which timed them
+ * itself.
  */
 export async function leaderboardResponse(
   request: Request,
@@ -61,14 +61,12 @@ export async function leaderboardResponse(
       return new Response(null, { status: 204, headers: CORS_HEADERS });
 
     case "GET": {
-      const textSource = parseLeaderboardSearch(
-        new URL(request.url).searchParams,
-      );
-      if (!textSource) {
+      const board = parseLeaderboardSearch(new URL(request.url).searchParams);
+      if (!board) {
         return text("Bad Request", 400);
       }
       const body: LeaderboardResponse = {
-        entries: await leaderboardOf(env).top(textSource),
+        entries: await leaderboardOf(env).top(board),
       };
 
       return Response.json(body, { headers: CORS_HEADERS });
@@ -81,10 +79,7 @@ export async function leaderboardResponse(
       if (!submission) {
         return text("Bad Request", 400);
       }
-      await leaderboardOf(env).record(
-        submission.textSource,
-        submission.records,
-      );
+      await leaderboardOf(env).record(submission.board, submission.records);
 
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }

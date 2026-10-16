@@ -145,7 +145,7 @@ export function Lobby({
           <CardTitle>{tDisplay("title")}</CardTitle>
           <CardDescription>{tDisplay("hint")}</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-[auto_1fr] md:items-start">
+        <CardContent className="flex flex-col gap-4">
           <DisplaySwitches display={display} onChange={onDisplayChange} />
           <DisplayPreview display={display} />
         </CardContent>

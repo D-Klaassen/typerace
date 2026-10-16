@@ -8,6 +8,7 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
+import { RacingTrack } from "@/components/racing-theme/racing-track";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
@@ -94,12 +95,28 @@ export function TurnScreen({
           </div>
         )}
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full bg-primary transition-[width]"
-          style={{ width: `${progress * 100}%` }}
+      {display.racingTheme ? (
+        <RacingTrack
+          cars={[
+            {
+              id: player,
+              name: player,
+              position: session.position,
+              typosInARow: session.typosInARow,
+              finished: session.finished,
+              you: true,
+            },
+          ]}
+          textLength={text.length}
         />
-      </div>
+      ) : (
+        <div className="h-2 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full bg-primary transition-[width]"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
+      )}
       <TypingText session={session} />
       <p className="text-sm text-muted-foreground tabular-nums">
         {t("progress", { typed: session.position, total: text.length })}

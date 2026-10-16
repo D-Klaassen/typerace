@@ -4,6 +4,7 @@ import {
   leaderboardTextSource,
   resolveTextSource,
   type Display,
+  type TypingSession,
 } from "@typerace/game";
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
@@ -13,6 +14,10 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
+import {
+  RacingTrack,
+  type RacingCar,
+} from "@/components/racing-theme/racing-track";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
 import { Button } from "@/components/ui/button";
@@ -83,13 +88,21 @@ export function RaceTyping({
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
-      <RaceProgress
-        racers={race.racers}
-        textLength={race.text.length}
-        nicknames={nicknames}
-        you={you}
-        ownPosition={session.position}
-      />
+      {display.racingTheme ? (
+        <RacingTrack
+          cars={racingCars(race, nicknames, you, session)}
+          textLength={race.text.length}
+          follow={you}
+        />
+      ) : (
+        <RaceProgress
+          racers={race.racers}
+          textLength={race.text.length}
+          nicknames={nicknames}
+          you={you}
+          ownPosition={session.position}
+        />
+      )}
       {session.finished ? (
         <p className="text-center text-lg font-medium" role="status">
           {t("finishedWaiting")}
@@ -109,11 +122,14 @@ export function Spectating({
   you,
   nicknames,
   clockOffsetMs,
+  racingTheme,
 }: {
   room: RoomView;
   you: string;
   nicknames: Record<string, string>;
   clockOffsetMs: number;
+  /** Spectators only get the Racing Theme if this browser remembers it on. */
+  racingTheme: boolean;
 }) {
   const t = useTranslations("Room");
 
@@ -122,14 +138,22 @@ export function Spectating({
       <p className="text-center text-muted-foreground" role="status">
         {t("spectating")}
       </p>
-      {room.race && (
-        <RaceProgress
-          racers={room.race.racers}
-          textLength={room.race.text.length}
-          nicknames={nicknames}
-          you={you}
-        />
-      )}
+      {room.race &&
+        (racingTheme ? (
+          <div className="w-full">
+            <RacingTrack
+              cars={racingCars(room.race, nicknames, you)}
+              textLength={room.race.text.length}
+            />
+          </div>
+        ) : (
+          <RaceProgress
+            racers={room.race.racers}
+            textLength={room.race.text.length}
+            nicknames={nicknames}
+            you={you}
+          />
+        ))}
       {room.darts && (
         <CrazyDartsMatch
           darts={room.darts}
@@ -145,12 +169,34 @@ export function Spectating({
           you={you}
           nicknames={nicknames}
           clockOffsetMs={clockOffsetMs}
-          display={NO_DISPLAY_AIDS}
+          display={{ ...NO_DISPLAY_AIDS, racingTheme }}
           onKey={() => {}}
         />
       )}
     </div>
   );
+}
+
+/** The race's cars, with our own from local typing, ahead of the Room's view. */
+function racingCars(
+  race: Race,
+  nicknames: Record<string, string>,
+  you: string,
+  own?: TypingSession,
+): RacingCar[] {
+  return race.racers.map((racer) => {
+    const typing = racer.playerId === you && own ? own : racer;
+
+    return {
+      id: racer.playerId,
+      name: nicknames[racer.playerId] ?? "?",
+      position: typing.position,
+      typosInARow: typing.typosInARow,
+      finished: typing.finished,
+      dropped: racer.dropped,
+      you: racer.playerId === you,
+    };
+  });
 }
 
 export function OnlineResults({

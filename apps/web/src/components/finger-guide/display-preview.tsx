@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { RacingTrack } from "@/components/racing-theme/racing-track";
 import { TypingText } from "@/components/typing/typing-text";
 import { TypingAids, type DisplayPreferences } from "./finger-guide";
 
@@ -32,6 +33,22 @@ export function DisplayPreview({ display }: { display: DisplayPreferences }) {
       <figcaption className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
         {t("preview")}
       </figcaption>
+      {display.racingTheme && (
+        <RacingTrack
+          cars={[
+            {
+              id: "preview",
+              name: "",
+              position,
+              typosInARow: 0,
+              finished: false,
+              you: true,
+            },
+          ]}
+          textLength={SAMPLE.length}
+          view="whole"
+        />
+      )}
       <TypingText session={{ text: SAMPLE, position, inError: false }} />
       {display.fingerGuide || display.keyboard ? (
         <TypingAids nextChar={SAMPLE[position]} display={display} />

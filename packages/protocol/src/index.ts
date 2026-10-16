@@ -114,6 +114,8 @@ export interface RacerView {
   playerId: string;
   position: number;
   typos: number;
+  /** Typos since their last correct key (see TypingSession). */
+  typosInARow: number;
   finished: boolean;
   dropped: boolean;
 }
@@ -126,6 +128,7 @@ export interface HotSeatView {
     text: string;
     position: number;
     inError: boolean;
+    typosInARow: number;
     /** On the Room's clock; null until the first keystroke. */
     firstKeyAtMs: number | null;
     /** What was left of the Time Bank when the Turn began. */
@@ -190,6 +193,7 @@ export function toRoomView(room: Room): RoomView {
         text: hotSeat.turn.text,
         position: hotSeat.turn.position,
         inError: hotSeat.turn.inError,
+        typosInARow: hotSeat.turn.typosInARow,
         firstKeyAtMs: hotSeat.turn.firstKeyAtMs,
         timeBankMs: currentTimeBankMs(hotSeat) ?? 0,
       },
@@ -201,6 +205,7 @@ export function toRoomView(room: Room): RoomView {
         playerId,
         position: session.position,
         typos: session.typos,
+        typosInARow: session.typosInARow,
         finished: session.finished,
         dropped,
       })),

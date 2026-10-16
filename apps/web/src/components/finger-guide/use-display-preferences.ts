@@ -23,15 +23,16 @@ function parse(raw: string | null): DisplayPreferences {
   try {
     const value = JSON.parse(raw) as Partial<DisplayPreferences>;
 
+    const flag = (key: keyof DisplayPreferences) => {
+      const stored = value[key];
+
+      return typeof stored === "boolean" ? stored : DEFAULT_DISPLAY[key];
+    };
+
     return {
-      fingerGuide:
-        typeof value.fingerGuide === "boolean"
-          ? value.fingerGuide
-          : DEFAULT_DISPLAY.fingerGuide,
-      keyboard:
-        typeof value.keyboard === "boolean"
-          ? value.keyboard
-          : DEFAULT_DISPLAY.keyboard,
+      fingerGuide: flag("fingerGuide"),
+      keyboard: flag("keyboard"),
+      racingTheme: flag("racingTheme"),
     };
   } catch {
     return DEFAULT_DISPLAY;

@@ -116,6 +116,7 @@ function ValidRoom({ host, code }: { host: string; code: string }) {
           you={you}
           nicknames={room.nicknames}
           clockOffsetMs={room.clockOffsetMs}
+          racingTheme={display.racingTheme}
         />
       );
     }

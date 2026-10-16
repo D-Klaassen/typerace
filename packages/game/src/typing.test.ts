@@ -28,6 +28,23 @@ describe("typing", () => {
     expect(session.typos).toBe(2);
   });
 
+  it("counts the Typos in a row, until the correct key", () => {
+    let session = startTyping("ab");
+    expect(session.typosInARow).toBe(0);
+
+    session = typeKey(session, "x", 0);
+    session = typeKey(session, "y", 50);
+    session = typeKey(session, "z", 100);
+    expect(session.typosInARow).toBe(3);
+
+    session = typeKey(session, "a", 150);
+    expect(session.typosInARow).toBe(0);
+    expect(session.typos).toBe(3);
+
+    session = typeKey(session, "x", 200);
+    expect(session.typosInARow).toBe(1);
+  });
+
   it("ignores keys that are not a single character", () => {
     let session = startTyping("Ab");
 

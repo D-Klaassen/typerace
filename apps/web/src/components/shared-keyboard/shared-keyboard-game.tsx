@@ -15,7 +15,7 @@ import {
   type TimeTrial,
   type TypingStats,
 } from "@typerace/game";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import {
   LeaderboardNote,
@@ -54,6 +54,10 @@ export function SharedKeyboardGame() {
     trial: TimeTrial;
     status: LeaderboardStatus;
   } | null>(null);
+
+  // Next.js keeps this page alive, hidden, after navigating away. Leaving
+  // quits the game, so coming back starts at setup with the same settings.
+  useLayoutEffect(() => () => setGame({ phase: "setup" }), []);
 
   function saveToLeaderboard(trial: TimeTrial) {
     const records = timeTrialRecords(trial);

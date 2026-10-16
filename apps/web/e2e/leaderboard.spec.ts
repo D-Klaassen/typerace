@@ -67,8 +67,12 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   await expect(board).toContainText("Anke");
   await expect(board).toContainText("Bram");
 
-  // English Words have a board of their own, which no test plays on.
-  await page.getByText("English", { exact: true }).click();
+  // English Words have a board of their own, which no test plays on. The
+  // hidden /play page, kept by Next.js, has the same options.
+  await page
+    .getByText("English", { exact: true })
+    .filter({ visible: true })
+    .click();
   await expect(page).toHaveURL(/source=words&language=en$/);
   await expect(
     page.getByText("No times on this board yet.", { exact: false }),
@@ -76,7 +80,10 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   await expect(page.getByRole("cell", { name: "Anke" })).toHaveCount(0);
 
   // And Gibberish goes back to a board per Key Set.
-  await page.getByText("Gibberish", { exact: true }).click();
+  await page
+    .getByText("Gibberish", { exact: true })
+    .filter({ visible: true })
+    .click();
   await expect(page).toHaveURL(/\/leaderboard\?preset=classic-medium$/);
   await expect(page.getByRole("group", { name: "Keys" })).toBeVisible();
 });

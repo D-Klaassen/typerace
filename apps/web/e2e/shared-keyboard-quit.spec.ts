@@ -21,6 +21,21 @@ async function expectSetup(page: Page) {
   await expect(page.locator("[data-typing-text]")).toHaveCount(0);
 }
 
+test("quitting a Shared Keyboard game and coming back starts at setup", async ({
+  page,
+}) => {
+  await startTurn(page);
+
+  await page.getByRole("button", { name: "Quit game" }).click();
+  await page
+    .getByRole("alertdialog", { name: "Quit this game?" })
+    .getByRole("button", { name: "Quit game" })
+    .click();
+  await page.getByRole("link", { name: "Play on a Shared Keyboard" }).click();
+
+  await expectSetup(page);
+});
+
 test("leaving a Shared Keyboard game and coming back starts at setup", async ({
   page,
 }) => {

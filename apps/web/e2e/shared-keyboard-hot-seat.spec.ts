@@ -14,7 +14,7 @@ test("two Players play a Hot Seat Match until one runs out of time", async ({
   await page.goto("/play");
 
   await expect(page.getByPlaceholder("Player 1")).toHaveAccessibleDescription(
-    "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race.",
+    "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences.",
   );
   await page.getByPlaceholder("Player 1").fill("Anna");
   await page.getByPlaceholder("Player 2").fill("Bob");
@@ -45,15 +45,11 @@ test("two Players play a Hot Seat Match until one runs out of time", async ({
   await expect(rows.nth(1)).toContainText("Anna");
   await expect(rows.nth(2)).toContainText("Bob");
 
-  // Both best times go on the Medium board.
-  await expect(page.getByRole("status")).toHaveText(
-    "The best times are on the leaderboard.",
-  );
-  await page.getByRole("link", { name: "See the leaderboard" }).click();
-  await expect(page).toHaveURL(/\/leaderboard\?preset=classic-medium$/);
-  const board = page.getByRole("table", { name: "Leaderboard" });
-  await expect(board).toContainText("Anna");
-  await expect(board).toContainText("Bob");
+  // Gibberish, the default text, is for practising keys: it has no board.
+  await expect(page.getByRole("status")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "See the leaderboard" }),
+  ).toHaveCount(0);
 });
 
 test("rejects duplicate nicknames", async ({ page }) => {

@@ -3,11 +3,12 @@ import {
   addToLeaderboard,
   LEADERBOARD_SIZE,
   leaderboardBoard,
+  leaderboardTextSource,
   hotSeatRecords,
   soloRaceRecords,
 } from "./leaderboard";
 import { finishRaceTurn, startClassicRace } from "./classic-race";
-import { resolveKeySet, type KeySetChoice } from "./key-sets";
+import { resolveKeySet } from "./key-sets";
 import { HOT_SEAT_TURN_LENGTH } from "./online-hot-seat";
 import { LANGUAGES, REAL_TEXT_KINDS, resolveTextSource } from "./text-source";
 import {
@@ -36,32 +37,19 @@ function turnTaking(timeMs: number): TypingStats {
 }
 
 describe("Leaderboard", () => {
-  it("has one Gibberish board per set of keys and Capitals, however they were chosen", () => {
-    const board = (keySet: KeySetChoice, capitals: boolean) =>
-      leaderboardBoard({
-        kind: "gibberish",
-        keySet: resolveKeySet(keySet, capitals),
-      });
-    const homeRow = board({ preset: "row-home" }, false);
-
-    expect(board({ custom: ";lkjhgfdsa" }, false)).toBe(homeRow);
-    expect(board({ preset: "row-home" }, true)).not.toBe(homeRow);
-  });
-
-  it("has one board per Text Source and Language for real text", () => {
-    const boards = [
-      ...REAL_TEXT_KINDS.flatMap((kind) =>
-        LANGUAGES.map((language) => leaderboardBoard({ kind, language })),
-      ),
-      leaderboardBoard({
-        kind: "gibberish",
-        keySet: resolveKeySet({ preset: "row-home" }, false),
-      }),
-    ];
+  it("has one board per Text Source and Language", () => {
+    const boards = REAL_TEXT_KINDS.flatMap((kind) =>
+      LANGUAGES.map((language) => leaderboardBoard({ kind, language })),
+    );
 
     expect(new Set(boards).size).toBe(boards.length);
-    expect(leaderboardBoard({ kind: "words", language: "nl" })).toBe(
-      leaderboardBoard(
+  });
+
+  it("has no board for Gibberish, which is for practising keys", () => {
+    const words = { kind: "words", language: "nl" } as const;
+
+    expect(
+      leaderboardTextSource(
         resolveTextSource({
           textSource: "words",
           language: "nl",
@@ -69,17 +57,16 @@ describe("Leaderboard", () => {
           capitals: true,
         }),
       ),
-    );
+    ).toEqual(words);
+    expect(
+      leaderboardTextSource({
+        kind: "gibberish",
+        keySet: resolveKeySet({ preset: "row-home" }, false),
+      }),
+    ).toBeNull();
   });
 
   it("keeps Times from the old 150-character Turns off today's boards", () => {
-    const homeRow = resolveKeySet({ preset: "row-home" }, false);
-
-    // How boards were named while Turns were 150 characters.
-    expect(leaderboardBoard({ kind: "gibberish", keySet: homeRow })).not.toBe(
-      "a:asdfghjkl;",
-    );
-    // Real text came later, but its boards carry the Turn length too.
     expect(leaderboardBoard({ kind: "words", language: "en" })).toBe(
       `${HOT_SEAT_TURN_LENGTH}:words:en`,
     );
@@ -103,6 +90,25 @@ describe("Leaderboard", () => {
     expect(hotSeatRecords(seat)).toEqual([
       { nickname: "Anna", timeMs: 30_000 },
       { nickname: "Bob", timeMs: 40_000 },
+    ]);
+  });
+
+  it("records Times in whole milliseconds, as the browser's clock has fractions", () => {
+    let seat = startHotSeat({ players: ["Anna", "Bob"], timeBankMs: 60_000 });
+    seat = completeTurn(seat, turnTaking(20_000.4));
+    seat = completeTurn(seat, turnTaking(25_000.6));
+    seat = runOutOfTime(seat, turnTaking(35_000));
+    const race = finishRaceTurn(
+      startClassicRace({ players: ["Anna"] }),
+      turnTaking(25_000.5),
+    );
+
+    expect(hotSeatRecords(seat)).toEqual([
+      { nickname: "Anna", timeMs: 20_000 },
+      { nickname: "Bob", timeMs: 25_001 },
+    ]);
+    expect(soloRaceRecords(race, HOT_SEAT_TURN_LENGTH)).toEqual([
+      { nickname: "Anna", timeMs: 25_001 },
     ]);
   });
 
@@ -220,28 +226,18 @@ describe("Leaderboard records of a Room", () => {
     );
   }
 
+  it("has nothing for a Hot Seat Match on Gibberish", () => {
+    const room = finish(hotSeatRoom());
+
+    expect(room.phase).toBe("results");
+    expect(roomLeaderboardRecords(room)).toBeNull();
+  });
+
   it("has the best Times and the Text Source once the Hot Seat Match is over", () => {
-    const started = hotSeatRoom();
+    const started = hotSeatRoom({ textSource: "sentences", language: "nl" });
     expect(roomLeaderboardRecords(typeTurn(started, "p1", 4_000))).toBeNull();
 
     const room = finish(started);
-
-    expect(room.phase).toBe("results");
-    const result = roomLeaderboardRecords(room);
-    expect(result?.textSource).toEqual({
-      kind: "gibberish",
-      keySet: resolveKeySet({ preset: "row-home" }, false),
-    });
-    expect(result?.records.map((record) => record.nickname)).toEqual([
-      "Anna",
-      "Bob",
-    ]);
-  });
-
-  it("has the Text Source and Language when the text was real", () => {
-    const room = finish(
-      hotSeatRoom({ textSource: "sentences", language: "nl" }),
-    );
 
     expect(room.phase).toBe("results");
     const result = roomLeaderboardRecords(room);

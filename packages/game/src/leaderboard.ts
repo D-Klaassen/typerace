@@ -1,13 +1,12 @@
 /**
- * The Leaderboard: the fastest Hot Seat Turns and solo Classic Races ever,
- * one board per Text Source. Times only compare fairly on the same kind of
- * text: Gibberish has a board per Key Set (the resolved keys plus Capitals,
- * however the Key Set was chosen), and Words and Sentences one per Language.
+ * The Leaderboard: the fastest Hot Seat Turns and solo Classic Races ever on
+ * Words and Sentences, one board per Text Source and Language, as Times only
+ * compare fairly on the same kind of text. Gibberish is for practising keys,
+ * so it has no board.
  */
 import type { ClassicRace } from "./classic-race";
-import { normalizeKeys } from "./key-sets";
 import { HOT_SEAT_TURN_LENGTH } from "./online-hot-seat";
-import type { TextSource } from "./text-source";
+import type { RealTextSource, TextSource } from "./text-source";
 import type { HotSeat } from "./hot-seat";
 
 /** How many entries a board keeps and shows. */
@@ -24,18 +23,25 @@ export interface LeaderboardEntry extends LeaderboardRecord {
   recordedAtMs: number;
 }
 
+/** The board a Match's Times go on; null for Gibberish, which has none. */
+export function leaderboardTextSource(
+  source: TextSource,
+): RealTextSource | null {
+  return source.kind === "gibberish" ? null : source;
+}
+
 /**
  * A stable name for the board of a Text Source, to store it under. It
  * includes the Turn length, so Times from Turns of another length (150
  * characters before) stay in storage but never share a board with today's.
  */
-export function leaderboardBoard(source: TextSource): string {
-  if (source.kind !== "gibberish") {
-    return `${HOT_SEAT_TURN_LENGTH}:${source.kind}:${source.language}`;
-  }
-  const { keys, capitals } = source.keySet;
+export function leaderboardBoard({ kind, language }: RealTextSource): string {
+  return `${HOT_SEAT_TURN_LENGTH}:${kind}:${language}`;
+}
 
-  return `${HOT_SEAT_TURN_LENGTH}:${capitals ? "A" : "a"}:${normalizeKeys(keys)}`;
+/** Times go on the board in whole milliseconds; the browser's clock has fractions. */
+function record(nickname: string, timeMs: number): LeaderboardRecord {
+  return { nickname, timeMs: Math.round(timeMs) };
 }
 
 /**
@@ -56,7 +62,7 @@ export function hotSeatRecords(
 
     return bestTimeMs === null || nickname === undefined
       ? []
-      : [{ nickname, timeMs: bestTimeMs }];
+      : [record(nickname, bestTimeMs)];
   });
 }
 
@@ -80,7 +86,7 @@ export function soloRaceRecords(
     return [];
   }
 
-  return [{ nickname, timeMs: stats.timeMs }];
+  return [record(nickname, stats.timeMs)];
 }
 
 /** Adds new records to a board, fastest first, and keeps the top entries. */

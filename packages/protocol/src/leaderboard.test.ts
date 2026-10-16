@@ -8,18 +8,19 @@ import {
 
 describe("parseLeaderboardSubmission", () => {
   const valid = {
-    keySet: { keys: "asdfghjkl;", capitals: false },
+    source: "words",
+    language: "en",
     records: [{ nickname: " Anna ", timeMs: 30_000 }],
   };
 
   it("accepts a finished Hot Seat Match and trims nicknames", () => {
     expect(parseLeaderboardSubmission(valid)).toEqual({
-      textSource: { kind: "gibberish", keySet: valid.keySet },
+      textSource: { kind: "words", language: "en" },
       records: [{ nickname: "Anna", timeMs: 30_000 }],
     });
   });
 
-  it("accepts a Hot Seat Match with real text, by Text Source and Language", () => {
+  it("round-trips a Hot Seat Match by Text Source and Language", () => {
     const records = [{ nickname: "Anna", timeMs: 30_000 }];
     const body = leaderboardSubmissionBody({
       textSource: { kind: "sentences", language: "nl" },
@@ -33,17 +34,20 @@ describe("parseLeaderboardSubmission", () => {
     });
   });
 
-  it("rejects impossible times, bad nicknames and unknown keys", () => {
+  it("rejects impossible times, bad nicknames, Gibberish and unknown text", () => {
     for (const body of [
       { ...valid, records: [{ nickname: "Anna", timeMs: 1_000 }] },
       { ...valid, records: [{ nickname: "Anna", timeMs: 30_000.5 }] },
       { ...valid, records: [{ nickname: "   ", timeMs: 30_000 }] },
       { ...valid, records: [{ nickname: "A".repeat(17), timeMs: 30_000 }] },
       { ...valid, records: [] },
-      { ...valid, keySet: { keys: "ÄÖ", capitals: false } },
-      { records: valid.records, source: "gibberish", language: "en" },
-      { records: valid.records, source: "words", language: "de" },
-      { ...valid, source: "words", language: "en" },
+      { ...valid, source: "gibberish" },
+      { ...valid, language: "de" },
+      { ...valid, keySet: { keys: "asdfghjkl;", capitals: false } },
+      {
+        keySet: { keys: "asdfghjkl;", capitals: false },
+        records: valid.records,
+      },
       "not json",
     ]) {
       expect(parseLeaderboardSubmission(body)).toBeNull();
@@ -52,18 +56,6 @@ describe("parseLeaderboardSubmission", () => {
 });
 
 describe("leaderboard search", () => {
-  it("round-trips a Key Set, with its keys in keyboard order", () => {
-    const search = leaderboardSearch({
-      kind: "gibberish",
-      keySet: { keys: "fjdk", capitals: true },
-    });
-
-    expect(parseLeaderboardSearch(new URLSearchParams(search))).toEqual({
-      kind: "gibberish",
-      keySet: { keys: "dfjk", capitals: true },
-    });
-  });
-
   it("round-trips a Text Source and Language", () => {
     const search = leaderboardSearch({ kind: "words", language: "en" });
 
@@ -73,9 +65,9 @@ describe("leaderboard search", () => {
     });
   });
 
-  it("rejects a search without enough keys or a known Text Source", () => {
+  it("rejects a search without a known Text Source and Language", () => {
     for (const search of [
-      "keys=a",
+      "keys=asdfghjkl%3B&capitals=false",
       "source=words",
       "source=gibberish&language=en",
       "source=poems&language=en",

@@ -29,6 +29,9 @@ export type TextSource =
   | { kind: "gibberish"; keySet: KeySet }
   | { kind: RealTextKind; language: Language };
 
+/** Real text in a Language: Words or Sentences. */
+export type RealTextSource = Extract<TextSource, { kind: RealTextKind }>;
+
 /** The Host's or the setup screen's choices that decide the text. */
 export interface TextChoice {
   textSource: TextSourceKind;

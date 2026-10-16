@@ -10,25 +10,29 @@ import {
 import { useTranslations } from "next-intl";
 import { ChoiceGroup } from "@/components/choice-group";
 
-export interface TextSourceValue {
-  textSource: TextSourceKind;
+export interface TextSourceValue<Kind extends TextSourceKind = TextSourceKind> {
+  textSource: Kind;
   language: Language;
 }
 
 /**
  * Gibberish, Words or Sentences, and the Language for real text. Gibberish's
- * keys are picked with the Key Set picker, shown next to this one.
+ * keys are picked with the Key Set picker, shown next to this one. `kinds`
+ * narrows the choice, like the Leaderboard's to real text.
  */
-export function TextSourcePicker({
+export function TextSourcePicker<Kind extends TextSourceKind = TextSourceKind>({
   value,
   onChange,
+  kinds = TEXT_SOURCE_KINDS as readonly Kind[],
   disabled = false,
 }: {
-  value: TextSourceValue;
-  onChange: (value: TextSourceValue) => void;
+  value: TextSourceValue<Kind>;
+  onChange: (value: TextSourceValue<Kind>) => void;
+  kinds?: readonly Kind[];
   disabled?: boolean;
 }) {
   const t = useTranslations("TextSource");
+  const kindLabel = (kind: TextSourceKind) => t(`kinds.${kind}`);
 
   return (
     <div className="flex flex-col gap-3">
@@ -36,9 +40,9 @@ export function TextSourcePicker({
         disabled={disabled}
         legend={t("title")}
         name="text-source"
-        options={TEXT_SOURCE_KINDS.map((kind) => ({
+        options={kinds.map((kind) => ({
           value: kind,
-          label: t(`kinds.${kind}`),
+          label: kindLabel(kind),
         }))}
         value={value.textSource}
         onChange={(textSource) => onChange({ ...value, textSource })}

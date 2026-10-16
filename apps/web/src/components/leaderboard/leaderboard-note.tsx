@@ -1,4 +1,4 @@
-import type { TextChoice } from "@typerace/game";
+import type { RealTextSource } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,11 +13,11 @@ export type LeaderboardStatus = "saving" | "saved" | "failed";
  */
 export function LeaderboardNote({
   status,
-  text,
+  textSource,
 }: {
   /** Null when there was nothing to save. */
   status: LeaderboardStatus | null;
-  text: TextChoice;
+  textSource: RealTextSource;
 }) {
   const t = useTranslations("Leaderboard");
 
@@ -34,7 +34,7 @@ export function LeaderboardNote({
         </p>
       )}
       <Link
-        href={leaderboardHref(text)}
+        href={leaderboardHref(textSource)}
         className={buttonVariants({ variant: "link" })}
       >
         {t("view")}

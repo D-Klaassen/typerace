@@ -1,6 +1,10 @@
 "use client";
 
-import type { Display } from "@typerace/game";
+import {
+  leaderboardTextSource,
+  resolveTextSource,
+  type Display,
+} from "@typerace/game";
 import type { RoomView } from "@typerace/protocol";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -169,6 +173,8 @@ export function OnlineResults({
   const percent = (value: number) => common("percent", { value });
   const { headers, rows } = resultTable(room.results, { t, seconds, percent });
   const winner = rows[0];
+  // Gibberish has no board, so a Hot Seat Match on it isn't recorded.
+  const board = leaderboardTextSource(resolveTextSource(room.settings));
 
   return (
     <div className="flex w-full max-w-3xl flex-col items-center gap-6">
@@ -209,9 +215,9 @@ export function OnlineResults({
           ))}
         </TableBody>
       </Table>
-      {room.results?.mode === "hotSeat" && (
+      {room.results?.mode === "hotSeat" && board !== null && (
         // The Room puts the best Times on the Leaderboard itself.
-        <LeaderboardNote status="saved" text={room.settings} />
+        <LeaderboardNote status="saved" textSource={board} />
       )}
       {isHost ? (
         <Button size="lg" onClick={onBackToLobby}>

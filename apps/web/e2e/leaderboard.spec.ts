@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-test("the Leaderboard shows a board per Key Set, linked from home", async ({
+test("the Leaderboard has a board per Text Source and Language, linked from home", async ({
   page,
 }) => {
   await page.goto("/");
@@ -9,18 +9,28 @@ test("the Leaderboard shows a board per Key Set, linked from home", async ({
   await expect(
     page.getByRole("heading", { name: "Leaderboard" }),
   ).toBeVisible();
-  // A board nobody has played yet: the pinkies with Capitals.
-  await page
-    .getByRole("group", { name: "Keys" })
-    .getByText("Fingers", { exact: true })
-    .click();
-  await page.getByText("Pinkies", { exact: true }).click();
-  await page.getByText("Capitals (practise Shift)").click();
+  // Gibberish is for practising keys, so it has no board.
+  await expect(page.getByRole("radio", { name: "Words" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "English" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Gibberish" })).toHaveCount(0);
+  await expect(page.getByRole("group", { name: "Keys" })).toBeHidden();
 
-  await expect(page).toHaveURL(/preset=finger-pinky&capitals=true$/);
+  // A board nobody plays on: Dutch Sentences.
+  await page.getByText("Sentences", { exact: true }).click();
+  await page.getByText("Dutch", { exact: true }).click();
+  await expect(page).toHaveURL(/\/leaderboard\?source=sentences&language=nl$/);
   await expect(
     page.getByText("No times on this board yet.", { exact: false }),
   ).toBeVisible();
+});
+
+test("an old link to a Gibberish board opens English Words", async ({
+  page,
+}) => {
+  await page.goto("/leaderboard?preset=classic-medium");
+
+  await expect(page.getByRole("radio", { name: "Words" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "English" })).toBeChecked();
 });
 
 async function typeTurnTaking(page: Page, ms: number) {
@@ -61,29 +71,19 @@ test("a Hot Seat Match with Dutch Words goes on the Dutch Words board", async ({
   await expect(page).toHaveURL(/\/leaderboard\?source=words&language=nl$/);
   await expect(page.getByRole("radio", { name: "Words" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "Dutch" })).toBeChecked();
-  // Real text has no Key Set, so there is no picker for one.
-  await expect(page.getByRole("group", { name: "Keys" })).toBeHidden();
   const board = page.getByRole("table", { name: "Leaderboard" });
   await expect(board).toContainText("Anke");
   await expect(board).toContainText("Bram");
 
-  // English Words have a board of their own, which no test plays on. The
+  // Dutch Sentences have a board of their own, which no test plays on. The
   // hidden /play page, kept by Next.js, has the same options.
   await page
-    .getByText("English", { exact: true })
+    .getByText("Sentences", { exact: true })
     .filter({ visible: true })
     .click();
-  await expect(page).toHaveURL(/source=words&language=en$/);
+  await expect(page).toHaveURL(/source=sentences&language=nl$/);
   await expect(
     page.getByText("No times on this board yet.", { exact: false }),
   ).toBeVisible();
   await expect(page.getByRole("cell", { name: "Anke" })).toHaveCount(0);
-
-  // And Gibberish goes back to a board per Key Set.
-  await page
-    .getByText("Gibberish", { exact: true })
-    .filter({ visible: true })
-    .click();
-  await expect(page).toHaveURL(/\/leaderboard\?preset=classic-medium$/);
-  await expect(page.getByRole("group", { name: "Keys" })).toBeVisible();
 });

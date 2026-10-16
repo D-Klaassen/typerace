@@ -13,6 +13,7 @@ import {
   TEXT_LENGTH_CHARACTERS,
   HOT_SEAT_TURN_LENGTH,
   hotSeatRecords,
+  leaderboardTextSource,
   soloRaceRecords,
   type ClassicRace,
   type LeaderboardRecord,
@@ -64,8 +65,15 @@ export function SharedKeyboardGame() {
   // quits the game, so coming back starts at setup with the same settings.
   useLayoutEffect(() => () => setGame({ phase: "setup" }), []);
 
+  /** The board the Times go on; Gibberish has none. */
+  const board = leaderboardTextSource(resolveTextSource(settings));
+
   /** A Hot Seat Match's best Times, or a solo Classic Race of a Turn's length. */
   function leaderboardRecords(match: Match): LeaderboardRecord[] {
+    if (board === null) {
+      return [];
+    }
+
     return match.mode === "hotSeat"
       ? hotSeatRecords(match.seat)
       : soloRaceRecords(
@@ -76,15 +84,12 @@ export function SharedKeyboardGame() {
 
   function saveToLeaderboard(match: Match) {
     const records = leaderboardRecords(match);
-    if (ROOMS_HOST === null || records.length === 0) {
+    if (ROOMS_HOST === null || board === null || records.length === 0) {
       return;
     }
 
     setSaved({ match, status: "saving" });
-    submitToLeaderboard(ROOMS_HOST, {
-      textSource: resolveTextSource(settings),
-      records,
-    }).then(
+    submitToLeaderboard(ROOMS_HOST, { textSource: board, records }).then(
       () => setSaved({ match, status: "saved" }),
       () => setSaved({ match, status: "failed" }),
     );
@@ -214,10 +219,11 @@ export function SharedKeyboardGame() {
               settings.players.find((player) => player.name === name)?.display
             }
             leaderboard={
-              ROOMS_HOST !== null && (
+              ROOMS_HOST !== null &&
+              board !== null && (
                 <LeaderboardNote
                   status={saved?.match === match ? saved.status : null}
-                  text={settings}
+                  textSource={board}
                 />
               )
             }
@@ -233,10 +239,11 @@ export function SharedKeyboardGame() {
             }
             leaderboard={
               ROOMS_HOST !== null &&
+              board !== null &&
               leaderboardRecords(match).length > 0 && (
                 <LeaderboardNote
                   status={saved?.match === match ? saved.status : null}
-                  text={settings}
+                  textSource={board}
                 />
               )
             }

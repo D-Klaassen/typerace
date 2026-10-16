@@ -3,7 +3,7 @@ import {
   leaderboardBoard,
   type LeaderboardEntry,
   type LeaderboardRecord,
-  type TextSource,
+  type RealTextSource,
 } from "@typerace/game";
 import {
   parseLeaderboardSearch,
@@ -18,7 +18,7 @@ import { DurableObject } from "cloudflare:workers";
  * reading a board and writing it back can't lose a concurrent record.
  */
 export class Leaderboard extends DurableObject<Env> {
-  async top(textSource: TextSource): Promise<LeaderboardEntry[]> {
+  async top(textSource: RealTextSource): Promise<LeaderboardEntry[]> {
     return (
       (await this.ctx.storage.get<LeaderboardEntry[]>(
         leaderboardBoard(textSource),
@@ -27,7 +27,7 @@ export class Leaderboard extends DurableObject<Env> {
   }
 
   async record(
-    textSource: TextSource,
+    textSource: RealTextSource,
     records: readonly LeaderboardRecord[],
   ): Promise<void> {
     await this.ctx.storage.put(

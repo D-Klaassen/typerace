@@ -51,7 +51,9 @@ test("a single Player races alone, and a Medium race goes on the Leaderboard", a
   await page.getByRole("button", { name: "Remove Player 2" }).click();
   await expect(page.getByPlaceholder("Player 2")).toBeHidden();
   await expect(
-    page.getByText("On your own, a Medium race goes on the leaderboard."),
+    page.getByText(
+      "On your own, a Medium race with Words or Sentences goes on the leaderboard.",
+    ),
   ).toBeVisible();
   // English Sentences: a board no other test plays on.
   await page.getByText("Sentences", { exact: true }).click();

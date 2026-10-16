@@ -115,7 +115,7 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 - **Shared Keyboard:**
   - Each Player takes one Turn.
   - The fastest Time wins. On a tie, the higher Accuracy wins, then whoever went first.
-  - **Solo:** a single Player can race on their own. The handover skips "pass the keyboard", and the results say they finished instead of naming a winner. A solo race of Medium length goes on the Leaderboard.
+  - **Solo:** a single Player can race on their own. The handover skips "pass the keyboard", and the results say they finished instead of naming a winner. A solo race of Medium length with Words or Sentences goes on the Leaderboard.
 
 ### Crazy Darts (Online only)
 
@@ -161,20 +161,19 @@ Items marked **(spec default)** were not discussed in the grilling session. They
 ## Results screen
 
 - **Every Mode:** final ranking, plus per Player their WPM, Accuracy, Typos and Time, and which aids (On-screen Keyboard, Finger Guide) they had on.
-- **Hot Seat:** also each Player's best Time and number of Turns, whether the best Times reached the Leaderboard, and a link to it.
+- **Hot Seat:** also each Player's best Time and number of Turns, and for Words and Sentences whether the best Times reached the Leaderboard, and a link to it.
 - **Next step:** Online, the Host gets "Rematch". On a Shared Keyboard, "Play again" and "Back to setup".
 
 ## Leaderboard
 
-- **What goes on it:** when a Hot Seat Match ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it. A solo Classic Race on a Shared Keyboard counts too when its text is Medium, the same length as a Turn.
-- **One board per kind of text,** as Times only compare on the same text. Each board keeps its fastest 20; equal Times rank in the order they were set.
-  - **Gibberish:** a board per Key Set: the resolved keys plus Capitals, so a custom set with the home row keys shares the board of the Home row preset.
-  - **Words and Sentences:** a board per Text Source and Language: English Words, Dutch Words, English Sentences and Dutch Sentences.
+- **What goes on it:** when a Hot Seat Match on Words or Sentences ends, each Player's best Time, under their nickname. Players who never finished a Turn have no Time. Online, only Players still in the Room are on it. A solo Classic Race on a Shared Keyboard counts too when its text is Medium, the same length as a Turn, and Words or Sentences.
+- **One board per Text Source and Language,** as Times only compare on the same text: English Words, Dutch Words, English Sentences and Dutch Sentences. Each board keeps its fastest 20; equal Times rank in the order they were set.
+- **No Gibberish:** Gibberish is for practising keys, so it has no board. Its Matches aren't recorded, and their results don't mention the Leaderboard. Boards stored from before stay in storage but are never shown.
 - **Per Turn length:** boards are stored under the Turn length too. Times from when Turns were 150 characters stay in storage but aren't on today's boards, so every Time on a board was set on a Turn of the same length.
 - **Online:** the Room records the Hot Seat Match itself, using the Times it measured on its own clock.
-- **Shared Keyboard:** the browser sends the best Times to the Rooms server, with the Key Set or the Text Source and Language. These can't be verified, so the server only checks they're plausible (5 s to 10 min, valid nicknames, and valid keys or a known Text Source and Language).
-- **The page** `/leaderboard`, linked from the home page and from Hot Seat results, has a Text Source picker (with a Language for Words and Sentences, or a Key Set picker for Gibberish) and shows that board. Its URL names the board, so it can be shared, and the link from Hot Seat results opens the board the Hot Seat Match went on.
-- **Nickname fields** say the nickname is shown on the Leaderboard after a Hot Seat Match or a solo Medium race.
+- **Shared Keyboard:** the browser sends the best Times, rounded to whole milliseconds, to the Rooms server with the Text Source and Language. These can't be verified, so the server only checks they're plausible (5 s to 10 min in whole milliseconds, valid nicknames, and a known Text Source and Language).
+- **The page** `/leaderboard`, linked from the home page and from Hot Seat results, has a picker for Words or Sentences and a Language, and shows that board. Its URL names the board, so it can be shared, and the link from Hot Seat results opens the board the Hot Seat Match went on.
+- **Nickname fields** say the nickname is shown on the Leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences.
 
 ## On-screen Keyboard and Finger Guide
 

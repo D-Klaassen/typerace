@@ -1,11 +1,8 @@
 import {
-  DEFAULT_KEY_SET_CHOICE,
-  findPreset,
   LANGUAGES,
   REAL_TEXT_KINDS,
   type LeaderboardEntry,
-  type TextChoice,
-  type TextSource,
+  type RealTextSource,
 } from "@typerace/game";
 import {
   LEADERBOARD_PATH,
@@ -18,7 +15,7 @@ import { roomsOrigin } from "./rooms-host";
 
 export async function fetchLeaderboard(
   host: string,
-  textSource: TextSource,
+  textSource: RealTextSource,
   signal?: AbortSignal,
 ): Promise<LeaderboardEntry[]> {
   const response = await fetch(
@@ -47,50 +44,24 @@ export async function submitToLeaderboard(
   }
 }
 
-/**
- * The Leaderboard page, opened on the board of the chosen text: a Key Set's
- * for Gibberish, else the Text Source and Language.
- */
-export function leaderboardHref({
-  textSource,
-  language,
-  keySet,
-  capitals,
-}: TextChoice): string {
-  if (textSource !== "gibberish") {
-    return `/leaderboard?${new URLSearchParams({ source: textSource, language })}`;
-  }
-  const params = new URLSearchParams(
-    "preset" in keySet ? { preset: keySet.preset } : { custom: keySet.custom },
-  );
-  if (capitals) {
-    params.set("capitals", "true");
-  }
-
-  return `/leaderboard?${params}`;
+/** The Leaderboard page, opened on the board of a Text Source and Language. */
+export function leaderboardHref({ kind, language }: RealTextSource): string {
+  return `/leaderboard?${new URLSearchParams({ source: kind, language })}`;
 }
 
 /**
- * The text a Leaderboard page link stands for: Gibberish with Medium keys
- * without a valid one, and English for a Text Source without a Language.
+ * The board a Leaderboard page link stands for: English for a link without
+ * a valid Language, and Words without a valid Text Source, like the old
+ * links to Gibberish boards.
  */
-export function textChoiceOfLeaderboardHref(
+export function textSourceOfLeaderboardHref(
   params: URLSearchParams,
-): TextChoice {
+): RealTextSource {
   const source = params.get("source");
   const language = params.get("language");
-  const preset = params.get("preset");
-  const custom = params.get("custom");
 
   return {
-    textSource: REAL_TEXT_KINDS.find((kind) => kind === source) ?? "gibberish",
+    kind: REAL_TEXT_KINDS.find((kind) => kind === source) ?? "words",
     language: LANGUAGES.find((known) => known === language) ?? "en",
-    keySet:
-      preset !== null && findPreset(preset)
-        ? { preset }
-        : custom !== null
-          ? { custom }
-          : DEFAULT_KEY_SET_CHOICE,
-    capitals: params.get("capitals") === "true",
   };
 }

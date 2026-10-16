@@ -27,7 +27,7 @@ test("an Online Hot Seat Match until the slowest Player runs out of time", async
   await anna.goto("/online");
   await anna.getByRole("button", { name: "Create Room" }).click();
   await expect(anna.getByLabel("Your nickname")).toHaveAccessibleDescription(
-    "Your nickname is shown on the leaderboard when you finish a Hot Seat Match.",
+    "Your nickname is shown on the leaderboard when you finish a Hot Seat Match with Words or Sentences.",
   );
   await enterRoom(anna, "Anna");
   await expect(anna).toHaveURL(/\/room\/[A-Z]{6}$/);
@@ -39,6 +39,7 @@ test("an Online Hot Seat Match until the slowest Player runs out of time", async
 
   await anna.getByText("Hot Seat", { exact: true }).first().click();
   await anna.getByText("1", { exact: true }).click(); // 1-minute Time Bank
+  await anna.getByText("Words", { exact: true }).click(); // English Words
   await anna.getByRole("button", { name: "Start Match" }).click();
 
   // Anna's Turn: she types fast, Bob watches.
@@ -67,7 +68,10 @@ test("an Online Hot Seat Match until the slowest Player runs out of time", async
   await expect(rows.nth(2)).toContainText("Bob");
   // Columns: #, Player, Best time, Turns, …
   await expect(rows.nth(2).getByRole("cell").nth(3)).toHaveText("2");
-  await expect(
-    bob.getByRole("link", { name: "See the leaderboard" }),
-  ).toBeVisible();
+  // The Room put both best Times on the English Words board.
+  await bob.getByRole("link", { name: "See the leaderboard" }).click();
+  await expect(bob).toHaveURL(/\/leaderboard\?source=words&language=en$/);
+  const board = bob.getByRole("table", { name: "Leaderboard" });
+  await expect(board).toContainText("Anna");
+  await expect(board).toContainText("Bob");
 });

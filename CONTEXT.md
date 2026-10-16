@@ -125,7 +125,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
+The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per Text Source and Language for Words and Sentences. Gibberish is for practising keys, so it has no board and its Times never go on the Leaderboard. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids

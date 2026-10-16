@@ -3,10 +3,15 @@ import {
   resolveKeySet,
   type KeySetChoice,
 } from "./key-sets";
-import { hotSeatRecords, type LeaderboardRecord } from "./leaderboard";
+import {
+  hotSeatRecords,
+  leaderboardTextSource,
+  type LeaderboardRecord,
+} from "./leaderboard";
 import {
   resolveTextSource,
   type Language,
+  type RealTextSource,
   type TextSource,
   type TextSourceKind,
 } from "./text-source";
@@ -487,16 +492,19 @@ export function roomTextSource(room: Room): TextSource {
 /**
  * The best Times of a finished Online Hot Seat Match, for the Leaderboard. Only
  * Players still in the Room are on it: the Room no longer knows who left.
+ * Gibberish has no board, so a Match on it has nothing to record.
  */
 export function roomLeaderboardRecords(
   room: Room,
-): { textSource: TextSource; records: LeaderboardRecord[] } | null {
-  if (room.phase !== "results" || !room.hotSeat) {
+): { textSource: RealTextSource; records: LeaderboardRecord[] } | null {
+  const textSource =
+    room.hotSeat && leaderboardTextSource(room.hotSeat.textSource);
+  if (room.phase !== "results" || !room.hotSeat || !textSource) {
     return null;
   }
 
   return {
-    textSource: room.hotSeat.textSource,
+    textSource,
     records: hotSeatRecords(
       room.hotSeat.seat,
       (id) => room.players.find((player) => player.id === id)?.nickname,

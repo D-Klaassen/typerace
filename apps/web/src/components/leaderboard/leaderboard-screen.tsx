@@ -2,15 +2,13 @@
 
 import {
   leaderboardBoard,
-  resolveTextSource,
+  REAL_TEXT_KINDS,
   type LeaderboardEntry,
-  type TextChoice,
-  type TextSource,
+  type RealTextSource,
 } from "@typerace/game";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { KeySetPicker } from "@/components/key-set/key-set-picker";
+import { useEffect, useState } from "react";
 import { TextSourcePicker } from "@/components/text-source/text-source-picker";
 import {
   Card,
@@ -30,26 +28,24 @@ import {
 import {
   fetchLeaderboard,
   leaderboardHref,
-  textChoiceOfLeaderboardHref,
+  textSourceOfLeaderboardHref,
 } from "@/lib/leaderboard";
 import { ROOMS_HOST } from "@/lib/rooms-host";
 
 /**
- * The fastest Hot Seat Turns for the text picked on the page: a Key Set for
- * Gibberish, or a Text Source and Language.
+ * The fastest Hot Seat Turns for the Text Source and Language picked on the
+ * page. Gibberish has no board, so it can't be picked.
  */
 export function LeaderboardScreen() {
   const t = useTranslations("Leaderboard");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState<TextChoice>(() =>
-    textChoiceOfLeaderboardHref(searchParams),
+  const [textSource, setTextSource] = useState<RealTextSource>(() =>
+    textSourceOfLeaderboardHref(searchParams),
   );
-  const textSource = useMemo(() => resolveTextSource(value), [value]);
 
-  function choose(changes: Partial<TextChoice>) {
-    const next = { ...value, ...changes };
-    setValue(next);
+  function choose(next: RealTextSource) {
+    setTextSource(next);
     // Keep the link shareable without adding to the history.
     router.replace(leaderboardHref(next), { scroll: false });
   }
@@ -67,11 +63,17 @@ export function LeaderboardScreen() {
           </CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-6">
-          <TextSourcePicker value={value} onChange={choose} />
-          {value.textSource === "gibberish" && (
-            <KeySetPicker value={value} onChange={choose} />
-          )}
+        <CardContent>
+          <TextSourcePicker
+            kinds={REAL_TEXT_KINDS}
+            value={{
+              textSource: textSource.kind,
+              language: textSource.language,
+            }}
+            onChange={({ textSource: kind, language }) =>
+              choose({ kind, language })
+            }
+          />
         </CardContent>
       </Card>
       <Board host={ROOMS_HOST} textSource={textSource} />
@@ -81,7 +83,13 @@ export function LeaderboardScreen() {
 
 type Loaded = { board: string; entries: LeaderboardEntry[] | "failed" };
 
-function Board({ host, textSource }: { host: string; textSource: TextSource }) {
+function Board({
+  host,
+  textSource,
+}: {
+  host: string;
+  textSource: RealTextSource;
+}) {
   const t = useTranslations("Leaderboard");
   const common = useTranslations("Common");
   const locale = useLocale();

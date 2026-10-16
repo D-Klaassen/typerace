@@ -15,7 +15,7 @@ Playing on a single device, alone or passed between the Players, with no Room an
 _Avoid_: Local, offline, couch play
 
 **Player**:
-A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and best Time on the Leaderboard.
+A person taking part in a game, known only by a nickname of at most 16 characters that is unique within that game, ignoring case. Players have no account, and nothing about them persists after they leave except their nickname and Times on the Leaderboard.
 _Avoid_: User, account, participant
 
 **Room**:
@@ -45,8 +45,16 @@ A set of game rules that decides how Players interact and who wins: Classic Race
 _Avoid_: Theme (when talking about rules), game type
 
 **Theme**:
-The visual look of the game, separate from its rules. Each Mode has a single fixed look for now.
+The visual look of the game, separate from its rules. Each Mode has its own fixed look, and Classic Race and Hot Seat can also be shown in the Racing Theme.
 _Avoid_: Mode, skin
+
+**Racing Theme**:
+A Theme for Classic Race and Hot Seat in which each Player's typing drives a car down a 3D road. The car is exactly as far along as their typing and its speed shows their current pace; a Typo makes it skid, and three Typos in a row make it crash until the right key is pressed. It changes no rules.
+_Avoid_: Racing simulator, racing mode, car mode
+
+**Ghost**:
+A see-through car in the Racing Theme that replays how an earlier Turn progressed over time, so the Player can race against it.
+_Avoid_: Replay, shadow, ghost rider
 
 **Classic Race**:
 A Mode where the fastest Player to finish the text wins. Online, everyone types the same text at once. On a Shared Keyboard, Players take Turns, and a single Player can race on their own.
@@ -117,7 +125,7 @@ Words per minute, counting every five correct characters as one word.
 The share of all keystrokes that were correct, so Typos lower it.
 
 **Leaderboard**:
-The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20.
+The fastest Hot Seat Turns of everyone who ever finished a Hot Seat Match, Online or on a Shared Keyboard, and the Times of solo Classic Races on a Shared Keyboard whose text was a Turn's length, with one board per kind of text: per Key Set (its keys plus Capitals) for Gibberish, and per Text Source and Language for Words and Sentences. Only Times from Turns of today's length count, so older, longer Turns aren't on it. Each Player's best Time from a finished Hot Seat Match goes on the board under their nickname, and a board keeps its top 20. Each entry also keeps how its typing progressed, so the board's fastest can be raced as a Ghost.
 _Avoid_: High scores, ranking (that's the results of one Match)
 
 ### Learning aids
@@ -131,5 +139,5 @@ An optional keyboard that highlights the next key, and the Shift key to hold wit
 _Avoid_: Keyboard hint, virtual keyboard
 
 **Display**:
-A Player's own choice of whether they see the On-screen Keyboard and the Finger Guide while typing. The Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
+A Player's own choice of whether they see the On-screen Keyboard, the Finger Guide, the Racing Theme and the Leaderboard's Ghost while typing. Only the Finger Guide is on by default. It doesn't change anyone else's screen, but the results show everyone which aids each Player had on.
 _Avoid_: Settings (those are the Host's)

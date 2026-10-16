@@ -21,7 +21,7 @@ import {
 } from "@typerace/game";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import { DEFAULT_DISPLAY } from "@/components/finger-guide/finger-guide";
 import {
   LeaderboardNote,
@@ -59,6 +59,10 @@ export function SharedKeyboardGame() {
     match: Match;
     status: LeaderboardStatus;
   } | null>(null);
+
+  // Next.js keeps this page alive, hidden, after navigating away. Leaving
+  // quits the game, so coming back starts at setup with the same settings.
+  useLayoutEffect(() => () => setGame({ phase: "setup" }), []);
 
   /** A Hot Seat Match's best Times, or a solo Classic Race of a Turn's length. */
   function leaderboardRecords(match: Match): LeaderboardRecord[] {

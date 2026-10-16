@@ -34,6 +34,7 @@ describe("toRoomView", () => {
           typos: 0,
           typosInARow: 0,
           finished: false,
+          finishedAtMs: null,
           dropped: false,
         },
         {
@@ -42,6 +43,7 @@ describe("toRoomView", () => {
           typos: 0,
           typosInARow: 0,
           finished: false,
+          finishedAtMs: null,
           dropped: false,
         },
       ],
@@ -87,6 +89,21 @@ describe("toRoomView", () => {
       inError: true,
       typosInARow: 2,
     });
+  });
+
+  it("sends when each racer finished, on the Room's clock, to put them in order", () => {
+    let room = racingRoom();
+    for (const [player, key, at] of [
+      ["b", "a", 3_500],
+      ["b", "b", 4_000],
+      ["a", "a", 4_500],
+    ] as const) {
+      room = typeInRoom(room, player, key, at);
+    }
+
+    expect(
+      toRoomView(room).race?.racers.map((racer) => racer.finishedAtMs),
+    ).toEqual([null, 4_000]);
   });
 
   it("includes the ranking once the race is over", () => {

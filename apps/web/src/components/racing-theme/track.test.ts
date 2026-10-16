@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { lapsFor, placeOnTrack } from "./track";
+import { lapOf, lapsFor, placeOnTrack } from "./track";
 
 describe("the circuit", () => {
   it("has a lap for every 100 or so characters, and at least one", () => {
@@ -23,5 +23,13 @@ describe("the circuit", () => {
       y: expect.closeTo(start.y, 3),
     });
     expect(placeOnTrack(0.5, 1, 0).x).not.toBeCloseTo(start.x, 0);
+  });
+
+  it("counts the lap a car is on, staying on the last lap at the finish", () => {
+    expect(lapOf(0, 2)).toBe(1);
+    expect(lapOf(0.49, 2)).toBe(1);
+    expect(lapOf(0.5, 2)).toBe(2);
+    expect(lapOf(1, 2)).toBe(2);
+    expect(lapOf(1, 1)).toBe(1);
   });
 });

@@ -167,6 +167,11 @@ export function SharedKeyboardGame() {
       const display =
         settings.players.find((p) => p.name === player)?.display ??
         DEFAULT_DISPLAY;
+      // The Player's place in the setup gives their car its colour and lane.
+      const carSeat = Math.max(
+        0,
+        settings.players.findIndex((p) => p.name === player),
+      );
 
       if (match.mode === "classicRace") {
         screen = (
@@ -176,6 +181,7 @@ export function SharedKeyboardGame() {
             text={text}
             timeBankMs={null}
             display={display}
+            seat={carSeat}
             onComplete={(stats) =>
               endTurn({
                 mode: "classicRace",
@@ -202,6 +208,7 @@ export function SharedKeyboardGame() {
             seat.players.find((p) => p.name === player)?.timeBankMs ?? 0
           }
           display={display}
+          seat={carSeat}
           onComplete={endHotSeatTurn(completeTurn)}
           onRunOutOfTime={endHotSeatTurn(runOutOfTime)}
         />

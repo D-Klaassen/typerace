@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { CRASH_TYPOS_IN_A_ROW, glide } from "./car-motion";
+import {
+  CRASH_SPIN_MS,
+  CRASH_TYPOS_IN_A_ROW,
+  glide,
+  SKID_MS,
+} from "./car-motion";
 
 /** What the circuit needs to know about one car's typing. */
 export interface CarTyping {
@@ -13,11 +18,14 @@ export interface CarTyping {
 /** Where to draw a car right now, and how far into a skid or crash it is. */
 export interface CarMotion {
   shown: number;
+  /** Time since the latest Typo, during its skid; null otherwise. */
   skidAgeMs: number | null;
+  /** Time since the crash, up to the end of the spin; null when not crashed. */
   crashAgeMs: number | null;
 }
 
-interface Tracked {
+/** When a car's last moves happened, on this browser's clock. */
+interface CarTimeline {
   from: number;
   to: number;
   changedAtMs: number;
@@ -42,13 +50,14 @@ export function useRaceMotion(
   });
 
   useEffect(() => {
-    const tracked = new Map<string, Tracked>();
+    const timelines = new Map<string, CarTimeline>();
+    let shown: Readonly<Record<string, CarMotion>> = {};
     let frame = requestAnimationFrame(function loop(nowMs) {
       const next: Record<string, CarMotion> = {};
       for (const car of latest.current) {
-        let track = tracked.get(car.id);
-        if (!track) {
-          track = {
+        let timeline = timelines.get(car.id);
+        if (!timeline) {
+          timeline = {
             from: car.position,
             to: car.position,
             changedAtMs: -Infinity,
@@ -56,42 +65,50 @@ export function useRaceMotion(
             lastTypoAtMs: null,
             crashedAtMs: null,
           };
-          tracked.set(car.id, track);
+          timelines.set(car.id, timeline);
         }
-        if (car.position !== track.to) {
-          track.from = glide({
-            from: track.from,
-            to: track.to,
-            sinceChangeMs: nowMs - track.changedAtMs,
+        if (car.position !== timeline.to) {
+          timeline.from = glide({
+            from: timeline.from,
+            to: timeline.to,
+            sinceChangeMs: nowMs - timeline.changedAtMs,
           });
-          track.to = car.position;
-          track.changedAtMs = nowMs;
+          timeline.to = car.position;
+          timeline.changedAtMs = nowMs;
         }
-        if (car.typosInARow > track.typosInARow) {
-          track.lastTypoAtMs = nowMs;
+        if (car.typosInARow > timeline.typosInARow) {
+          timeline.lastTypoAtMs = nowMs;
         }
-        track.typosInARow = car.typosInARow;
+        timeline.typosInARow = car.typosInARow;
         if (car.typosInARow >= CRASH_TYPOS_IN_A_ROW) {
-          track.crashedAtMs ??= nowMs;
+          timeline.crashedAtMs ??= nowMs;
         } else {
-          track.crashedAtMs = null;
+          timeline.crashedAtMs = null;
         }
 
+        const sinceTypoMs =
+          timeline.lastTypoAtMs === null
+            ? Infinity
+            : nowMs - timeline.lastTypoAtMs;
         next[car.id] = {
           shown: glide({
-            from: track.from,
-            to: track.to,
-            sinceChangeMs: nowMs - track.changedAtMs,
+            from: timeline.from,
+            to: timeline.to,
+            sinceChangeMs: nowMs - timeline.changedAtMs,
           }),
-          skidAgeMs:
-            car.typosInARow > 0 && track.lastTypoAtMs !== null
-              ? nowMs - track.lastTypoAtMs
-              : null,
+          // The skid plays out in full, even if the right key comes first.
+          skidAgeMs: sinceTypoMs < SKID_MS ? sinceTypoMs : null,
           crashAgeMs:
-            track.crashedAtMs === null ? null : nowMs - track.crashedAtMs,
+            timeline.crashedAtMs === null
+              ? null
+              : Math.min(CRASH_SPIN_MS, nowMs - timeline.crashedAtMs),
         };
       }
-      setMotion(next);
+      // Once nothing moves, the circuit needn't draw again every frame.
+      if (!sameMotion(shown, next)) {
+        shown = next;
+        setMotion(next);
+      }
       frame = requestAnimationFrame(loop);
     });
 
@@ -99,6 +116,23 @@ export function useRaceMotion(
   }, []);
 
   return motion;
+}
+
+function sameMotion(
+  a: Readonly<Record<string, CarMotion>>,
+  b: Readonly<Record<string, CarMotion>>,
+): boolean {
+  const ids = Object.keys(b);
+
+  return (
+    ids.length === Object.keys(a).length &&
+    ids.every(
+      (id) =>
+        a[id]?.shown === b[id]!.shown &&
+        a[id]?.skidAgeMs === b[id]!.skidAgeMs &&
+        a[id]?.crashAgeMs === b[id]!.crashAgeMs,
+    )
+  );
 }
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";

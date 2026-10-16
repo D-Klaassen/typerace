@@ -29,7 +29,7 @@ export function carMood({
 /** How long a single Typo's skid lasts. */
 export const SKID_MS = 600;
 /** How long a crash's spin takes. */
-const CRASH_SPIN_MS = 900;
+export const CRASH_SPIN_MS = 900;
 /** Up to about 26°, three swings, fading out. */
 const SKID_YAW = 0.45;
 const SKID_SLIDE = 0.22;

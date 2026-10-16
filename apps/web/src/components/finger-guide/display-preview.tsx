@@ -42,7 +42,7 @@ export function DisplayPreview({ display }: { display: DisplayPreferences }) {
               position,
               typosInARow: 0,
               finished: false,
-              you: true,
+              isYou: true,
             },
           ]}
           textLength={SAMPLE.length}

@@ -16,6 +16,7 @@ import {
 } from "@/components/finger-guide/finger-guide";
 import {
   RacingTrack,
+  typingCar,
   type RacingCar,
 } from "@/components/racing-theme/racing-track";
 import { TypingText } from "@/components/typing/typing-text";
@@ -177,7 +178,7 @@ export function Spectating({
   );
 }
 
-/** The race's cars, with our own from local typing, ahead of the Room's view. */
+/** Everyone's cars in this Classic Race, ours from local typing, ahead of the Room's view. */
 function racingCars(
   race: Race,
   nicknames: Record<string, string>,
@@ -185,16 +186,18 @@ function racingCars(
   own?: TypingSession,
 ): RacingCar[] {
   return race.racers.map((racer) => {
-    const typing = racer.playerId === you && own ? own : racer;
+    const isYou = racer.playerId === you;
+    const typing = isYou && own ? own : racer;
 
     return {
-      id: racer.playerId,
-      name: nicknames[racer.playerId] ?? "?",
-      position: typing.position,
-      typosInARow: typing.typosInARow,
-      finished: typing.finished,
+      ...typingCar(typing, {
+        id: racer.playerId,
+        name: nicknames[racer.playerId] ?? "?",
+        isYou,
+      }),
+      // Our own finish is timed by the Room too, once its update arrives.
+      finishedAtMs: racer.finishedAtMs,
       dropped: racer.dropped,
-      you: racer.playerId === you,
     };
   });
 }

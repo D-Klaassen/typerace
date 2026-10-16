@@ -175,18 +175,18 @@ A Theme for Classic Race and Hot Seat, Online and on a Shared Keyboard (not Craz
 - **The circuit:** a looping race track seen from above, drawn in plain SVG with no 3D library.
   - One lap for every ~100 characters, rounded, at least one: a Medium text or a Hot Seat Turn is one lap.
   - Every car is exactly as far along as its Player's typing. It glides to each new letter in 90 ms and is never drawn ahead of it.
-  - Up to six cars, one lane each, with a name tag. Your own car says "You". Online, each car keeps the same colour on every screen, and a Player who left is faded where they stopped.
+  - Up to six cars, one lane each, with a name tag. Your own car says "You". A Player's place in the Room or the setup gives their car its colour and lane, the same on every screen and every Turn. A Player who left is faded where they stopped.
 - **Layout:**
   - The track view zooms in on your car (or the leader's, for a Spectator) and follows it round, always north up.
   - A small map of the whole circuit in its corner shows everyone as dots, with a box for what the track view shows. The lap count is in the other corner.
-  - With more than one car, a race order beside the track shows each car's place and how many letters it is behind the leader (or that it finished, crashed or left).
+  - With more than one car, a race order beside the track shows each car's place and how many letters it is behind the leader (or that it finished, crashed or left). Those who finished come first, in the order the Room timed them, then everyone still typing, furthest first, then those who left. Without a car of its own to follow, the camera follows whoever leads the cars still racing.
   - The text, the On-screen Keyboard and the Finger Guide sit below, as without the Theme.
 - **No speed is shown.** The cars' movement is the only sign of pace, so WPM stays hidden while typing.
-- **A Typo** makes the car skid for 600 ms: it wobbles (three swings of up to about 26°, fading out), drifts a little sideways and leaves tyre marks.
+- **A Typo** makes the car skid for 600 ms, even if the right key comes sooner: it wobbles (three swings of up to about 26°, fading out), drifts a little sideways and leaves tyre marks.
 - **Three Typos in a row** crash it:
-  - It spins one and a quarter turns over 0.9 s, ending sideways, and slides towards the grass.
+  - It spins one and a quarter turns over 0.9 s, ending sideways, and slides towards the nearer kerb and the grass beyond it.
   - It stays there until the right key is pressed, with "Crashed! Press the right key to drive on" on your own screen and "Crashed" in the race order.
-  - Online, the Room sends every Player's Typos in a row, so others see their cars skid and crash too.
+  - Online, the Room sends every Player's Typos in a row (and when they finished), so others see their cars skid and crash too.
 - **Reduced motion** (the computer's setting): no wobble, spin, slide or tyre marks. A crashed car just stops, with a still "⚠ Stop" tag, and the crash notice doesn't pulse.
 - **Later:** Ghosts (see `CONTEXT.md`), first from earlier Turns in a Match, then from the Leaderboard.
 

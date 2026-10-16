@@ -10,6 +10,11 @@ export function lapsFor(textLength: number): number {
   return Math.max(1, Math.round(textLength / CHARACTERS_PER_LAP));
 }
 
+/** Which lap (from 1) a car `progress` (0–1) of the way through `laps` laps is on. */
+export function lapOf(progress: number, laps: number): number {
+  return Math.min(laps, Math.floor(progress * laps) + 1);
+}
+
 /** The SVG box the whole circuit fits in. */
 export const TRACK_WIDTH = 960;
 export const TRACK_HEIGHT = 500;
@@ -43,7 +48,7 @@ export interface TrackPlace {
 }
 
 /**
- * Where a car `progress` (0–1) of the way through a race of `laps` laps is,
+ * Where a car `progress` (0–1) of the way through a text of `laps` laps is,
  * `offset` units to the right of the centre line. 0 and 1 are both on the
  * start line.
  */

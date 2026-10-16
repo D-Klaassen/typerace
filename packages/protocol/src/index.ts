@@ -117,6 +117,8 @@ export interface RacerView {
   /** Typos since their last correct key (see TypingSession). */
   typosInARow: number;
   finished: boolean;
+  /** When they typed the last character, on the Room's clock; null until then. */
+  finishedAtMs: number | null;
   dropped: boolean;
 }
 
@@ -207,6 +209,7 @@ export function toRoomView(room: Room): RoomView {
         typos: session.typos,
         typosInARow: session.typosInARow,
         finished: session.finished,
+        finishedAtMs: session.finished ? session.lastCorrectAtMs : null,
         dropped,
       })),
     },

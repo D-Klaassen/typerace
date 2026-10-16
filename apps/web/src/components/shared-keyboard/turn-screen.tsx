@@ -8,7 +8,7 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
-import { RacingTrack } from "@/components/racing-theme/racing-track";
+import { RacingTrack, typingCar } from "@/components/racing-theme/racing-track";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
 import { useTyping } from "@/components/typing/use-typing";
@@ -23,6 +23,7 @@ export function TurnScreen({
   text,
   timeBankMs,
   display,
+  seat,
   onComplete,
   onRunOutOfTime,
 }: {
@@ -30,6 +31,8 @@ export function TurnScreen({
   text: string;
   timeBankMs: number | null;
   display: DisplayPreferences;
+  /** The Player's place in the setup, for their Racing Theme car. */
+  seat: number;
   onComplete: (stats: TypingStats) => void;
   onRunOutOfTime?: (stats: TypingStats) => void;
 }) {
@@ -98,14 +101,7 @@ export function TurnScreen({
       {display.racingTheme ? (
         <RacingTrack
           cars={[
-            {
-              id: player,
-              name: player,
-              position: session.position,
-              typosInARow: session.typosInARow,
-              finished: session.finished,
-              you: true,
-            },
+            typingCar(session, { id: player, name: player, isYou: true, seat }),
           ]}
           textLength={text.length}
         />

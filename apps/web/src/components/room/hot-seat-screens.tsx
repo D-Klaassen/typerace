@@ -6,7 +6,7 @@ import {
   TypingAids,
   type DisplayPreferences,
 } from "@/components/finger-guide/finger-guide";
-import { RacingTrack } from "@/components/racing-theme/racing-track";
+import { RacingTrack, typingCar } from "@/components/racing-theme/racing-track";
 import { HotSeatStandings } from "@/components/shared-keyboard/hot-seat-standings";
 import { formatClock } from "@/components/typing/format-clock";
 import { TypingText } from "@/components/typing/typing-text";
@@ -37,6 +37,11 @@ export function OnlineHotSeat({
   const nameOf = (id: string) => nicknames[id] ?? "?";
   // A new key per Turn gives every Turn a fresh typing session.
   const turnKey = `${seat.turnsTaken}-${seat.eliminated.length}`;
+  // The Player's place in the Room gives their car its colour and lane.
+  const carSeat = Math.max(
+    0,
+    seat.players.findIndex((player) => player.name === seat.currentPlayer),
+  );
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
@@ -46,6 +51,7 @@ export function OnlineHotSeat({
             key={turnKey}
             turn={turn}
             you={you}
+            seat={carSeat}
             display={display}
             onKey={onKey}
           />
@@ -55,6 +61,7 @@ export function OnlineHotSeat({
             turn={turn}
             playerId={seat.currentPlayer ?? ""}
             player={nameOf(seat.currentPlayer ?? "")}
+            seat={carSeat}
             clockOffsetMs={clockOffsetMs}
             racingTheme={display.racingTheme}
           />
@@ -67,11 +74,13 @@ export function OnlineHotSeat({
 function MyTurn({
   turn,
   you,
+  seat,
   display,
   onKey,
 }: {
   turn: Turn;
   you: string;
+  seat: number;
   display: DisplayPreferences;
   onKey: (key: string) => void;
 }) {
@@ -91,17 +100,7 @@ function MyTurn({
       />
       {display.racingTheme && (
         <RacingTrack
-          cars={[
-            {
-              id: you,
-              // Shown as "You", like the Online Classic Race.
-              name: "",
-              position: session.position,
-              typosInARow: session.typosInARow,
-              finished: session.finished,
-              you: true,
-            },
-          ]}
+          cars={[typingCar(session, { id: you, name: "", isYou: true, seat })]}
           textLength={turn.text.length}
         />
       )}
@@ -123,12 +122,14 @@ function WatchTurn({
   turn,
   playerId,
   player,
+  seat,
   clockOffsetMs,
   racingTheme,
 }: {
   turn: Turn;
   playerId: string;
   player: string;
+  seat: number;
   clockOffsetMs: number;
   racingTheme: boolean;
 }) {
@@ -148,13 +149,10 @@ function WatchTurn({
       {racingTheme && (
         <RacingTrack
           cars={[
-            {
-              id: playerId,
-              name: player,
-              position: turn.position,
-              typosInARow: turn.typosInARow,
-              finished: turn.position === turn.text.length,
-            },
+            typingCar(
+              { ...turn, finished: turn.position === turn.text.length },
+              { id: playerId, name: player, seat },
+            ),
           ]}
           textLength={turn.text.length}
         />

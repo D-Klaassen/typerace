@@ -223,6 +223,13 @@ A Theme for Classic Race and Hot Seat, Online and on a Shared Keyboard (not Craz
 | Right pinky  | `0` `-` `=` `p` `[` `]` `\` `;` `'` `/`, right Shift |
 | Thumbs       | Space                                                |
 
+## Dark mode
+
+- **Every page is dark.** There is no light mode to stay in, whatever the device's own setting.
+- **The switch:** "Dark mode", in the top-right corner of every page. Switching it off turns the page light, and a car races along the top of the screen, bumps the switch back on, turns around and drives off with its headlights on.
+- **The switch is locked** from the moment it's switched off until the car has gone.
+- **With reduced motion,** there is no car: dark mode just comes back after a moment.
+
 ## Architecture
 
 ```

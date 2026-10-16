@@ -46,7 +46,7 @@ _Avoid_: Theme (when talking about rules), game type
 
 **Theme**:
 The visual look of the game, separate from its rules. Each Mode has its own fixed look, and Classic Race and Hot Seat can also be shown in the Racing Theme.
-_Avoid_: Mode, skin
+_Avoid_: Mode, skin, dark mode (every page is always dark)
 
 **Racing Theme**:
 A Theme for Classic Race and Hot Seat in which each Player's typing drives a car round a race track seen from above. The car is exactly as far along as their typing; a Typo makes it skid, and three Typos in a row make it crash until the right key is pressed. It changes no rules.

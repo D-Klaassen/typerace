@@ -8,14 +8,17 @@ export interface DisplayPreferences {
   fingerGuide: boolean;
   /** The keyboard, with the next key (and Shift) lit up. */
   keyboard: boolean;
+  /** The text still to type, each character in its finger's colour. */
+  coloredText: boolean;
   /** Classic Race and Hot Seat as cars on a circuit (see CONTEXT.md: Racing Theme). */
   racingTheme: boolean;
 }
 
-/** A Player's starting point: the Finger Guide on, the rest off. */
+/** A Player's starting point: only the Finger Guide on. */
 export const DEFAULT_DISPLAY: DisplayPreferences = {
   fingerGuide: true,
   keyboard: false,
+  coloredText: false,
   racingTheme: false,
 };
 
@@ -23,6 +26,7 @@ export const DEFAULT_DISPLAY: DisplayPreferences = {
 export const NO_DISPLAY_AIDS: DisplayPreferences = {
   fingerGuide: false,
   keyboard: false,
+  coloredText: false,
   racingTheme: false,
 };
 

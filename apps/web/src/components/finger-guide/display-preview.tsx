@@ -49,11 +49,17 @@ export function DisplayPreview({ display }: { display: DisplayPreferences }) {
           view="whole"
         />
       )}
-      <TypingText session={{ text: SAMPLE, position, inError: false }} />
+      <TypingText
+        session={{ text: SAMPLE, position, inError: false }}
+        coloredText={display.coloredText}
+      />
       {display.fingerGuide || display.keyboard ? (
         <TypingAids nextChar={SAMPLE[position]} display={display} />
       ) : (
-        <p className="text-sm text-muted-foreground">{t("nothingExtra")}</p>
+        !display.coloredText &&
+        !display.racingTheme && (
+          <p className="text-sm text-muted-foreground">{t("nothingExtra")}</p>
+        )
       )}
     </figure>
   );

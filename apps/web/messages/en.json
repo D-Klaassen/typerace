@@ -48,7 +48,8 @@
         "long": "Long"
       },
       "soloLeaderboardHint": "On your own, a Medium race with Words or Sentences goes on the leaderboard.",
-      "previewFor": "Preview for {name}",
+      "aids": "Display",
+      "aidsHint": "Every Player gets the same Display during their Turns.",
       "nicknameHint": "Nicknames are shown on the leaderboard after a Hot Seat Match or a solo Medium race with Words or Sentences."
     },
     "Handover": {
@@ -187,13 +188,15 @@
     "title": "Your display",
     "hint": "Only you see this. It’s used in every Match, so set it before you start.",
     "keyboard": "On-screen Keyboard",
-    "keyboardFor": "On-screen Keyboard for {name}",
+    "keyboardDescription": "A keyboard below the text that lights up the next key, and the Shift key to hold with it.",
     "fingerGuide": "Finger Guide",
-    "fingerGuideFor": "Finger Guide for {name}",
+    "fingerGuideDescription": "A pair of hands below the text that lights up the finger for the next key.",
+    "coloredText": "Coloured Text",
+    "coloredTextDescription": "Every character still to type is in the colour of the finger that types it.",
     "racingTheme": "Racing Theme",
-    "racingThemeFor": "Racing Theme for {name}",
+    "racingThemeDescription": "Classic Race and Hot Seat as cars racing round a circuit, each exactly as far along as its Player's typing.",
     "preview": "Preview",
-    "nothingExtra": "Just the text: no keyboard or hands while you type.",
+    "nothingExtra": "Just the text: no colours, keyboard or hands while you type.",
     "noAids": "None"
   },
   "KeySet": {

@@ -22,17 +22,17 @@ function parse(raw: string | null): DisplayPreferences {
   }
   try {
     const value = JSON.parse(raw) as Partial<DisplayPreferences>;
-
-    const flag = (key: keyof DisplayPreferences) => {
+    const choice = (key: keyof DisplayPreferences) => {
       const stored = value[key];
 
       return typeof stored === "boolean" ? stored : DEFAULT_DISPLAY[key];
     };
 
     return {
-      fingerGuide: flag("fingerGuide"),
-      keyboard: flag("keyboard"),
-      racingTheme: flag("racingTheme"),
+      fingerGuide: choice("fingerGuide"),
+      keyboard: choice("keyboard"),
+      coloredText: choice("coloredText"),
+      racingTheme: choice("racingTheme"),
     };
   } catch {
     return DEFAULT_DISPLAY;
